@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QA Estimation Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── Print stylesheet ──────────────────────────────────────────────── */
+      @media print {
+        /* Hide all no-print elements */
+        .no-print { display: none !important; }
+
+        /* Ensure body background is white */
+        body { background: white !important; }
+
+        /* Prevent orphaned headings */
+        h1, h2, h3 { page-break-after: avoid; }
+
+        /* Keep table rows together where possible */
+        tr { page-break-inside: avoid; }
+
+        /* Ensure links print with URL (useful for external refs) */
+        a[href]::after { content: none; }
+
+        /* Matrix table: allow horizontal flow, keep cells readable */
+        table { font-size: 10px; }
+
+        /* Remove box shadows for cleaner print output */
+        * { box-shadow: none !important; }
+
+        /* Sticky columns don't work on print — reset */
+        .sticky { position: static !important; }
+
+        /* Ensure full-width layout on print */
+        main { max-width: 100% !important; padding: 0 !important; }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-gray-900 antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
