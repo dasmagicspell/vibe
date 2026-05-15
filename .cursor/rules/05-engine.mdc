@@ -1,0 +1,33 @@
+---
+description: Calculation engine rules and extension patterns
+globs: src/services/CalculationEngine.ts, src/services/CalculationEngine.test.ts, src/utils/modelHelpers.ts
+alwaysApply: false
+---
+
+# Calculation Engine
+
+## Entry point
+`runCalculationEngine(model: TestingModel, project: ProjectSpec): ScheduleOutput`
+Pure function — no mutations, no localStorage, no React.
+
+## Extension pattern for a new test type
+1. Add the enum value to `TestType` in src/types/index.ts
+2. Add it to `ALWAYS_ACTIVE_TEST_TYPES` or `CONDITIONAL_TEST_TYPES`
+3. Add a description to `TEST_TYPE_DESCRIPTIONS`
+4. Add default estimates to `DEFAULT_SCENARIO_ESTIMATES` in modelHelpers.ts
+5. Add test cases to `BASE_TEST_CASES` in testCases.ts
+6. If conditional: add its activation logic to `deriveActiveTestTypes()` in projectHelpers.ts
+7. Add calibration UI to Step3Scenarios (it auto-renders from the enum — verify it appears)
+8. Add a unit test for the activation condition in projectHelpers.test.ts
+
+## Arithmetic helpers (use these, don't inline)
+addEstimates(a, b) | scaleEstimate(e, factor) | sumEstimates(array)
+All round to nearest 0.25 hrs internally.
+
+## Browser scaling
+Only CrossBrowser and ResponsiveMobile use BROWSER_TIER_SCALING.
+All other test types ignore the browser tier in cell computation.
+
+## Extending the summary section
+Add new line items to `deliverableLineItems` in the ScheduleOutput.
+They appear automatically in ScheduleSummary. Update the grand total accumulation loop.

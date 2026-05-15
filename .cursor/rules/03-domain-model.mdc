@@ -1,0 +1,43 @@
+---
+description: Domain concepts, the calculation formula, and key type relationships
+alwaysApply: true
+---
+
+# Domain Model
+
+## Three core types
+- `TestingModel` — engineer's calibration data. Shared across projects via JSON file.
+  Contains: CalibrationEntry[], BrowserCalibrationEntry[], OverheadFactors,
+  DeliverableEstimate[], ExploratoryBlock[].
+- `ProjectSpec` — one client project's intake answers. One JSON file per project.
+- `ScheduleOutput` — computed from Model + Project. Never persisted. Always recomputed.
+
+## The calculation formula
+  CellEstimate = BaseEstimate(testType, complexity) at Standard rigor
+               × RIGOR_MULTIPLIERS[rigorLevel]      (Smoke=0.5, Standard=1.0, Enhanced=1.5, Audit=2.2)
+               × BROWSER_SCALING[browserTier]       (CrossBrowser and Responsive only)
+
+  RetestingEstimate  = ExecutionSubtotal × DEFECT_DENSITY_MULTIPLIERS[density]
+  RegressionEstimate = RetestingEstimate × 0.60
+  CoordOverhead      = ExecutionSubtotal × coordinationFraction
+  ReportOverhead     = ExecutionSubtotal × reportingFraction
+  GrandTotal         = sum of all the above + deliverables
+
+## Certainty levels
+- High   — exact (testType, complexity) base-rate entry found
+- Medium — adjacent complexity entry found and interpolated
+- Low    — no calibration data; cell is zero; flagged for engineer review
+
+## Conditional test types
+`deriveActiveTestTypes()` in projectHelpers.ts determines which test types are active.
+Always call it — never set `selectedTestTypes` manually. It runs automatically inside
+`updateDraft()` in IntakeView whenever any intake field changes.
+
+## CalibrationEntry.pageCategory is optional
+When undefined, the entry is a base rate (applies to all page categories).
+The engine checks for exact (pageCategory, testType, complexity) matches first,
+then falls back to base rates, degrading certainty accordingly.
+
+## E2E automation is a summary line item
+TestType.E2EAutomation is filtered out of the matrix columns.
+It appears in deliverableLineItems in the summary section instead.

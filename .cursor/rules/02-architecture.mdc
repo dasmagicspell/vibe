@@ -1,0 +1,30 @@
+---
+description: File structure, state rules, and where code belongs
+alwaysApply: true
+---
+
+# Architecture Rules
+
+## Where things live
+- `src/types/index.ts` — ALL domain types and enums. Single source of truth.
+  Never define a type anywhere else. Never split into multiple files.
+- `src/utils/` — pure functions only (no React, no DOM, no localStorage)
+- `src/services/` — side effects: StorageService, CalculationEngine, testCases
+- `src/context/AppContext.tsx` — all global state via useReducer
+- `src/components/shared/` — cross-feature UI primitives
+- `src/components/calibration/` — calibration wizard
+- `src/components/intake/` — intake form sections
+- `src/components/schedule/` — matrix, summary, drill-down, scope tab
+- `src/views/` — top-level routed pages (orchestrate components, own section state)
+
+## State rules
+- Global state lives in AppContext only. Dispatch an action; never mutate directly.
+- Local UI state (open/closed, active tab, editing index) stays in the component.
+- Components never call localStorage directly — use StorageService.
+- ScheduleOutput is never persisted. It is always recomputed from model + project.
+
+## Actions available in AppContext
+SET_ROLE | SET_MODEL | CLEAR_MODEL | SET_PROJECT | CLEAR_PROJECT |
+SET_SCHEDULE | CLEAR_SCHEDULE | SET_SCOPE_DOC | MARK_MODEL_CLEAN | MARK_PROJECT_CLEAN
+
+## One component per file. Named exports only.

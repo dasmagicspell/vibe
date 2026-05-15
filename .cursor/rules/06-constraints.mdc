@@ -1,0 +1,31 @@
+---
+description: Hard constraints — things never to add or change
+alwaysApply: true
+---
+
+# Hard Constraints
+
+## Never add
+- A backend, server, or API layer
+- A database (SQLite, Supabase, Firebase, etc.)
+- Authentication or user accounts
+- A state management library (Zustand, Redux, Jotai, etc.)
+- A component library (shadcn/ui, MUI, Radix, Chakra, etc.)
+- A CSS-in-JS library
+- BrowserRouter — the app uses HashRouter and must stay that way
+
+## Never change
+- The routing library (react-router-dom)
+- The build tool (Vite) or the singlefile plugin
+- The test runner (Vitest)
+- The location of domain types (src/types/index.ts is the only place)
+
+## Never do in components
+- Call localStorage directly — use StorageService
+- Persist ScheduleOutput — it is always recomputed
+- Set selectedTestTypes manually — always call deriveActiveTestTypes()
+- Use `as any` or `as unknown as X` without a comment explaining why
+
+## Dependency discipline
+Before adding an npm package, confirm the standard library or existing deps
+don't already cover it. This project intentionally has a small dependency surface.

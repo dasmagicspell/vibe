@@ -1,0 +1,40 @@
+---
+description: Component rules — style, structure, and Tailwind conventions
+globs: src/components/**/*.tsx, src/views/**/*.tsx
+alwaysApply: false
+---
+
+# Component Rules
+
+## Structure
+- Functional components only. No class components.
+- Keep components under ~200 lines. Extract a sub-component rather than growing.
+- One component per file. Named export matching the filename.
+- Sub-components used only within one file can live in the same file, below the main export.
+
+## Props
+- Always type props with an inline `interface Props { ... }` at the top of the file.
+- Use `useCallback` for functions passed as props to child components.
+- Never pass the whole AppState down — pass only the slice the component needs.
+
+## Tailwind
+- Utility classes directly on elements. No custom CSS files.
+- No inline `style={{}}` except for genuinely dynamic values (e.g. computed widths).
+- Use `no-print` class on anything that must not appear in the print stylesheet.
+- Don't write 15-class strings on one element — extract a sub-component.
+- Responsive: lg: prefix for desktop-only layout (sidebar, wide table).
+
+## Forms
+- Never use `<form>` elements — use div + onClick handlers.
+- All number inputs: `type="number"`, `min={0}`, `step={0.25}` for hour fields.
+- All selects: controlled via value + onChange.
+- Labels: always associate with `htmlFor` / `id`.
+
+## Print behaviour
+- The print stylesheet hides `.no-print` elements globally (defined in index.html).
+- Sticky table columns are reset to static on print — account for this in layout.
+- ScheduleView switches content based on `activeTab`; only the visible section prints.
+
+## Shared components available (import from @/components/shared/)
+Tooltip | TimeEstimateInput | SelectField | RadioGroup | CertaintyBadge
+StepNav (from @/components/calibration/StepWizard)

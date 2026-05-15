@@ -1,0 +1,26 @@
+---
+description: Project overview, stack, and deployment model
+alwaysApply: true
+---
+
+# QA Estimation Calculator — Project Overview
+
+Internal tool for A Positive Future. Lets a test engineer calibrate an estimation
+model and an account manager run a client intake to generate a QA schedule.
+
+## Stack
+- React 18 + TypeScript (strict) + Vite + Tailwind CSS
+- Built with vite-plugin-singlefile → one self-contained index.html
+- HashRouter (not BrowserRouter) so file:// URLs work from a Teams folder
+- No backend. No database. No authentication.
+- State: React Context + useReducer (AppContext)
+- Persistence: localStorage (session) + JSON file import/export
+
+## Two roles, three views
+- Engineer → /calibrate (7-step wizard, exports testing-model.json)
+- Account manager → /intake (10-section form) → /schedule (pivot matrix + export)
+
+## File sharing model
+The engineer exports testing-model.json. It lives in a shared Teams folder.
+Account managers import it at the start of each project intake session.
+Projects are saved as project-*.json and can be reloaded the same way.
