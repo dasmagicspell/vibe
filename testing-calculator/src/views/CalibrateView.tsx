@@ -46,7 +46,10 @@ export function CalibrateView() {
   )
   const [activeStep, setActiveStep] = useState(0)
   const [viewedSteps, setViewedSteps] = useState<Set<number>>(new Set())
-  const scrollingRef = useRef(false)
+  /** Target step while smooth-scrolling from a bubble click; suppresses scroll-spy until scroll ends. */
+  const navLockRef = useRef<number | null>(null)
+  const navLockReleaseTimerRef = useRef<number | undefined>(undefined)
+  const scheduleNavLockReleaseRef = useRef<() => void>(() => {})
   const activeStepRef = useRef(0)
 
   const isExistingModel = existingModel !== null
@@ -58,12 +61,12 @@ export function CalibrateView() {
   function scrollToStep(step: number) {
     const el = document.getElementById(CALIBRATE_STEP_ID(step))
     if (!el) return
-    scrollingRef.current = true
-    const top = el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET_PX
-    window.scrollTo({ top, behavior: 'smooth' })
+    navLockRef.current = step
     activeStepRef.current = step
     setActiveStep(step)
-    window.setTimeout(() => { scrollingRef.current = false }, 600)
+    const top = el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET_PX
+    window.scrollTo({ top, behavior: 'smooth' })
+    scheduleNavLockReleaseRef.current()
   }
 
   function handleExport(modelToExport: TestingModel) {
@@ -88,8 +91,21 @@ export function CalibrateView() {
 
     let rafId = 0
 
+    function releaseNavLock() {
+      if (navLockRef.current === null) return
+      navLockRef.current = null
+      syncActiveStepFromScroll()
+    }
+
+    function scheduleNavLockRelease() {
+      if (navLockRef.current === null) return
+      window.clearTimeout(navLockReleaseTimerRef.current)
+      navLockReleaseTimerRef.current = window.setTimeout(releaseNavLock, 150)
+    }
+    scheduleNavLockReleaseRef.current = scheduleNavLockRelease
+
     function syncActiveStepFromScroll() {
-      if (scrollingRef.current) return
+      if (navLockRef.current !== null) return
 
       const tops = sections.map(s => s.getBoundingClientRect().top)
       const index = getActiveSectionIndex(tops, SCROLL_OFFSET_PX)
@@ -102,15 +118,19 @@ export function CalibrateView() {
     function scheduleSync() {
       cancelAnimationFrame(rafId)
       rafId = requestAnimationFrame(syncActiveStepFromScroll)
+      scheduleNavLockRelease()
     }
 
     scheduleSync()
     window.addEventListener('scroll', scheduleSync, { passive: true })
     window.addEventListener('resize', scheduleSync, { passive: true })
+    window.addEventListener('scrollend', releaseNavLock)
     return () => {
       cancelAnimationFrame(rafId)
+      window.clearTimeout(navLockReleaseTimerRef.current)
       window.removeEventListener('scroll', scheduleSync)
       window.removeEventListener('resize', scheduleSync)
+      window.removeEventListener('scrollend', releaseNavLock)
     }
   }, [])
 
