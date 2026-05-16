@@ -4,6 +4,7 @@ import type { TestingModel } from '@/types'
 import { useApp, useModel } from '@/context/AppContext'
 import { StorageService } from '@/services/StorageService'
 import { createDefaultModel } from '@/utils/modelHelpers'
+import { getActiveSectionIndex } from '@/utils/scrollSpy'
 import { StepWizard } from '@/components/calibration/StepWizard'
 import { Step1Profile }      from '@/components/calibration/Step1Profile'
 import { Step2Overhead }     from '@/components/calibration/Step2Overhead'
@@ -43,6 +44,7 @@ export function CalibrateView() {
   const [activeStep, setActiveStep] = useState(0)
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
   const scrollingRef = useRef(false)
+  const activeStepRef = useRef(0)
 
   const isExistingModel = existingModel !== null
 
@@ -64,6 +66,7 @@ export function CalibrateView() {
     scrollingRef.current = true
     const top = el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET_PX
     window.scrollTo({ top, behavior: 'smooth' })
+    activeStepRef.current = step
     setActiveStep(step)
     markStepsCompleteThrough(step)
     window.setTimeout(() => { scrollingRef.current = false }, 600)
@@ -89,27 +92,33 @@ export function CalibrateView() {
 
     if (sections.length === 0) return
 
-    const observer = new IntersectionObserver(
-      entries => {
-        if (scrollingRef.current) return
-        const visible = entries
-          .filter(e => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-        if (visible.length === 0) return
-        const index = sections.indexOf(visible[0].target as HTMLElement)
-        if (index >= 0) {
-          setActiveStep(index)
-          markStepsCompleteThrough(index)
-        }
-      },
-      {
-        rootMargin: `-${SCROLL_OFFSET_PX}px 0px -45% 0px`,
-        threshold: [0, 0.1, 0.25, 0.5],
-      },
-    )
+    let rafId = 0
 
-    sections.forEach(el => observer.observe(el))
-    return () => observer.disconnect()
+    function syncActiveStepFromScroll() {
+      if (scrollingRef.current) return
+
+      const tops = sections.map(s => s.getBoundingClientRect().top)
+      const index = getActiveSectionIndex(tops, SCROLL_OFFSET_PX)
+      if (activeStepRef.current === index) return
+
+      activeStepRef.current = index
+      setActiveStep(index)
+      markStepsCompleteThrough(index)
+    }
+
+    function scheduleSync() {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(syncActiveStepFromScroll)
+    }
+
+    scheduleSync()
+    window.addEventListener('scroll', scheduleSync, { passive: true })
+    window.addEventListener('resize', scheduleSync, { passive: true })
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('scroll', scheduleSync)
+      window.removeEventListener('resize', scheduleSync)
+    }
   }, [])
 
   const steps = STEP_LABELS.map((label, i) => ({
