@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useApp, useModel } from '@/context/AppContext'
 import { StorageService } from '@/services/StorageService'
+import { getAppBuildDate, getAppVersion } from '@/utils/appMeta'
 import type { AppRole } from '@/types'
 
 export function HomeView() {
@@ -103,6 +104,8 @@ export function HomeView() {
 
         <p className="text-center text-xs text-gray-400 mt-8">
           A Positive Future · Internal tool · All data stays on your device
+          <br />
+          v{getAppVersion()} · Built {getAppBuildDate()}
         </p>
       </div>
     </main>
