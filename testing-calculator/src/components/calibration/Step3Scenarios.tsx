@@ -9,8 +9,8 @@ import { StepNav } from './StepWizard'
 interface Step3Props {
   entries: CalibrationEntry[]
   onChange: (entries: CalibrationEntry[]) => void
-  onBack: () => void
-  onNext: () => void
+  onBack?: () => void
+  onNext?: () => void
 }
 
 const COMPLEXITY_LEVELS = [ComplexityLevel.Low, ComplexityLevel.Medium, ComplexityLevel.High] as const
@@ -143,7 +143,7 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
         ))}
       </div>
 
-      <StepNav onBack={onBack} onNext={onNext} />
+      {(onBack || onNext) && <StepNav onBack={onBack} onNext={onNext} />}
     </div>
   )
 }

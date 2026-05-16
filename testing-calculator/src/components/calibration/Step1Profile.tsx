@@ -9,7 +9,7 @@ interface ProfileData {
 interface Step1Props {
   data: ProfileData
   onChange: (data: ProfileData) => void
-  onNext: () => void
+  onNext?: () => void
 }
 
 export function Step1Profile({ data, onChange, onNext }: Step1Props) {
@@ -82,10 +82,12 @@ export function Step1Profile({ data, onChange, onNext }: Step1Props) {
         </div>
       </div>
 
-      <StepNav
-        onNext={onNext}
-        nextDisabled={!isValid}
-      />
+      {onNext && (
+        <StepNav
+          onNext={onNext}
+          nextDisabled={!isValid}
+        />
+      )}
     </div>
   )
 }

@@ -7,8 +7,8 @@ import { StepNav } from './StepWizard'
 interface Step4Props {
   data: BrowserCalibrationEntry[]
   onChange: (data: BrowserCalibrationEntry[]) => void
-  onBack: () => void
-  onNext: () => void
+  onBack?: () => void
+  onNext?: () => void
 }
 
 const TIERS = [BrowserTier.Basic, BrowserTier.Standard, BrowserTier.Enhanced, BrowserTier.Custom]
@@ -73,7 +73,7 @@ export function Step4Browser({ data, onChange, onBack, onNext }: Step4Props) {
         starting point — it should be adjusted per project in those cases.
       </div>
 
-      <StepNav onBack={onBack} onNext={onNext} />
+      {(onBack || onNext) && <StepNav onBack={onBack} onNext={onNext} />}
     </div>
   )
 }

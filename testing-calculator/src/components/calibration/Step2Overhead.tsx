@@ -6,8 +6,8 @@ import { StepNav } from './StepWizard'
 interface Step2Props {
   data: OverheadFactors
   onChange: (data: OverheadFactors) => void
-  onBack: () => void
-  onNext: () => void
+  onBack?: () => void
+  onNext?: () => void
 }
 
 const DENSITY_OPTIONS = [
@@ -149,7 +149,7 @@ export function Step2Overhead({ data, onChange, onBack, onNext }: Step2Props) {
         </div>
       </div>
 
-      <StepNav onBack={onBack} onNext={onNext} />
+      {(onBack || onNext) && <StepNav onBack={onBack} onNext={onNext} />}
     </div>
   )
 }

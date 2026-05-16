@@ -13,8 +13,7 @@ interface StepWizardProps {
 
 /**
  * Horizontal step progress bar used at the top of the calibration wizard.
- * Shows step labels, completion indicators, and the active step.
- * Completed steps are clickable (to go back and edit).
+ * Stays visible while scrolling; each bubble scrolls to its section on click.
  */
 export function StepWizard({ steps, currentStep, onNavigate }: StepWizardProps) {
   return (
@@ -22,8 +21,7 @@ export function StepWizard({ steps, currentStep, onNavigate }: StepWizardProps) 
       <ol className="flex items-center w-full">
         {steps.map((step, index) => {
           const isActive   = index === currentStep
-          const isComplete = step.isComplete && index < currentStep
-          const isClickable = isComplete
+          const isComplete = step.isComplete
           const isLast = index === steps.length - 1
 
           return (
@@ -34,12 +32,8 @@ export function StepWizard({ steps, currentStep, onNavigate }: StepWizardProps) 
               {/* Step indicator + label */}
               <button
                 type="button"
-                disabled={!isClickable && !isActive}
-                onClick={() => isClickable ? onNavigate(index) : undefined}
-                className={`
-                  flex flex-col items-center gap-1 group
-                  ${isClickable ? 'cursor-pointer' : 'cursor-default'}
-                `}
+                onClick={() => onNavigate(index)}
+                className="flex flex-col items-center gap-1 group cursor-pointer"
                 aria-current={isActive ? 'step' : undefined}
               >
                 {/* Circle */}
@@ -122,6 +116,8 @@ export function StepNav({
   nextDisabled = false,
   isLastStep = false,
 }: StepNavProps) {
+  if (!onBack && !onNext) return null
+
   return (
     <div className="flex items-center justify-between pt-6 mt-6 border-t border-gray-200">
       <div>

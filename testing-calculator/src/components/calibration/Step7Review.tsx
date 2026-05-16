@@ -6,7 +6,7 @@ import { StepNav } from './StepWizard'
 interface Step7Props {
   model: TestingModel
   isExistingModel: boolean   // true if we're updating an existing model
-  onBack: () => void
+  onBack?: () => void
   onExport: (model: TestingModel) => void   // save + export
   onSaveOnly: (model: TestingModel) => void // save to session without exporting
 }
@@ -169,7 +169,7 @@ export function Step7Review({ model, isExistingModel, onBack, onExport, onSaveOn
         </button>
       </div>
 
-      <StepNav onBack={onBack} />
+      {onBack && <StepNav onBack={onBack} />}
     </div>
   )
 }

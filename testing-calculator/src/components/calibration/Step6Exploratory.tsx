@@ -5,8 +5,8 @@ import { StepNav } from './StepWizard'
 interface Step6Props {
   data: ExploratoryBlock[]
   onChange: (data: ExploratoryBlock[]) => void
-  onBack: () => void
-  onNext: () => void
+  onBack?: () => void
+  onNext?: () => void
 }
 
 export function Step6Exploratory({ data, onChange, onBack, onNext }: Step6Props) {
@@ -115,7 +115,9 @@ export function Step6Exploratory({ data, onChange, onBack, onNext }: Step6Props)
         Add exploratory block
       </button>
 
-      <StepNav onBack={onBack} onNext={onNext} nextLabel="Review model" />
+      {(onBack || onNext) && (
+        <StepNav onBack={onBack} onNext={onNext} nextLabel="Review model" />
+      )}
     </div>
   )
 }

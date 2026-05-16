@@ -6,8 +6,8 @@ import { StepNav } from './StepWizard'
 interface Step5Props {
   data: DeliverableEstimate[]
   onChange: (data: DeliverableEstimate[]) => void
-  onBack: () => void
-  onNext: () => void
+  onBack?: () => void
+  onNext?: () => void
 }
 
 const DELIVERABLE_DESCRIPTIONS: Record<DeliverableType, string> = {
@@ -86,7 +86,7 @@ export function Step5Deliverables({ data, onChange, onBack, onNext }: Step5Props
         ))}
       </div>
 
-      <StepNav onBack={onBack} onNext={onNext} />
+      {(onBack || onNext) && <StepNav onBack={onBack} onNext={onNext} />}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { TestingModel } from '@/types'
 import { useApp, useModel } from '@/context/AppContext'
@@ -17,6 +17,21 @@ const STEP_LABELS = [
   'Profile', 'Overhead', 'Scenarios', 'Browser', 'Deliverables', 'Exploratory', 'Review',
 ]
 
+export const CALIBRATE_STEP_ID = (index: number) => `calibrate-step-${index}`
+
+/** Sticky nav bar (h-14) + step wizard — used for scroll offset and intersection root margin */
+const SCROLL_OFFSET_PX = 176
+
+function StepSeparator() {
+  return (
+    <>
+      <div className="my-10" aria-hidden="true" />
+      <hr className="border-gray-200" />
+      <div className="my-10" aria-hidden="true" />
+    </>
+  )
+}
+
 export function CalibrateView() {
   const { dispatch } = useApp()
   const existingModel = useModel()
@@ -25,8 +40,9 @@ export function CalibrateView() {
   const [draft, setDraft] = useState<TestingModel>(() =>
     existingModel ? { ...existingModel } : createDefaultModel()
   )
-  const [currentStep, setCurrentStep] = useState(0)
+  const [activeStep, setActiveStep] = useState(0)
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
+  const scrollingRef = useRef(false)
 
   const isExistingModel = existingModel !== null
 
@@ -34,25 +50,23 @@ export function CalibrateView() {
     setDraft(prev => ({ ...prev, ...updates }))
   }, [])
 
-  function markComplete(step: number) {
-    setCompletedSteps(prev => new Set(prev).add(step))
+  function markStepsCompleteThrough(step: number) {
+    setCompletedSteps(prev => {
+      const next = new Set(prev)
+      for (let i = 0; i < step; i++) next.add(i)
+      return next
+    })
   }
 
-  function advance() {
-    dispatch({ type: 'SET_MODEL', model: draft })
-    markComplete(currentStep)
-    setCurrentStep(s => s + 1)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  function goBack() {
-    setCurrentStep(s => s - 1)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  function jumpTo(step: number) {
-    setCurrentStep(step)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+  function scrollToStep(step: number) {
+    const el = document.getElementById(CALIBRATE_STEP_ID(step))
+    if (!el) return
+    scrollingRef.current = true
+    const top = el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET_PX
+    window.scrollTo({ top, behavior: 'smooth' })
+    setActiveStep(step)
+    markStepsCompleteThrough(step)
+    window.setTimeout(() => { scrollingRef.current = false }, 600)
   }
 
   function handleExport(modelToExport: TestingModel) {
@@ -66,6 +80,37 @@ export function CalibrateView() {
     dispatch({ type: 'MARK_MODEL_CLEAN' })
     navigate('/')
   }
+
+  // Track which section is in view for the sticky step indicator
+  useEffect(() => {
+    const sections = STEP_LABELS.map((_, i) =>
+      document.getElementById(CALIBRATE_STEP_ID(i))
+    ).filter((el): el is HTMLElement => el !== null)
+
+    if (sections.length === 0) return
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (scrollingRef.current) return
+        const visible = entries
+          .filter(e => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+        if (visible.length === 0) return
+        const index = sections.indexOf(visible[0].target as HTMLElement)
+        if (index >= 0) {
+          setActiveStep(index)
+          markStepsCompleteThrough(index)
+        }
+      },
+      {
+        rootMargin: `-${SCROLL_OFFSET_PX}px 0px -45% 0px`,
+        threshold: [0, 0.1, 0.25, 0.5],
+      },
+    )
+
+    sections.forEach(el => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
 
   const steps = STEP_LABELS.map((label, i) => ({
     label,
@@ -86,67 +131,104 @@ export function CalibrateView() {
         </div>
       </div>
 
-      <div className="mb-8">
-        <StepWizard steps={steps} currentStep={currentStep} onNavigate={jumpTo} />
+      <div
+        className="
+          sticky top-14 z-30 -mx-4 px-4 py-4 mb-2
+          bg-gray-50/95 backdrop-blur-sm border-b border-gray-200
+        "
+      >
+        <StepWizard
+          steps={steps}
+          currentStep={activeStep}
+          onNavigate={scrollToStep}
+        />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        {currentStep === 0 && (
+      <div>
+        <section
+          id={CALIBRATE_STEP_ID(0)}
+          className="scroll-mt-44 bg-white rounded-xl border border-gray-200 p-6"
+        >
           <Step1Profile
             data={{ engineerName: draft.engineerName, version: draft.version, notes: draft.notes ?? '' }}
             onChange={({ engineerName, version, notes }) => updateDraft({ engineerName, version, notes })}
-            onNext={advance}
           />
-        )}
-        {currentStep === 1 && (
+        </section>
+
+        <StepSeparator />
+
+        <section
+          id={CALIBRATE_STEP_ID(1)}
+          className="scroll-mt-44 bg-white rounded-xl border border-gray-200 p-6"
+        >
           <Step2Overhead
             data={draft.overheadFactors}
             onChange={overheadFactors => updateDraft({ overheadFactors })}
-            onBack={goBack} onNext={advance}
           />
-        )}
-        {currentStep === 2 && (
+        </section>
+
+        <StepSeparator />
+
+        <section
+          id={CALIBRATE_STEP_ID(2)}
+          className="scroll-mt-44 bg-white rounded-xl border border-gray-200 p-6"
+        >
           <Step3Scenarios
             entries={draft.entries}
             onChange={entries => updateDraft({ entries })}
-            onBack={goBack} onNext={advance}
           />
-        )}
-        {currentStep === 3 && (
+        </section>
+
+        <StepSeparator />
+
+        <section
+          id={CALIBRATE_STEP_ID(3)}
+          className="scroll-mt-44 bg-white rounded-xl border border-gray-200 p-6"
+        >
           <Step4Browser
             data={draft.browserCalibration}
             onChange={browserCalibration => updateDraft({ browserCalibration })}
-            onBack={goBack} onNext={advance}
           />
-        )}
-        {currentStep === 4 && (
+        </section>
+
+        <StepSeparator />
+
+        <section
+          id={CALIBRATE_STEP_ID(4)}
+          className="scroll-mt-44 bg-white rounded-xl border border-gray-200 p-6"
+        >
           <Step5Deliverables
             data={draft.deliverableEstimates}
             onChange={deliverableEstimates => updateDraft({ deliverableEstimates })}
-            onBack={goBack} onNext={advance}
           />
-        )}
-        {currentStep === 5 && (
+        </section>
+
+        <StepSeparator />
+
+        <section
+          id={CALIBRATE_STEP_ID(5)}
+          className="scroll-mt-44 bg-white rounded-xl border border-gray-200 p-6"
+        >
           <Step6Exploratory
             data={draft.exploratoryBlocks}
             onChange={exploratoryBlocks => updateDraft({ exploratoryBlocks })}
-            onBack={goBack} onNext={advance}
           />
-        )}
-        {currentStep === 6 && (
+        </section>
+
+        <StepSeparator />
+
+        <section
+          id={CALIBRATE_STEP_ID(6)}
+          className="scroll-mt-44 bg-white rounded-xl border border-gray-200 p-6"
+        >
           <Step7Review
             model={draft}
             isExistingModel={isExistingModel}
-            onBack={goBack}
             onExport={handleExport}
             onSaveOnly={handleSaveOnly}
           />
-        )}
+        </section>
       </div>
-
-      <p className="text-center text-xs text-gray-400 mt-4">
-        Step {currentStep + 1} of {STEP_LABELS.length}
-      </p>
     </main>
   )
 }
