@@ -61,7 +61,7 @@ export function HomeView() {
                 onClick={() => dispatch({ type: 'CLEAR_MODEL' })}
                 className="text-xs text-green-700 hover:text-green-900 underline"
               >
-                Remove
+                Unload
               </button>
             </div>
           </div>
