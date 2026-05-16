@@ -112,17 +112,6 @@ export function NavBar() {
                 Import model
               </button>
             )}
-
-            {/* Role badge */}
-            {role && (
-              <button
-                onClick={() => dispatch({ type: 'SET_ROLE', role: null })}
-                className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors capitalize"
-                title="Click to switch role"
-              >
-                {role === 'engineer' ? '🔧 Engineer' : '📋 Account manager'}
-              </button>
-            )}
           </div>
         </div>
       </div>
