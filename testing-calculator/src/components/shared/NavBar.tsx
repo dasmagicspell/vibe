@@ -51,10 +51,6 @@ export function NavBar() {
     }
   }
 
-  function handleExportModel() {
-    if (model) StorageService.exportModelToFile(model)
-  }
-
   return (
     <nav className="no-print bg-white border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-screen-xl mx-auto px-4">
@@ -97,14 +93,6 @@ export function NavBar() {
                 </span>
                 {state.modelDirty && (
                   <span className="text-xs text-amber-600 font-medium">● unsaved</span>
-                )}
-                {role === 'engineer' && (
-                  <button
-                    onClick={handleExportModel}
-                    className="text-xs px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
-                  >
-                    Export model
-                  </button>
                 )}
                 {role === 'manager' && (
                   <button
