@@ -5,7 +5,14 @@
 // =============================================================================
 
 import type { TestingModel, CalibrationEntry, TimeEstimate, BrowserCalibrationEntry, DeliverableEstimate, ExploratoryBlock } from '@/types'
-import { TestType, ComplexityLevel, BrowserTier, DeliverableType, DefectDensity } from '@/types'
+import {
+  TestType,
+  ComplexityLevel,
+  BrowserTier,
+  DeliverableType,
+  DefectDensity,
+  ALWAYS_ACTIVE_TEST_TYPES,
+} from '@/types'
 
 // ---------------------------------------------------------------------------
 // ID generation
@@ -251,6 +258,18 @@ export function upsertBaseRateEntry(
 // Validation
 // ---------------------------------------------------------------------------
 
+const COMPLEXITY_LEVELS = [ComplexityLevel.Low, ComplexityLevel.Medium, ComplexityLevel.High] as const
+
+/** All three hour fields are present (non-zero). */
+export function isTimeEstimateFilled(estimate: TimeEstimate): boolean {
+  return estimate.minHours > 0 && estimate.expectedHours > 0 && estimate.maxHours > 0
+}
+
+export function isTimeEstimateRangeValid(estimate: TimeEstimate): boolean {
+  return estimate.minHours <= estimate.expectedHours &&
+         estimate.expectedHours <= estimate.maxHours
+}
+
 export interface ModelValidationResult {
   isValid: boolean
   errors: string[]
@@ -299,6 +318,56 @@ export function validateModel(model: TestingModel): ModelValidationResult {
     errors,
     warnings,
   }
+}
+
+/** True when a calibration wizard step is missing required data or has invalid values. */
+export function calibrationStepHasError(stepIndex: number, model: TestingModel): boolean {
+  switch (stepIndex) {
+    case 0:
+      return !model.engineerName.trim() || !model.version.trim()
+
+    case 1:
+      return model.overheadFactors.coordinationFraction < 0 ||
+             model.overheadFactors.coordinationFraction > 1 ||
+             model.overheadFactors.reportingFraction < 0 ||
+             model.overheadFactors.reportingFraction > 1
+
+    case 2: {
+      if (model.entries.length === 0) return true
+      if (model.entries.some(e => !isTimeEstimateRangeValid(e.baseEstimate))) return true
+      return ALWAYS_ACTIVE_TEST_TYPES.some(testType =>
+        COMPLEXITY_LEVELS.some(complexity => {
+          const entry = findBaseRateEntry(model.entries, testType, complexity)
+          return !entry || !isTimeEstimateFilled(entry.baseEstimate)
+        }),
+      )
+    }
+
+    case 3:
+      return model.browserCalibration.some(
+        b => !isTimeEstimateFilled(b.estimatePerPage) || !isTimeEstimateRangeValid(b.estimatePerPage),
+      )
+
+    case 4:
+      return model.deliverableEstimates.some(
+        d => !isTimeEstimateFilled(d.estimate) || !isTimeEstimateRangeValid(d.estimate),
+      )
+
+    case 5:
+      if (model.exploratoryBlocks.length === 0) return true
+      return model.exploratoryBlocks.some(b => !b.label.trim() || b.hours <= 0)
+
+    case 6:
+      return !validateModel(model).isValid
+
+    default:
+      return false
+  }
+}
+
+/** Per-step error flags for the calibration wizard bubbles (indices 0–6). */
+export function getCalibrationStepErrors(model: TestingModel): boolean[] {
+  return Array.from({ length: 7 }, (_, i) => calibrationStepHasError(i, model))
 }
 
 // ---------------------------------------------------------------------------

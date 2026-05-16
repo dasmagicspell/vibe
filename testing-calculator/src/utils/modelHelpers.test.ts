@@ -5,6 +5,8 @@ import {
   findBaseRateEntry,
   upsertBaseRateEntry,
   validateModel,
+  calibrationStepHasError,
+  getCalibrationStepErrors,
   formatHours,
   formatRange,
   bumpModelVersion,
@@ -159,6 +161,51 @@ describe('validateModel', () => {
     const result = validateModel(model)
     expect(result.isValid).toBe(false)
     expect(result.errors.some(e => e.includes('min > expected'))).toBe(true)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// calibrationStepHasError
+// ---------------------------------------------------------------------------
+
+describe('calibrationStepHasError', () => {
+  it('flags profile step when engineer name or version is empty', () => {
+    const model = createDefaultModel()
+    expect(calibrationStepHasError(0, model)).toBe(true)
+
+    model.engineerName = 'Jane Tester'
+    model.version = ''
+    expect(calibrationStepHasError(0, model)).toBe(true)
+
+    model.version = '1.0.0'
+    expect(calibrationStepHasError(0, model)).toBe(false)
+  })
+
+  it('flags scenarios step when a standard type estimate is cleared', () => {
+    const model = { ...createDefaultModel(), engineerName: 'Jane Tester' }
+    expect(calibrationStepHasError(2, model)).toBe(false)
+
+    const entry = findBaseRateEntry(model.entries, TestType.Functional, ComplexityLevel.Low)!
+    entry.baseEstimate = { minHours: 0, expectedHours: 0, maxHours: 0 }
+    expect(calibrationStepHasError(2, model)).toBe(true)
+  })
+
+  it('flags exploratory step when blocks are empty or incomplete', () => {
+    const model = { ...createDefaultModel(), engineerName: 'Jane Tester' }
+    expect(calibrationStepHasError(5, model)).toBe(false)
+
+    model.exploratoryBlocks = [{ label: '', hours: 0 }]
+    expect(calibrationStepHasError(5, model)).toBe(true)
+
+    model.exploratoryBlocks = []
+    expect(calibrationStepHasError(5, model)).toBe(true)
+  })
+
+  it('getCalibrationStepErrors returns seven flags', () => {
+    const errors = getCalibrationStepErrors(createDefaultModel())
+    expect(errors).toHaveLength(7)
+    expect(errors[0]).toBe(true)
+    expect(errors.slice(1, 6).every(Boolean)).toBe(false)
   })
 })
 

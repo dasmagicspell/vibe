@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { TestingModel } from '@/types'
 import { useApp, useModel } from '@/context/AppContext'
 import { StorageService } from '@/services/StorageService'
-import { createDefaultModel } from '@/utils/modelHelpers'
+import { createDefaultModel, getCalibrationStepErrors } from '@/utils/modelHelpers'
 import { getActiveSectionIndex } from '@/utils/scrollSpy'
 import { StepWizard } from '@/components/calibration/StepWizard'
 import { Step1Profile }      from '@/components/calibration/Step1Profile'
@@ -22,6 +22,9 @@ export const CALIBRATE_STEP_ID = (index: number) => `calibrate-step-${index}`
 
 /** Sticky nav bar (h-14) + step wizard — used for scroll offset and intersection root margin */
 const SCROLL_OFFSET_PX = 176
+
+/** Step bubbles stay gray until the user dwells on that section for this long. */
+const STEP_VIEW_DWELL_MS = 1000
 
 function StepSeparator() {
   return (
@@ -42,7 +45,7 @@ export function CalibrateView() {
     existingModel ? { ...existingModel } : createDefaultModel()
   )
   const [activeStep, setActiveStep] = useState(0)
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
+  const [viewedSteps, setViewedSteps] = useState<Set<number>>(new Set())
   const scrollingRef = useRef(false)
   const activeStepRef = useRef(0)
 
@@ -52,14 +55,6 @@ export function CalibrateView() {
     setDraft(prev => ({ ...prev, ...updates }))
   }, [])
 
-  function markStepsCompleteThrough(step: number) {
-    setCompletedSteps(prev => {
-      const next = new Set(prev)
-      for (let i = 0; i < step; i++) next.add(i)
-      return next
-    })
-  }
-
   function scrollToStep(step: number) {
     const el = document.getElementById(CALIBRATE_STEP_ID(step))
     if (!el) return
@@ -68,7 +63,6 @@ export function CalibrateView() {
     window.scrollTo({ top, behavior: 'smooth' })
     activeStepRef.current = step
     setActiveStep(step)
-    markStepsCompleteThrough(step)
     window.setTimeout(() => { scrollingRef.current = false }, 600)
   }
 
@@ -103,7 +97,6 @@ export function CalibrateView() {
 
       activeStepRef.current = index
       setActiveStep(index)
-      markStepsCompleteThrough(index)
     }
 
     function scheduleSync() {
@@ -121,9 +114,28 @@ export function CalibrateView() {
     }
   }, [])
 
+  // Mark a step as viewed only after the user dwells on it (scroll or click).
+  useEffect(() => {
+    const step = activeStep
+    const timer = window.setTimeout(() => {
+      if (activeStepRef.current !== step) return
+      setViewedSteps(prev => {
+        if (prev.has(step)) return prev
+        const next = new Set(prev)
+        next.add(step)
+        return next
+      })
+    }, STEP_VIEW_DWELL_MS)
+
+    return () => clearTimeout(timer)
+  }, [activeStep])
+
+  const stepErrors = getCalibrationStepErrors(draft)
+
   const steps = STEP_LABELS.map((label, i) => ({
     label,
-    isComplete: completedSteps.has(i),
+    isComplete: viewedSteps.has(i),
+    hasError: stepErrors[i],
   }))
 
   return (

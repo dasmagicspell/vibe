@@ -28,6 +28,7 @@ export function StepWizard({ steps, currentStep, onNavigate }: StepWizardProps) 
         {steps.map((step, index) => {
           const isActive   = index === currentStep
           const isComplete = step.isComplete
+          const hasError   = step.hasError ?? false
           const isLast = index === steps.length - 1
 
           return (
@@ -45,12 +46,14 @@ export function StepWizard({ steps, currentStep, onNavigate }: StepWizardProps) 
                   className={`
                     flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold
                     transition-colors ring-2 ring-offset-1 ring-offset-gray-50
-                    ${isActive
-                      ? 'bg-brand-600 text-white ring-brand-600'
-                      : isComplete
-                        ? 'bg-brand-100 text-brand-700 ring-brand-200 group-hover:bg-brand-200'
-                        : step.hasError
-                          ? 'bg-red-100 text-red-700 ring-red-200'
+                    ${hasError
+                      ? isActive
+                        ? 'bg-brand-600 text-white ring-red-500'
+                        : 'bg-red-100 text-red-700 ring-red-500 group-hover:bg-red-200'
+                      : isActive
+                        ? 'bg-brand-600 text-white ring-brand-600'
+                        : isComplete
+                          ? 'bg-brand-100 text-brand-700 ring-brand-200 group-hover:bg-brand-200'
                           : 'bg-gray-100 text-gray-400 ring-gray-200'}
                   `}
                 >
@@ -62,9 +65,9 @@ export function StepWizard({ steps, currentStep, onNavigate }: StepWizardProps) 
               <span
                 className={`
                   hidden sm:block mt-1 text-xs font-medium text-center leading-tight max-w-16
-                  ${isActive    ? 'text-brand-700' :
+                  ${hasError    ? 'text-red-600' :
+                    isActive    ? 'text-brand-700' :
                     isComplete  ? 'text-brand-600' :
-                    step.hasError ? 'text-red-600' :
                     'text-gray-400'}
                 `}
               >
