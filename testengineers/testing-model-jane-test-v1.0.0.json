@@ -1,0 +1,634 @@
+{
+  "version": "1.0.0",
+  "engineerName": "Jane Test",
+  "calibratedAt": "2026-05-16T17:10:05.708Z",
+  "entries": [
+    {
+      "id": "4c2cd0f9-b021-4045-b3ed-8a0c9131494e",
+      "testType": "Functional (manual)",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      }
+    },
+    {
+      "id": "6ba9ff1c-a665-4329-ba22-0dd80663073a",
+      "testType": "Functional (manual)",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      }
+    },
+    {
+      "id": "2ac645e9-e041-45a6-9b12-e12583f1b700",
+      "testType": "Functional (manual)",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2.5,
+        "expectedHours": 4,
+        "maxHours": 7
+      }
+    },
+    {
+      "id": "e749d0ce-b5c6-4c7d-8a18-7a813eba99df",
+      "testType": "UI / Layout",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.15,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      }
+    },
+    {
+      "id": "384fbb09-fae7-417e-bdce-1cfba465cf31",
+      "testType": "UI / Layout",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 0.75,
+        "maxHours": 1.25
+      }
+    },
+    {
+      "id": "583a6171-9ff3-430e-a8a4-dd8fa024efa2",
+      "testType": "UI / Layout",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.75,
+        "expectedHours": 1.5,
+        "maxHours": 2.5
+      }
+    },
+    {
+      "id": "78df5adf-ab12-4809-8615-39e3c4fd1c00",
+      "testType": "Content review",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.1,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      }
+    },
+    {
+      "id": "3488ea84-e422-4203-8a50-35131632628b",
+      "testType": "Content review",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      }
+    },
+    {
+      "id": "10ba4544-9f7c-4468-95ad-f7b231be92c3",
+      "testType": "Content review",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.5
+      }
+    },
+    {
+      "id": "11beed63-44c7-484a-82f5-ab05233bbbfa",
+      "testType": "Link validation",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.1,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      }
+    },
+    {
+      "id": "38f85558-e507-4129-81ad-67fd4f90570b",
+      "testType": "Link validation",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      }
+    },
+    {
+      "id": "d602bf09-f83a-4384-96b4-b8bd57e0c215",
+      "testType": "Link validation",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 0.75,
+        "maxHours": 1.25
+      }
+    },
+    {
+      "id": "5f8ee046-57a6-4b05-8607-6f1fc568fd2b",
+      "testType": "Form validation",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      }
+    },
+    {
+      "id": "d30467fd-c10d-4adb-89c1-6b4481bf878c",
+      "testType": "Form validation",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.75
+      }
+    },
+    {
+      "id": "c77e2e5c-31f4-4559-89db-2aadf3d1c4e6",
+      "testType": "Form validation",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      }
+    },
+    {
+      "id": "16766e8c-5bc0-44d6-8fc6-38b543d2ba0a",
+      "testType": "Role / Permission",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      }
+    },
+    {
+      "id": "569ac914-0994-49ba-a7bb-71be68ec533e",
+      "testType": "Role / Permission",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.75,
+        "expectedHours": 1.5,
+        "maxHours": 2.5
+      }
+    },
+    {
+      "id": "349bae6f-2bff-432d-a534-01cb28ebb116",
+      "testType": "Role / Permission",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1.5,
+        "expectedHours": 3,
+        "maxHours": 5
+      }
+    },
+    {
+      "id": "6688f628-f48d-4aa8-b5b1-3036ea936c52",
+      "testType": "Cross-browser",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      }
+    },
+    {
+      "id": "9c2a4865-2635-4c76-82a2-c001ac40c4cb",
+      "testType": "Cross-browser",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.5
+      }
+    },
+    {
+      "id": "29093b92-803f-4739-ab3c-8f3006e85c03",
+      "testType": "Cross-browser",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3
+      }
+    },
+    {
+      "id": "4fb124ed-5471-418f-855f-1c8177ecc6a5",
+      "testType": "Responsive / Mobile",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      }
+    },
+    {
+      "id": "a4a7cdb3-97dc-4e33-af32-7a27ee61a6d1",
+      "testType": "Responsive / Mobile",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.5
+      }
+    },
+    {
+      "id": "9cc91c4e-30e4-4f10-9fd0-0fa93296a1dd",
+      "testType": "Responsive / Mobile",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3
+      }
+    },
+    {
+      "id": "8d421e89-0a0e-4bf7-8d69-523b8ac821d5",
+      "testType": "Accessibility (WCAG)",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      }
+    },
+    {
+      "id": "7a88988e-d424-452d-bd06-c00243f494f2",
+      "testType": "Accessibility (WCAG)",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      }
+    },
+    {
+      "id": "63295455-d06f-4353-8985-b6e411958058",
+      "testType": "Accessibility (WCAG)",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 6
+      }
+    },
+    {
+      "id": "0e1d8f09-6908-48b5-93cc-956b6aaf8228",
+      "testType": "Performance (basic)",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.1,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      }
+    },
+    {
+      "id": "34d1d1b4-34ff-4add-9c9a-0e3320056727",
+      "testType": "Performance (basic)",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      }
+    },
+    {
+      "id": "311b0dc7-1449-4427-b2ca-875aeb156bd0",
+      "testType": "Performance (basic)",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.5
+      }
+    },
+    {
+      "id": "18bb2d9f-e86f-432a-bfc5-13137255d62d",
+      "testType": "SEO / Meta",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.1,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      }
+    },
+    {
+      "id": "feee4a0f-9184-4df9-b56b-26011ec21592",
+      "testType": "SEO / Meta",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      }
+    },
+    {
+      "id": "2e45f30b-41d8-4a2c-bf10-d318a7c2d91a",
+      "testType": "SEO / Meta",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 0.75,
+        "maxHours": 1.25
+      }
+    },
+    {
+      "id": "61697b51-b7de-4c00-a2e5-1be50d1443ec",
+      "testType": "Security / Privacy",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      }
+    },
+    {
+      "id": "76d35656-7738-43b9-8f29-035460e6714c",
+      "testType": "Security / Privacy",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.75
+      }
+    },
+    {
+      "id": "aa780c02-7045-441f-85b5-152babeab561",
+      "testType": "Security / Privacy",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      }
+    },
+    {
+      "id": "f85d5b62-05fd-4cfa-abb0-df1e6678d94a",
+      "testType": "Analytics and tag",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      }
+    },
+    {
+      "id": "6018d443-a684-40e0-8165-8421b1101011",
+      "testType": "Analytics and tag",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 2
+      }
+    },
+    {
+      "id": "5575e298-e8c7-4f3b-85a8-39ca2101578c",
+      "testType": "Analytics and tag",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      }
+    },
+    {
+      "id": "c2103996-817a-43b0-89c9-481645646ab5",
+      "testType": "CMS / Admin",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      }
+    },
+    {
+      "id": "49ac6523-b674-4691-8b22-b5654b804a94",
+      "testType": "CMS / Admin",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      }
+    },
+    {
+      "id": "f531b93e-cc6c-43c7-a4bf-ecaacea21729",
+      "testType": "CMS / Admin",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 7
+      }
+    },
+    {
+      "id": "ec8bc62e-7f14-4ff9-ae56-aa2e9810b725",
+      "testType": "Email / Notification",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      }
+    },
+    {
+      "id": "14f1b646-d2ae-4343-a4e5-19c61d599828",
+      "testType": "Email / Notification",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.75
+      }
+    },
+    {
+      "id": "48819a83-c12b-49f0-8739-41609e57b46f",
+      "testType": "Email / Notification",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      }
+    },
+    {
+      "id": "0239f89b-4f75-4571-b2bf-b956a6553c9a",
+      "testType": "Content migration",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 2
+      }
+    },
+    {
+      "id": "c066f9ef-7f6e-4a99-87a7-212e3dd5a3d5",
+      "testType": "Content migration",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 4
+      }
+    },
+    {
+      "id": "d7c0f25c-c73a-47bb-8ad3-f7d7130b7be6",
+      "testType": "Content migration",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2.5,
+        "expectedHours": 5,
+        "maxHours": 9
+      }
+    },
+    {
+      "id": "04298270-6b07-46bb-8175-8652d5c27c04",
+      "testType": "Exploratory",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 2
+      }
+    },
+    {
+      "id": "9d2e1571-3b5a-4fc3-b8cd-ac1255793062",
+      "testType": "Exploratory",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 2,
+        "expectedHours": 2,
+        "maxHours": 4
+      }
+    },
+    {
+      "id": "3b22a8c8-575c-4f22-8d99-1517577061e6",
+      "testType": "Exploratory",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 4
+      }
+    },
+    {
+      "id": "b0403334-c42c-4f30-a001-24d690336549",
+      "testType": "E2E automation",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 8
+      }
+    },
+    {
+      "id": "fb8b061b-4aae-492b-ab6c-938faeeba44e",
+      "testType": "E2E automation",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 4,
+        "expectedHours": 8,
+        "maxHours": 16
+      }
+    },
+    {
+      "id": "a1af3874-5023-48da-98be-3e3cf933dd5f",
+      "testType": "E2E automation",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 8,
+        "expectedHours": 16,
+        "maxHours": 30
+      }
+    }
+  ],
+  "browserCalibration": [
+    {
+      "tier": "Basic",
+      "estimatePerPage": {
+        "minHours": 0.1,
+        "expectedHours": 0.2,
+        "maxHours": 0.35
+      }
+    },
+    {
+      "tier": "Standard",
+      "estimatePerPage": {
+        "minHours": 0.25,
+        "expectedHours": 0.4,
+        "maxHours": 0.7
+      }
+    },
+    {
+      "tier": "Enhanced",
+      "estimatePerPage": {
+        "minHours": 0.4,
+        "expectedHours": 0.75,
+        "maxHours": 1.25
+      }
+    },
+    {
+      "tier": "Custom",
+      "estimatePerPage": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 2
+      }
+    }
+  ],
+  "overheadFactors": {
+    "coordinationFraction": 0.12,
+    "reportingFraction": 0.15,
+    "defaultDefectDensity": "Medium"
+  },
+  "deliverableEstimates": [
+    {
+      "type": "Test plan / matrix creation",
+      "estimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 6
+      },
+      "notes": "Includes test coverage matrix and risk assessment"
+    },
+    {
+      "type": "UAT support",
+      "estimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 8
+      },
+      "notes": "Helping client team create and run acceptance tests"
+    },
+    {
+      "type": "Final QA report",
+      "estimate": {
+        "minHours": 1.5,
+        "expectedHours": 3,
+        "maxHours": 5
+      },
+      "notes": "Formal sign-off document with test results summary"
+    }
+  ],
+  "exploratoryBlocks": [
+    {
+      "label": "1-hour block",
+      "hours": 1
+    },
+    {
+      "label": "2-hour block",
+      "hours": 2
+    },
+    {
+      "label": "Half-day block",
+      "hours": 4
+    },
+    {
+      "label": "Full-day block",
+      "hours": 8
+    }
+  ],
+  "notes": "dd"
+}

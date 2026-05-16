@@ -1,11 +1,10 @@
 import type { TestingModel } from '@/types'
 import { ComplexityLevel, ALWAYS_ACTIVE_TEST_TYPES } from '@/types'
-import { validateModel, findBaseRateEntry, formatRange, bumpModelVersion } from '@/utils/modelHelpers'
+import { validateModel, findBaseRateEntry, formatRange } from '@/utils/modelHelpers'
 import { StepNav } from './StepWizard'
 
 interface Step7Props {
   model: TestingModel
-  isExistingModel: boolean   // true if we're updating an existing model
   onBack?: () => void
   onExport: (model: TestingModel) => void   // save + export
   onSaveOnly: (model: TestingModel) => void // save to session without exporting
@@ -13,13 +12,13 @@ interface Step7Props {
 
 const COMPLEXITY_LEVELS = [ComplexityLevel.Low, ComplexityLevel.Medium, ComplexityLevel.High]
 
-export function Step7Review({ model, isExistingModel, onBack, onExport, onSaveOnly }: Step7Props) {
+export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props) {
   const validation = validateModel(model)
 
-  // Prepare the export — bump version if updating
-  const modelToExport: TestingModel = isExistingModel
-    ? { ...model, version: bumpModelVersion(model.version), calibratedAt: new Date().toISOString() }
-    : { ...model, calibratedAt: new Date().toISOString() }
+  const modelToExport: TestingModel = {
+    ...model,
+    calibratedAt: new Date().toISOString(),
+  }
 
   const totalEntries   = model.entries.length
   const calibratedTypes = ALWAYS_ACTIVE_TEST_TYPES.filter(tt =>
@@ -135,7 +134,10 @@ export function Step7Review({ model, isExistingModel, onBack, onExport, onSaveOn
         <ol className="list-decimal list-inside space-y-1 text-brand-700">
           <li>Place the exported <code className="font-mono text-xs bg-brand-100 px-1 rounded">testing-model.json</code> in the shared Teams folder.</li>
           <li>Account managers import the file using the "Import model" button on the home screen.</li>
-          <li>When you recalibrate in the future, the version number will auto-increment.</li>
+          <li>
+            When updating a loaded model, the version auto-increments on your first calibration
+            change unless you edit the version field yourself.
+          </li>
         </ol>
       </div>
 

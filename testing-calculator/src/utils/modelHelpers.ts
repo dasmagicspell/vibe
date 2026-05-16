@@ -390,12 +390,34 @@ export function formatExpected(estimate: TimeEstimate): string {
   return `${formatHours(estimate.expectedHours)} hrs`
 }
 
-/** Bump the patch version — used when the engineer re-exports an updated model */
+/** Whether a loaded model's version should auto-bump on the first calibration edit. */
+export function shouldAutoBumpModelVersion(opts: {
+  hadLoadedModel: boolean
+  versionManuallyEdited: boolean
+  versionAutoBumped: boolean
+  hasNonVersionFieldChange: boolean
+  currentVersion: string
+  loadedVersion: string
+}): boolean {
+  return (
+    opts.hadLoadedModel &&
+    !opts.versionManuallyEdited &&
+    !opts.versionAutoBumped &&
+    opts.hasNonVersionFieldChange &&
+    opts.currentVersion === opts.loadedVersion
+  )
+}
+
+/**
+ * Bump a version string when the engineer has not edited it since load.
+ * If the string ends with digits, increment that trailing number; otherwise append ".1".
+ */
 export function bumpModelVersion(version: string): string {
-  const parts = version.split('.').map(Number)
-  if (parts.length === 3) {
-    parts[2] += 1
-    return parts.join('.')
+  const match = version.match(/(\d+)$/)
+  if (match) {
+    const trailing = match[1]
+    const incremented = String(parseInt(trailing, 10) + 1)
+    return version.slice(0, -trailing.length) + incremented
   }
-  return version
+  return `${version}.1`
 }

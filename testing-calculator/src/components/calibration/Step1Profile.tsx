@@ -60,7 +60,8 @@ export function Step1Profile({ data, onChange, onNext }: Step1Props) {
                        focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
           />
           <p className="mt-1 text-xs text-gray-400">
-            Use semantic versioning. Increment the patch number (last digit) each time you recalibrate.
+            Use semantic versioning. When updating a loaded model, this auto-increments on your
+            first calibration change unless you edit it here.
           </p>
         </div>
 

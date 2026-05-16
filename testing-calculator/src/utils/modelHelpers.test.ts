@@ -10,6 +10,7 @@ import {
   formatHours,
   formatRange,
   bumpModelVersion,
+  shouldAutoBumpModelVersion,
   DEFAULT_SCENARIO_ESTIMATES,
 } from './modelHelpers'
 import { TestType, ComplexityLevel, DefectDensity } from '@/types'
@@ -242,17 +243,43 @@ describe('formatRange', () => {
 })
 
 // ---------------------------------------------------------------------------
+// shouldAutoBumpModelVersion
+// ---------------------------------------------------------------------------
+
+describe('shouldAutoBumpModelVersion', () => {
+  const base = {
+    hadLoadedModel: true,
+    versionManuallyEdited: false,
+    versionAutoBumped: false,
+    hasNonVersionFieldChange: true,
+    currentVersion: '1.0.0',
+    loadedVersion: '1.0.0',
+  }
+
+  it('returns true only when a loaded model is edited and version is untouched', () => {
+    expect(shouldAutoBumpModelVersion(base)).toBe(true)
+    expect(shouldAutoBumpModelVersion({ ...base, hadLoadedModel: false })).toBe(false)
+    expect(shouldAutoBumpModelVersion({ ...base, versionManuallyEdited: true })).toBe(false)
+    expect(shouldAutoBumpModelVersion({ ...base, versionAutoBumped: true })).toBe(false)
+    expect(shouldAutoBumpModelVersion({ ...base, hasNonVersionFieldChange: false })).toBe(false)
+    expect(shouldAutoBumpModelVersion({ ...base, currentVersion: '2.0.0' })).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
 // bumpModelVersion
 // ---------------------------------------------------------------------------
 
 describe('bumpModelVersion', () => {
-  it('increments the patch version', () => {
+  it('increments the trailing number when present', () => {
     expect(bumpModelVersion('1.0.0')).toBe('1.0.1')
     expect(bumpModelVersion('2.3.9')).toBe('2.3.10')
+    expect(bumpModelVersion('v1')).toBe('v2')
   })
 
-  it('returns the original string if format is unexpected', () => {
-    expect(bumpModelVersion('v1')).toBe('v1')
+  it('appends .1 when the string does not end with a number', () => {
+    expect(bumpModelVersion('beta')).toBe('beta.1')
+    expect(bumpModelVersion('release-candidate')).toBe('release-candidate.1')
   })
 })
 

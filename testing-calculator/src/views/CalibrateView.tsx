@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import type { TestingModel } from '@/types'
 import { useApp, useModel } from '@/context/AppContext'
 import { StorageService } from '@/services/StorageService'
-import { createDefaultModel, getCalibrationStepErrors } from '@/utils/modelHelpers'
+import {
+  bumpModelVersion,
+  createDefaultModel,
+  getCalibrationStepErrors,
+  shouldAutoBumpModelVersion,
+} from '@/utils/modelHelpers'
 import { getActiveSectionIndex } from '@/utils/scrollSpy'
 import { StepWizard } from '@/components/calibration/StepWizard'
 import { Step1Profile }      from '@/components/calibration/Step1Profile'
@@ -44,6 +49,11 @@ export function CalibrateView() {
   const [draft, setDraft] = useState<TestingModel>(() =>
     existingModel ? { ...existingModel } : createDefaultModel()
   )
+  const loadedVersionRef = useRef(
+    existingModel ? existingModel.version : createDefaultModel().version
+  )
+  const versionManuallyEditedRef = useRef(false)
+  const versionAutoBumpedRef = useRef(false)
   const [activeStep, setActiveStep] = useState(0)
   const [viewedSteps, setViewedSteps] = useState<Set<number>>(new Set())
   /** Target step while smooth-scrolling from a bubble click; suppresses scroll-spy until scroll ends. */
@@ -55,8 +65,31 @@ export function CalibrateView() {
   const isExistingModel = existingModel !== null
 
   const updateDraft = useCallback((updates: Partial<TestingModel>) => {
-    setDraft(prev => ({ ...prev, ...updates }))
-  }, [])
+    setDraft(prev => {
+      if ('version' in updates && updates.version !== prev.version) {
+        versionManuallyEditedRef.current = true
+      }
+
+      const hasNonVersionFieldChange = Object.keys(updates).some(k => k !== 'version')
+      let next: TestingModel = { ...prev, ...updates }
+
+      if (
+        shouldAutoBumpModelVersion({
+          hadLoadedModel: isExistingModel,
+          versionManuallyEdited: versionManuallyEditedRef.current,
+          versionAutoBumped: versionAutoBumpedRef.current,
+          hasNonVersionFieldChange,
+          currentVersion: next.version,
+          loadedVersion: loadedVersionRef.current,
+        })
+      ) {
+        versionAutoBumpedRef.current = true
+        next = { ...next, version: bumpModelVersion(loadedVersionRef.current) }
+      }
+
+      return next
+    })
+  }, [isExistingModel])
 
   function scrollToStep(step: number) {
     const el = document.getElementById(CALIBRATE_STEP_ID(step))
@@ -264,7 +297,6 @@ export function CalibrateView() {
         >
           <Step7Review
             model={draft}
-            isExistingModel={isExistingModel}
             onExport={handleExport}
             onSaveOnly={handleSaveOnly}
           />
