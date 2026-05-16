@@ -8,6 +8,7 @@ import type {
   ClientScopeDoc,
 } from '@/types'
 import { StorageService } from '@/services/StorageService'
+import { normalizeTestingModel } from '@/utils/modelHelpers'
 
 // ---------------------------------------------------------------------------
 // Actions
@@ -49,7 +50,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, role: action.role }
 
     case 'SET_MODEL':
-      return { ...state, model: action.model, modelDirty: true }
+      return { ...state, model: normalizeTestingModel(action.model), modelDirty: true }
 
     case 'CLEAR_MODEL':
       return { ...state, model: null, modelDirty: false }

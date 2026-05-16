@@ -22,9 +22,9 @@ export function IntakeSidebar({
   sections, currentSection, onNavigate, canGenerate, onGenerate,
 }: IntakeSidebarProps) {
   return (
-    <>
+    <div className="w-full lg:w-52 flex-none flex flex-col gap-4">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col gap-1 w-52 flex-none sticky top-20 self-start">
+      <aside className="hidden lg:flex flex-col gap-1 sticky top-20 self-start w-full">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-3 mb-1">
           Sections
         </p>
@@ -105,9 +105,10 @@ export function IntakeSidebar({
         </div>
       </aside>
 
-      {/* Mobile: horizontal scrollable pills */}
-      <div className="lg:hidden overflow-x-auto pb-2 mb-4">
-        <div className="flex gap-2 w-max">
+      {/* Mobile: horizontal scrollable pills + generate */}
+      <div className="lg:hidden w-full space-y-3">
+        <div className="overflow-x-auto pb-1">
+          <div className="flex gap-2 w-max">
           {sections.map((section, index) => {
             const isActive = index === currentSection
             return (
@@ -139,8 +140,22 @@ export function IntakeSidebar({
               </button>
             )
           })}
+          </div>
         </div>
+        <button
+          type="button"
+          onClick={onGenerate}
+          disabled={!canGenerate}
+          className={`
+            w-full py-2 rounded-lg text-sm font-semibold transition-colors
+            ${canGenerate
+              ? 'bg-green-600 text-white hover:bg-green-700'
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
+          `}
+        >
+          Generate schedule
+        </button>
       </div>
-    </>
+    </div>
   )
 }

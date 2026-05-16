@@ -210,6 +210,36 @@ export function createDefaultModel(): TestingModel {
   }
 }
 
+/**
+ * Ensures a loaded or imported model has all required arrays and every entry has
+ * a valid baseEstimate (guards against partial session saves or legacy JSON).
+ */
+export function normalizeTestingModel(raw: TestingModel): TestingModel {
+  const defaults = createDefaultModel()
+
+  const entries = (raw.entries ?? []).map(entry => {
+    const legacy = entry as CalibrationEntry & { estimate?: TimeEstimate }
+    const baseEstimate =
+      entry.baseEstimate ??
+      legacy.estimate ??
+      { minHours: 0, expectedHours: 0, maxHours: 0 }
+    return { ...entry, baseEstimate }
+  })
+
+  return {
+    ...defaults,
+    ...raw,
+    entries,
+    browserCalibration:
+      raw.browserCalibration?.length ? raw.browserCalibration : defaults.browserCalibration,
+    deliverableEstimates:
+      raw.deliverableEstimates?.length ? raw.deliverableEstimates : defaults.deliverableEstimates,
+    exploratoryBlocks:
+      raw.exploratoryBlocks?.length ? raw.exploratoryBlocks : defaults.exploratoryBlocks,
+    overheadFactors: raw.overheadFactors ?? defaults.overheadFactors,
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Helpers for reading and updating entries
 // ---------------------------------------------------------------------------

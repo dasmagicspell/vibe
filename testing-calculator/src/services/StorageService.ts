@@ -7,6 +7,7 @@
 
 import type { TestingModel, ProjectSpec } from '@/types'
 import { STORAGE_KEYS } from '@/types'
+import { normalizeTestingModel } from '@/utils/modelHelpers'
 
 // ---------------------------------------------------------------------------
 // Type guards — validate imported JSON before trusting it
@@ -56,7 +57,7 @@ export const StorageService = {
       const raw = localStorage.getItem(STORAGE_KEYS.MODEL)
       if (!raw) return null
       const parsed: unknown = JSON.parse(raw)
-      return isTestingModel(parsed) ? parsed : null
+      return isTestingModel(parsed) ? normalizeTestingModel(parsed) : null
     } catch {
       return null
     }
@@ -134,7 +135,7 @@ export const StorageService = {
           try {
             const parsed: unknown = JSON.parse(reader.result as string)
             if (isTestingModel(parsed)) {
-              resolve(parsed)
+              resolve(normalizeTestingModel(parsed))
             } else {
               reject(new Error(
                 'This file does not appear to be a valid Testing Model. ' +

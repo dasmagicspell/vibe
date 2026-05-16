@@ -7,6 +7,7 @@ import {
   bumpModelVersion,
   createDefaultModel,
   getCalibrationStepErrors,
+  normalizeTestingModel,
   shouldAutoBumpModelVersion,
 } from '@/utils/modelHelpers'
 import { getActiveSectionIndex } from '@/utils/scrollSpy'
@@ -47,7 +48,7 @@ export function CalibrateView() {
   const navigate = useNavigate()
 
   const [draft, setDraft] = useState<TestingModel>(() =>
-    existingModel ? { ...existingModel } : createDefaultModel()
+    existingModel ? normalizeTestingModel(existingModel) : createDefaultModel()
   )
   const loadedVersionRef = useRef(
     existingModel ? existingModel.version : createDefaultModel().version

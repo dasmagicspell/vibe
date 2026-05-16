@@ -5,6 +5,7 @@ import {
   findBaseRateEntry,
   upsertBaseRateEntry,
   validateModel,
+  normalizeTestingModel,
   calibrationStepHasError,
   getCalibrationStepErrors,
   formatHours,
@@ -162,6 +163,41 @@ describe('validateModel', () => {
     const result = validateModel(model)
     expect(result.isValid).toBe(false)
     expect(result.errors.some(e => e.includes('min > expected'))).toBe(true)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// normalizeTestingModel
+// ---------------------------------------------------------------------------
+
+describe('normalizeTestingModel', () => {
+  it('fills missing model arrays from defaults', () => {
+    const sparse = {
+      version: '1.0.0',
+      engineerName: 'Jane',
+      calibratedAt: '2025-01-01T00:00:00Z',
+      entries: [],
+    } as TestingModel
+
+    const normalized = normalizeTestingModel(sparse)
+    expect(normalized.browserCalibration.length).toBeGreaterThan(0)
+    expect(normalized.deliverableEstimates.length).toBeGreaterThan(0)
+    expect(normalized.exploratoryBlocks.length).toBeGreaterThan(0)
+  })
+
+  it('maps legacy estimate field to baseEstimate on entries', () => {
+    const legacy = createDefaultModel()
+    legacy.engineerName = 'Jane'
+    const entry = legacy.entries[0]
+    const legacyEntry = {
+      ...entry,
+      baseEstimate: undefined,
+      estimate: { minHours: 1, expectedHours: 2, maxHours: 3 },
+    } as typeof entry & { estimate: { minHours: number; expectedHours: number; maxHours: number } }
+    legacy.entries[0] = legacyEntry
+
+    const normalized = normalizeTestingModel(legacy)
+    expect(normalized.entries[0].baseEstimate.expectedHours).toBe(2)
   })
 })
 
