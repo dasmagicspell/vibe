@@ -11,10 +11,6 @@ interface StepWizardProps {
   onNavigate: (step: number) => void
 }
 
-function trackSegmentClass(complete: boolean): string {
-  return complete ? 'bg-brand-300' : 'bg-gray-200'
-}
-
 /**
  * Horizontal step progress bar used at the top of the calibration wizard.
  * Stays visible while scrolling; each bubble scrolls to its section on click.
@@ -22,57 +18,45 @@ function trackSegmentClass(complete: boolean): string {
 export function StepWizard({ steps, currentStep, onNavigate }: StepWizardProps) {
   return (
     <nav aria-label="Calibration progress" className="w-full">
-      <ol className="flex w-full">
+      <ol className="relative flex w-full">
+        {/* Single continuous track — always visible, independent of navigation state */}
+        <div
+          className="absolute left-4 right-4 top-4 h-0.5 bg-gray-200 pointer-events-none"
+          aria-hidden="true"
+        />
+
         {steps.map((step, index) => {
           const isActive   = index === currentStep
           const isComplete = step.isComplete
-          const isFirst = index === 0
           const isLast = index === steps.length - 1
 
           return (
             <li
               key={step.label}
-              className={`flex flex-col items-center ${isLast ? 'flex-none' : 'flex-1'}`}
+              className={`relative z-10 flex flex-col items-center ${isLast ? 'flex-none' : 'flex-1'}`}
             >
-              {/* Bubble row — line segments flank each circle for one continuous track */}
-              <div className="flex items-center w-full">
-                {!isFirst && (
-                  <div
-                    className={`flex-1 h-0.5 min-w-1 ${trackSegmentClass(steps[index - 1].isComplete)}`}
-                    aria-hidden="true"
-                  />
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => onNavigate(index)}
-                  className="relative z-10 shrink-0 group cursor-pointer"
-                  aria-current={isActive ? 'step' : undefined}
+              <button
+                type="button"
+                onClick={() => onNavigate(index)}
+                className="group cursor-pointer"
+                aria-current={isActive ? 'step' : undefined}
+              >
+                <span
+                  className={`
+                    flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold
+                    transition-colors ring-2 ring-offset-1 ring-offset-gray-50
+                    ${isActive
+                      ? 'bg-brand-600 text-white ring-brand-600'
+                      : isComplete
+                        ? 'bg-brand-100 text-brand-700 ring-brand-200 group-hover:bg-brand-200'
+                        : step.hasError
+                          ? 'bg-red-100 text-red-700 ring-red-200'
+                          : 'bg-gray-100 text-gray-400 ring-gray-200'}
+                  `}
                 >
-                  <span
-                    className={`
-                      flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold
-                      transition-colors ring-2 ring-offset-1
-                      ${isActive
-                        ? 'bg-brand-600 text-white ring-brand-600'
-                        : isComplete
-                          ? 'bg-brand-100 text-brand-700 ring-brand-200 group-hover:bg-brand-200'
-                          : step.hasError
-                            ? 'bg-red-100 text-red-700 ring-red-200'
-                            : 'bg-gray-100 text-gray-400 ring-gray-200'}
-                    `}
-                  >
-                    {index + 1}
-                  </span>
-                </button>
-
-                {!isLast && (
-                  <div
-                    className={`flex-1 h-0.5 min-w-1 ${trackSegmentClass(isComplete)}`}
-                    aria-hidden="true"
-                  />
-                )}
-              </div>
+                  {index + 1}
+                </span>
+              </button>
 
               {/* Label — hidden on very small screens */}
               <span
