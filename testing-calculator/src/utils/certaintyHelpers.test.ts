@@ -69,6 +69,18 @@ describe('intakeCertaintyForProject', () => {
     } as ProjectSpec
     expect(intakeCertaintyForProject(project)).toBe('Low')
   })
+
+  it('includes lowest integration certainty when integrations exist', () => {
+    const project = {
+      rigorCertainty: 'High',
+      browserTierCertainty: 'High',
+      integrations: [
+        { id: '1', certainty: 'High' },
+        { id: '2', certainty: 'Low' },
+      ],
+    } as ProjectSpec
+    expect(intakeCertaintyForProject(project)).toBe('Low')
+  })
 })
 
 describe('intakeCertaintyForCell', () => {
@@ -88,10 +100,11 @@ describe('intakeCertaintyForCell', () => {
 
 describe('normalizeProjectSpec', () => {
   it('fills missing certainty fields with High', () => {
-    const project = { pages: [{}], workflows: [] } as ProjectSpec
+    const project = { pages: [{}], workflows: [], integrations: [{}] } as ProjectSpec
     const normalized = normalizeProjectSpec(project)
     expect(normalized.rigorCertainty).toBe('High')
     expect(normalized.browserTierCertainty).toBe('High')
     expect(normalized.pages[0].complexityCertainty).toBe('High')
+    expect(normalized.integrations[0].certainty).toBe('High')
   })
 })

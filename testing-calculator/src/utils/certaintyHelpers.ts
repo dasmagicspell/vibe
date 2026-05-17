@@ -6,6 +6,7 @@
 import type {
   CalibrationEntry,
   CertaintyLevel,
+  IntegrationSpec,
   PageSpec,
   ProjectSpec,
   TimeEstimate,
@@ -69,11 +70,16 @@ export function intakeCertaintyForRow(
   return workflow?.complexityCertainty ?? defaultComplexityCertainty()
 }
 
+function integrationCertainties(project: ProjectSpec): CertaintyLevel[] {
+  return (project.integrations ?? []).map(i => i.certainty ?? defaultComplexityCertainty())
+}
+
 /** Project-wide intake certainty applied to every matrix cell. */
 export function intakeCertaintyForProject(project: ProjectSpec): CertaintyLevel {
   const levels: CertaintyLevel[] = [
     project.rigorCertainty ?? 'High',
     project.browserTierCertainty ?? 'High',
+    ...integrationCertainties(project),
   ]
   if (project.defectDensityOverride !== undefined) {
     levels.push(project.defectDensityCertainty ?? 'High')
@@ -107,6 +113,13 @@ export function normalizeWorkflowSpec(workflow: WorkflowSpec): WorkflowSpec {
   }
 }
 
+export function normalizeIntegrationSpec(integration: IntegrationSpec): IntegrationSpec {
+  return {
+    ...integration,
+    certainty: integration.certainty ?? defaultComplexityCertainty(),
+  }
+}
+
 export function normalizeProjectSpec(project: ProjectSpec): ProjectSpec {
   return {
     ...project,
@@ -114,5 +127,6 @@ export function normalizeProjectSpec(project: ProjectSpec): ProjectSpec {
     browserTierCertainty: project.browserTierCertainty ?? 'High',
     pages: project.pages.map(normalizePageSpec),
     workflows: project.workflows.map(normalizeWorkflowSpec),
+    integrations: (project.integrations ?? []).map(normalizeIntegrationSpec),
   }
 }

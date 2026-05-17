@@ -6,7 +6,7 @@
 //   min(lookupCertainty, calibrationCertainty, intakeCertainty)
 //   lookup: High = exact match, Medium = adjacent interpolation, Low = no data
 //   calibration: engineer-declared on CalibrationEntry
-//   intake: account manager confidence on complexity, rigor, browser, etc.
+//   intake: account manager confidence on complexity, rigor, browser, integrations, etc.
 // =============================================================================
 
 import type {

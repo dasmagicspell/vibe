@@ -357,6 +357,8 @@ export interface IntegrationSpec {
   /** e.g. CRM, analytics, payment gateway, email, webhook, custom API */
   category: string
   hasAnalytics: boolean
+  /** Account manager confidence in this integration listing */
+  certainty: CertaintyLevel
 }
 
 /**

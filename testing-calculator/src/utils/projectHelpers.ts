@@ -76,6 +76,7 @@ export function createIntegrationSpec(overrides: Partial<IntegrationSpec> = {}):
     name:         '',
     category:     '',
     hasAnalytics: false,
+    certainty:    'High',
     ...overrides,
   }
 }

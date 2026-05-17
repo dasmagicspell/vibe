@@ -1,5 +1,6 @@
-import type { IntegrationSpec, ProjectSpec } from '@/types'
+import type { CertaintyLevel, IntegrationSpec, ProjectSpec } from '@/types'
 import { createIntegrationSpec, INTEGRATION_CATEGORY_OPTIONS } from '@/utils/projectHelpers'
+import { CertaintySelector } from '@/components/shared/CertaintySelector'
 interface Props {
   integrations: IntegrationSpec[]
   onChange: (updates: Partial<ProjectSpec>) => void
@@ -116,6 +117,16 @@ export function Section5Integrations({ integrations, onChange }: Props) {
                   This integration includes analytics or tag tracking (activates Analytics &amp; Tag testing)
                 </span>
               </label>
+            </div>
+
+            <div className="flex items-center gap-2 mt-3">
+              <span className="text-xs text-gray-500">Confidence in integration:</span>
+              <CertaintySelector
+                id={`int-certainty-${integration.id}`}
+                compact
+                value={integration.certainty ?? 'High'}
+                onChange={v => updateIntegration(integration.id, { certainty: v as CertaintyLevel })}
+              />
             </div>
           </div>
         ))}
