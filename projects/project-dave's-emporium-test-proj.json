@@ -1,0 +1,46 @@
+{
+  "projectName": "Test Proj",
+  "clientName": "Dave's Emporium",
+  "createdAt": "2026-05-17T19:48:57.727Z",
+  "siteType": "Brochure",
+  "projectMoment": "New launch",
+  "sensitiveData": "None",
+  "paymentScope": "None",
+  "accountScope": "None",
+  "riskLevel": "Medium",
+  "pages": [
+    {
+      "id": "c6971602-70f0-40d6-9242-459abe734081",
+      "name": "Home and About",
+      "category": "Informational",
+      "complexity": "Medium",
+      "complexityCertainty": "High",
+      "isTemplate": true,
+      "templateInstanceCount": 2
+    }
+  ],
+  "workflows": [],
+  "integrations": [],
+  "rigorLevel": "Standard",
+  "rigorCertainty": "High",
+  "browserTier": "Standard",
+  "browserTierCertainty": "High",
+  "selectedTestTypes": [
+    "Functional (manual)",
+    "UI / Layout",
+    "Content review",
+    "Link validation",
+    "Cross-browser",
+    "Responsive / Mobile",
+    "Accessibility (WCAG)",
+    "Performance (basic)",
+    "SEO / Meta",
+    "Security / Privacy"
+  ],
+  "includeExploratory": false,
+  "includeAutomation": false,
+  "includeCMSAdmin": false,
+  "selectedDeliverables": [],
+  "reportingLevel": "Internal bug list",
+  "retestingIncluded": true
+}

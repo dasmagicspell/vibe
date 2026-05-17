@@ -10,6 +10,7 @@ import {
 } from '@/utils/projectHelpers'
 import { normalizeProjectSpec } from '@/utils/certaintyHelpers'
 import { runCalculationEngine } from '@/services/CalculationEngine'
+import { StorageService } from '@/services/StorageService'
 import { getActiveSectionIndex } from '@/utils/scrollSpy'
 import { StepWizard } from '@/components/calibration/StepWizard'
 import { Section1Identity }    from '@/components/intake/Section1Identity'
@@ -96,6 +97,12 @@ export function IntakeView() {
     dispatch({ type: 'SET_PROJECT', project: draft })
     dispatch({ type: 'SET_SCHEDULE', schedule })
     navigate('/schedule')
+  }
+
+  function handleSaveProject() {
+    dispatch({ type: 'SET_PROJECT', project: draft })
+    dispatch({ type: 'MARK_PROJECT_CLEAN' })
+    StorageService.exportProjectToFile(draft)
   }
 
   // Track which section is in view for the sticky step indicator
@@ -308,6 +315,18 @@ export function IntakeView() {
             modelName={modelLabel}
           />
         </section>
+
+        <div className="mt-10 pt-2">
+          <button
+            type="button"
+            onClick={handleSaveProject}
+            className="w-full px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors
+                       bg-green-600 text-white hover:bg-green-700"
+            title="Save project spec as JSON for reloading later"
+          >
+            ↓ Save project JSON
+          </button>
+        </div>
       </div>
     </main>
   )
