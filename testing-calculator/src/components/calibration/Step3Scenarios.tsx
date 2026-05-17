@@ -118,7 +118,7 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
         <h2 className="text-lg font-semibold text-gray-900">Calibration scenarios</h2>
         <p className="mt-1 text-sm text-gray-500">
           For each test type, enter how long it takes to test a page at Low, Medium, and High
-          complexity at your standard level of rigour. Set certainty (green / yellow / red) to
+          complexity at your standard level of rigor. Set certainty (green / yellow / red) to
           reflect how confident you are in each estimate.
         </p>
         <p className="mt-2 text-xs text-gray-400">

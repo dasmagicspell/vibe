@@ -108,7 +108,7 @@ function buildAssumptions(project: ProjectSpec, output: ScheduleOutput): string[
     `Pages in scope: ${project.pages.length} defined (${effectivePages} effective including template instances)`,
     `Workflows in scope: ${project.workflows.length}`,
     `Browser and device coverage: ${project.browserTier} tier — ${BROWSER_TIER_DEFINITIONS[project.browserTier]}`,
-    `Testing rigour: ${project.rigorLevel} — ${RIGOR_DEFINITIONS[project.rigorLevel]}`,
+    `Testing rigor: ${project.rigorLevel} — ${RIGOR_DEFINITIONS[project.rigorLevel]}`,
     `Estimate generated with model: ${output.engineerName} v${output.modelVersion}`,
     `Content and designs are final at the time testing begins`,
     `The development team is available to answer questions during the testing period`,
@@ -144,7 +144,7 @@ function buildOptionalAddOns(project: ProjectSpec, output: ScheduleOutput): stri
     addOns.push(`Enhanced browser coverage — adds Firefox + real-device spot checks`)
   }
   if (project.rigorLevel === RigorLevel.Standard) {
-    addOns.push(`Upgraded to Enhanced rigour — deeper exploration, more edge cases`)
+    addOns.push(`Upgraded to Enhanced rigor — deeper exploration, more edge cases`)
   }
 
   addOns.push('Accessibility audit to WCAG 2.1 AA with remediation recommendations')

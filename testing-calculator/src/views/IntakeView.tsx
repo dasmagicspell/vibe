@@ -31,7 +31,7 @@ const SECTION_LABELS = [
   'Workflows',
   'Integrations',
   'E-commerce',
-  'Risk & rigour',
+  'Risk & rigor',
   'Test types',
   'Deliverables',
   'Generate',

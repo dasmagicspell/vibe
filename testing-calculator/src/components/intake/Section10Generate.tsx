@@ -70,7 +70,7 @@ export function Section10Generate({ project, onGenerate, modelLoaded, modelName 
           <SummaryRow label="Payment scope" value={project.paymentScope} />
           <SummaryRow label="User accounts" value={project.accountScope} />
           <SummaryRow label="Risk level" value={project.riskLevel} />
-          <SummaryRow label="Rigour" value={project.rigorLevel} />
+          <SummaryRow label="Rigor" value={project.rigorLevel} />
           <SummaryRow label="Browser tier" value={project.browserTier} />
           <SummaryRow
             label="Active test types"

@@ -84,17 +84,17 @@ export function Section7RiskRigor({ data, onChange }: Props) {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">Risk and rigour</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Risk and rigor</h2>
         <p className="mt-1 text-sm text-gray-500">
-          These settings scale every estimate in the schedule. Higher rigour and higher risk
-          increase time across all test types via the rigour multiplier.
+          These settings scale every estimate in the schedule. Higher rigor and higher risk
+          increase time across all test types via the rigor multiplier.
         </p>
       </div>
 
       <RadioGroup
         name="risk-level"
         label="How risky is failure?"
-        tooltip="Risk level is recorded for scope context. It does not directly multiply estimates or affect certainty — rigour does that."
+        tooltip="Risk level is recorded for scope context. It does not directly multiply estimates or affect certainty — rigor does that."
         value={data.riskLevel}
         onChange={v => onChange({ riskLevel: v as RiskLevel })}
         options={RISK_OPTIONS}
@@ -104,15 +104,15 @@ export function Section7RiskRigor({ data, onChange }: Props) {
       <div className="space-y-2">
         <RadioGroup
           name="rigor-level"
-          label="Required testing rigour"
-          tooltip="Rigour multiplies all estimates: Smoke=0.5×, Standard=1.0×, Enhanced=1.5×, Audit=2.2×. Choose based on what the client needs to see and sign off on."
+          label="Required testing rigor"
+          tooltip="Rigor multiplies all estimates: Smoke=0.5×, Standard=1.0×, Enhanced=1.5×, Audit=2.2×. Choose based on what the client needs to see and sign off on."
           value={data.rigorLevel}
           onChange={v => onChange({ rigorLevel: v as RigorLevel })}
           options={RIGOR_OPTIONS}
           columns={4}
         />
         <div className="flex items-center gap-2 pl-1">
-          <span className="text-xs text-gray-500">Confidence in rigour:</span>
+          <span className="text-xs text-gray-500">Confidence in rigor:</span>
           <CertaintySelector
             id="rigor-certainty"
             compact
