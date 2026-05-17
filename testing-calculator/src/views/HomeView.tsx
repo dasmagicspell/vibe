@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useApp, useModel } from '@/context/AppContext'
+import { useApp, useModel, useProject } from '@/context/AppContext'
 import { StorageService } from '@/services/StorageService'
 import { getAppBuildDate, getAppVersion } from '@/utils/appMeta'
 import type { AppRole } from '@/types'
@@ -7,6 +7,7 @@ import type { AppRole } from '@/types'
 export function HomeView() {
   const { dispatch } = useApp()
   const model    = useModel()
+  const project  = useProject()
   const navigate = useNavigate()
 
   async function handleImportModel() {
@@ -16,6 +17,16 @@ export function HomeView() {
       dispatch({ type: 'MARK_MODEL_CLEAN' })
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Could not import model file.')
+    }
+  }
+
+  async function handleImportProject() {
+    try {
+      const imported = await StorageService.importProjectFromFile()
+      dispatch({ type: 'SET_PROJECT', project: imported })
+      dispatch({ type: 'MARK_PROJECT_CLEAN' })
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Could not import project file.')
     }
   }
 
@@ -78,6 +89,42 @@ export function HomeView() {
               className="mt-3 text-xs px-3 py-1.5 rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
             >
               Import model file
+            </button>
+          </div>
+        )}
+
+        {/* Project status */}
+        {project ? (
+          <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-800">Project loaded</p>
+                <p className="text-xs text-green-600 mt-0.5">
+                  {project.clientName} · {project.projectName} · Created{' '}
+                  {new Date(project.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              <button
+                onClick={() => dispatch({ type: 'CLEAR_PROJECT' })}
+                className="text-xs text-green-700 hover:text-green-900 underline"
+              >
+                Unload
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200">
+            <p className="text-sm font-medium text-amber-800">No project loaded</p>
+            <p className="text-xs text-amber-700 mt-0.5">
+              Load a previously saved{' '}
+              <code className="font-mono bg-amber-100 px-1 rounded">project-*.json</code>{' '}
+              file to continue intake or view a schedule.
+            </p>
+            <button
+              onClick={handleImportProject}
+              className="mt-3 text-xs px-3 py-1.5 rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors"
+            >
+              Load project file
             </button>
           </div>
         )}

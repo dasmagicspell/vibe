@@ -30,6 +30,9 @@ export function NavBar() {
   ]
 
   const isActive = (to: string) => location.pathname.startsWith(to)
+  const isHome     = location.pathname === '/'
+  const isIntake   = location.pathname === '/intake'
+  const showProjectLoad = role === 'manager' && !isHome && !isIntake
 
   async function handleImportModel() {
     try {
@@ -94,7 +97,7 @@ export function NavBar() {
                 {state.modelDirty && (
                   <span className="text-xs text-amber-600 font-medium">● unsaved</span>
                 )}
-                {role === 'manager' && (
+                {showProjectLoad && (
                   <button
                     onClick={handleImportProject}
                     className="text-xs px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
@@ -105,12 +108,14 @@ export function NavBar() {
                 )}
               </>
             ) : (
-              <button
-                onClick={handleImportModel}
-                className="text-xs px-3 py-1.5 rounded-md bg-brand-600 text-white hover:bg-brand-700 transition-colors"
-              >
-                Import model
-              </button>
+              !isHome && (
+                <button
+                  onClick={handleImportModel}
+                  className="text-xs px-3 py-1.5 rounded-md bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+                >
+                  Import model
+                </button>
+              )
             )}
           </div>
         </div>
