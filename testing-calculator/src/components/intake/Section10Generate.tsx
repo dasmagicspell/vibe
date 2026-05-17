@@ -1,13 +1,17 @@
 import type { ProjectSpec } from '@/types'
-import { validateProject, countEffectivePages } from '@/utils/projectHelpers'
+import { validateProject, countEffectivePages, getScheduleBlockers } from '@/utils/projectHelpers'
+
 interface Props {
   project: ProjectSpec
   onGenerate: () => void
-  modelName: string
+  modelLoaded: boolean
+  modelName?: string
 }
 
-export function Section10Generate({ project, onGenerate, modelName }: Props) {
+export function Section10Generate({ project, onGenerate, modelLoaded, modelName }: Props) {
   const validation = validateProject(project)
+  const blockers = getScheduleBlockers(modelLoaded, project)
+  const canGenerate = blockers.length === 0
   const effectivePages = countEffectivePages(project.pages)
 
   return (
@@ -19,11 +23,12 @@ export function Section10Generate({ project, onGenerate, modelName }: Props) {
         </p>
       </div>
 
-      {/* Validation errors */}
-      {!validation.isValid && (
+      {blockers.length > 0 && (
         <div className="p-4 rounded-xl bg-red-50 border border-red-200 space-y-1">
-          <p className="text-sm font-semibold text-red-800">Fix these issues before generating:</p>
-          {validation.errors.map(err => (
+          <p className="text-sm font-semibold text-red-800">
+            Resolve these before generating:
+          </p>
+          {blockers.map(err => (
             <p key={err} className="text-sm text-red-700">• {err}</p>
           ))}
         </div>
@@ -34,11 +39,12 @@ export function Section10Generate({ project, onGenerate, modelName }: Props) {
         </div>
       ))}
 
-      {/* Project summary card */}
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
           <p className="font-semibold text-gray-900">{project.projectName || '(unnamed project)'}</p>
-          <p className="text-xs text-gray-500">{project.clientName} · {new Date(project.createdAt).toLocaleDateString()}</p>
+          <p className="text-xs text-gray-500">
+            {project.clientName} · {new Date(project.createdAt).toLocaleDateString()}
+          </p>
         </div>
 
         <dl className="divide-y divide-gray-100">
@@ -81,11 +87,15 @@ export function Section10Generate({ project, onGenerate, modelName }: Props) {
             label="Retesting"
             value={project.retestingIncluded ? 'Included' : 'Excluded'}
           />
-          <SummaryRow label="Testing model" value={modelName} />
+          <SummaryRow
+            label="Testing model"
+            value={modelLoaded && modelName
+              ? modelName
+              : 'Not loaded — import testing-model.json'}
+          />
         </dl>
       </div>
 
-      {/* Active test types list */}
       <div>
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
           Active test types ({project.selectedTestTypes.length})
@@ -102,24 +112,23 @@ export function Section10Generate({ project, onGenerate, modelName }: Props) {
         </div>
       </div>
 
-      {/* Generate button */}
       <div className="flex flex-col gap-3 pt-2">
         <button
           type="button"
           onClick={onGenerate}
-          disabled={!validation.isValid}
+          disabled={!canGenerate}
           className={`
             w-full py-3 rounded-xl text-sm font-semibold transition-colors
-            ${validation.isValid
+            ${canGenerate
               ? 'bg-green-600 text-white hover:bg-green-700'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
           `}
         >
           🚀 Generate estimation schedule
         </button>
-        {!validation.isValid && (
+        {!canGenerate && (
           <p className="text-xs text-center text-red-500">
-            Fix the errors above before generating.
+            Resolve the issues above before generating.
           </p>
         )}
       </div>

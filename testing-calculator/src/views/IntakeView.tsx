@@ -6,7 +6,7 @@ import {
   createDefaultProject,
   deriveActiveTestTypes,
   getIntakeStepErrors,
-  validateProject,
+  canAccessSchedule,
 } from '@/utils/projectHelpers'
 import { normalizeProjectSpec } from '@/utils/certaintyHelpers'
 import { runCalculationEngine } from '@/services/CalculationEngine'
@@ -91,9 +91,7 @@ export function IntakeView() {
   }
 
   function handleGenerate() {
-    if (!model) return
-    const validation = validateProject(draft)
-    if (!validation.isValid) return
+    if (!model || !canAccessSchedule(true, draft)) return
     const schedule = runCalculationEngine(model, draft)
     dispatch({ type: 'SET_PROJECT', project: draft })
     dispatch({ type: 'SET_SCHEDULE', schedule })
@@ -169,32 +167,13 @@ export function IntakeView() {
     return () => clearTimeout(timer)
   }, [activeStep])
 
-  if (!model) {
-    return (
-      <main className="max-w-xl mx-auto px-4 py-16 text-center">
-        <p className="text-lg font-semibold text-gray-900 mb-2">No testing model loaded</p>
-        <p className="text-sm text-gray-500 mb-6">
-          Import the shared <code className="font-mono bg-gray-100 px-1 rounded">testing-model.json</code>{' '}
-          file before starting a project intake.
-        </p>
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm hover:bg-brand-700 transition-colors"
-        >
-          Go to home screen
-        </button>
-      </main>
-    )
-  }
-
   const stepErrors = getIntakeStepErrors(draft)
   const steps = SECTION_LABELS.map((label, i) => ({
     label,
     isComplete: viewedSteps.has(i),
     hasError: stepErrors[i],
   }))
-  const modelLabel = `${model.engineerName} v${model.version}`
+  const modelLabel = model ? `${model.engineerName} v${model.version}` : undefined
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
@@ -203,8 +182,18 @@ export function IntakeView() {
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Project intake</h1>
           <p className="text-sm text-gray-500">
-            Define the site using model <span className="font-medium text-gray-700">{modelLabel}</span>,
-            then generate a data-driven estimation schedule.
+            {modelLabel ? (
+              <>
+                Define the site using model{' '}
+                <span className="font-medium text-gray-700">{modelLabel}</span>, then generate a
+                data-driven estimation schedule.
+              </>
+            ) : (
+              <>
+                Draft the client project below. Import a testing model before generating the
+                schedule.
+              </>
+            )}
           </p>
         </div>
       </div>
@@ -315,6 +304,7 @@ export function IntakeView() {
           <Section10Generate
             project={draft}
             onGenerate={handleGenerate}
+            modelLoaded={!!model}
             modelName={modelLabel}
           />
         </section>

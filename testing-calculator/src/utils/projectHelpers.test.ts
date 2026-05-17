@@ -4,6 +4,7 @@ import {
   deriveActiveTestTypes, getTestTypeActivationReason,
   isSectionComplete, validateProject, countEffectivePages,
   intakeStepHasError, getIntakeStepErrors,
+  getScheduleBlockers, canAccessSchedule,
 } from './projectHelpers'
 import {
   PageCategory, AccountScope, ProjectMoment, TestType,
@@ -279,6 +280,41 @@ describe('intakeStepHasError', () => {
 
   it('returns ten step flags from getIntakeStepErrors', () => {
     expect(getIntakeStepErrors(createDefaultProject())).toHaveLength(10)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// getScheduleBlockers / canAccessSchedule
+// ---------------------------------------------------------------------------
+
+describe('getScheduleBlockers', () => {
+  it('requires a loaded model', () => {
+    const project = { ...createDefaultProject(), projectName: 'Site', clientName: 'Acme' }
+    const blockers = getScheduleBlockers(false, project)
+    expect(blockers.some(b => b.includes('testing model'))).toBe(true)
+    expect(canAccessSchedule(false, project)).toBe(false)
+  })
+
+  it('requires a project', () => {
+    const blockers = getScheduleBlockers(true, null)
+    expect(blockers).toContain('Complete the project intake form first.')
+  })
+
+  it('includes validation errors for an incomplete project', () => {
+    const blockers = getScheduleBlockers(true, createDefaultProject())
+    expect(blockers).toContain('Project name is required.')
+    expect(canAccessSchedule(true, createDefaultProject())).toBe(false)
+  })
+
+  it('allows access when model is loaded and project is valid', () => {
+    const project = {
+      ...createDefaultProject(),
+      projectName: 'Site',
+      clientName:  'Acme',
+      pages:       [createPageSpec({ name: 'Home' })],
+    }
+    expect(getScheduleBlockers(true, project)).toEqual([])
+    expect(canAccessSchedule(true, project)).toBe(true)
   })
 })
 

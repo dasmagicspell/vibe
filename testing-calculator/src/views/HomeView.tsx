@@ -71,7 +71,7 @@ export function HomeView() {
             <p className="text-xs text-amber-700 mt-0.5">
               Account managers: import the shared{' '}
               <code className="font-mono bg-amber-100 px-1 rounded">testing-model.json</code>{' '}
-              file from the team's shared folder before starting an intake.
+              file before generating a schedule. You can draft intake without a model loaded.
             </p>
             <button
               onClick={handleImportModel}
@@ -96,8 +96,6 @@ export function HomeView() {
             title="Account manager"
             description="Define a new project and generate a time and task estimate schedule."
             action="Start intake"
-            disabled={!model}
-            disabledReason="Import a testing model first"
             onClick={() => selectRole('manager')}
           />
         </div>

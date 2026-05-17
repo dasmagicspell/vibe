@@ -263,6 +263,42 @@ export function validateProject(project: ProjectSpec): ProjectValidationResult {
   return { isValid: errors.length === 0, errors, warnings }
 }
 
+/**
+ * Reasons schedule generation or viewing is blocked.
+ * Intake can be drafted without a model; both require a loaded model and valid project.
+ */
+export function getScheduleBlockers(
+  modelLoaded: boolean,
+  project: ProjectSpec | null,
+): string[] {
+  const blockers: string[] = []
+
+  if (!modelLoaded) {
+    blockers.push(
+      'Import a testing model (testing-model.json) before generating or viewing a schedule.',
+    )
+  }
+
+  if (!project) {
+    blockers.push('Complete the project intake form first.')
+    return blockers
+  }
+
+  const validation = validateProject(project)
+  if (!validation.isValid) {
+    blockers.push(...validation.errors)
+  }
+
+  return blockers
+}
+
+export function canAccessSchedule(
+  modelLoaded: boolean,
+  project: ProjectSpec | null,
+): boolean {
+  return getScheduleBlockers(modelLoaded, project).length === 0
+}
+
 const INTAKE_STEP_COUNT = 10
 
 /** True when an intake wizard step is missing required data or has invalid values. */

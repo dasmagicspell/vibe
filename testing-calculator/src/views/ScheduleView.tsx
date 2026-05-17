@@ -6,6 +6,7 @@ import { runCalculationEngine }   from '@/services/CalculationEngine'
 import { StorageService }         from '@/services/StorageService'
 import { generateClientScopeDoc } from '@/utils/scopeDocHelpers'
 import { downloadCSV }            from '@/utils/exportHelpers'
+import { canAccessSchedule, getScheduleBlockers } from '@/utils/projectHelpers'
 import { ScheduleMatrix }  from '@/components/schedule/ScheduleMatrix'
 import { ScheduleSummary } from '@/components/schedule/ScheduleSummary'
 import { ReviewFlags }     from '@/components/schedule/ReviewFlags'
@@ -23,12 +24,14 @@ export function ScheduleView() {
   const [activeTab, setActiveTab]   = useState<ActiveTab>('schedule')
   const [scopeDoc, setScopeDoc]     = useState<ClientScopeDoc | null>(null)
 
-  // ── Auto-compute schedule if missing ──────────────────────────────────────
+  const scheduleReady = canAccessSchedule(!!model, project)
+
+  // ── Auto-compute schedule if missing and prerequisites are met ─────────────
   useEffect(() => {
-    if (!schedule && model && project) {
+    if (!schedule && scheduleReady && model && project) {
       dispatch({ type: 'SET_SCHEDULE', schedule: runCalculationEngine(model, project) })
     }
-  }, [schedule, model, project, dispatch])
+  }, [schedule, scheduleReady, model, project, dispatch])
 
   // ── Build scope doc when schedule is available ────────────────────────────
   useEffect(() => {
@@ -46,21 +49,47 @@ export function ScheduleView() {
     }
   }, [model, project, dispatch])
 
+  async function handleImportModel() {
+    try {
+      const imported = await StorageService.importModelFromFile()
+      dispatch({ type: 'SET_MODEL', model: imported })
+      dispatch({ type: 'MARK_MODEL_CLEAN' })
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Could not import model file.')
+    }
+  }
+
   // ── Guards ────────────────────────────────────────────────────────────────
-  if (!model || !project) {
+  const blockers = getScheduleBlockers(!!model, project)
+  if (blockers.length > 0) {
     return (
-      <main className="max-w-xl mx-auto px-4 py-16 text-center">
-        <p className="text-lg font-semibold text-gray-900 mb-2">No project loaded</p>
-        <p className="text-sm text-gray-500 mb-6">
-          Complete the project intake form to generate an estimation schedule.
+      <main className="max-w-xl mx-auto px-4 py-16">
+        <p className="text-lg font-semibold text-gray-900 mb-2 text-center">
+          Schedule not available
         </p>
-        <button
-          type="button"
-          onClick={() => navigate('/intake')}
-          className="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm hover:bg-brand-700 transition-colors"
-        >
-          Go to intake form
-        </button>
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 space-y-1 mb-6">
+          {blockers.map(msg => (
+            <p key={msg} className="text-sm text-red-700">• {msg}</p>
+          ))}
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/intake')}
+            className="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm hover:bg-brand-700 transition-colors"
+          >
+            Go to intake form
+          </button>
+          {!model && (
+            <button
+              type="button"
+              onClick={handleImportModel}
+              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm hover:bg-gray-50 transition-colors"
+            >
+              Import testing model
+            </button>
+          )}
+        </div>
       </main>
     )
   }
@@ -73,6 +102,8 @@ export function ScheduleView() {
       </main>
     )
   }
+
+  if (!model || !project) return null
 
   const modelVersionMismatch = model.version !== schedule.modelVersion
 
