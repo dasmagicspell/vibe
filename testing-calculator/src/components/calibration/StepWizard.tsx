@@ -9,15 +9,16 @@ interface StepWizardProps {
   currentStep: number
   /** Allow jumping to a step by clicking it (only if target is complete or current) */
   onNavigate: (step: number) => void
+  ariaLabel?: string
 }
 
 /**
  * Horizontal step progress bar used at the top of the calibration wizard.
  * Stays visible while scrolling; each bubble scrolls to its section on click.
  */
-export function StepWizard({ steps, currentStep, onNavigate }: StepWizardProps) {
+export function StepWizard({ steps, currentStep, onNavigate, ariaLabel = 'Progress' }: StepWizardProps) {
   return (
-    <nav aria-label="Calibration progress" className="w-full">
+    <nav aria-label={ariaLabel} className="w-full">
       <ol className="relative flex w-full">
         {/* Single continuous track — always visible, independent of navigation state */}
         <div

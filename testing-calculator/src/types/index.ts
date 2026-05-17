@@ -15,7 +15,7 @@ export interface TimeEstimate {
   maxHours: number
 }
 
-/** Confidence that an estimate is accurate. Determined by calibration coverage. */
+/** Confidence that an estimate is accurate. Set explicitly in calibration/intake; capped at schedule generation. */
 export type CertaintyLevel = 'High' | 'Medium' | 'Low'
 
 // ---------------------------------------------------------------------------
@@ -256,8 +256,7 @@ export enum DeliverableType {
  * A single calibration data point.
  * When pageCategory is undefined, this is a BASE RATE that applies to all page
  * categories as a fallback. When pageCategory is set, it is a category-specific
- * override. The calculation engine checks for specific matches first, then
- * falls back to base rates, degrading certainty accordingly.
+ * override (not yet used by the calculation engine).
  */
 export interface CalibrationEntry {
   id: string
@@ -266,6 +265,8 @@ export interface CalibrationEntry {
   complexity: ComplexityLevel
   /** Baseline estimate at RigorLevel.Standard */
   baseEstimate: TimeEstimate
+  /** Engineer-declared confidence in this estimate (auto Low when estimate is empty) */
+  certainty: CertaintyLevel
   notes?: string
 }
 
@@ -326,6 +327,8 @@ export interface PageSpec {
   name: string
   category: PageCategory
   complexity: ComplexityLevel
+  /** Account manager confidence in the assigned complexity level */
+  complexityCertainty: CertaintyLevel
   /** True if this page is one template used for many similar pages (e.g. blog post) */
   isTemplate: boolean
   /** Number of instances if isTemplate = true */
@@ -342,6 +345,8 @@ export interface WorkflowSpec {
   hasBranching: boolean
   hasPaymentStep: boolean
   complexity: ComplexityLevel
+  /** Account manager confidence in the assigned complexity level */
+  complexityCertainty: CertaintyLevel
   notes?: string
 }
 
@@ -379,7 +384,11 @@ export interface ProjectSpec {
 
   // Testing parameters
   rigorLevel: RigorLevel
+  /** Account manager confidence in the selected rigor level */
+  rigorCertainty: CertaintyLevel
   browserTier: BrowserTier
+  /** Account manager confidence in the selected browser tier */
+  browserTierCertainty: CertaintyLevel
   customBrowserDescription?: string
   selectedTestTypes: TestType[]    // always-active types + any conditional ones triggered
 
@@ -398,6 +407,11 @@ export interface ProjectSpec {
 
   // Override default defect density for this project
   defectDensityOverride?: DefectDensity
+  /** Confidence in defect density override (meaningful when defectDensityOverride is set) */
+  defectDensityCertainty?: CertaintyLevel
+
+  /** Per-deliverable confidence when selected in intake */
+  deliverableCertainties?: Partial<Record<DeliverableType, CertaintyLevel>>
 
   notes?: string
 }
@@ -417,14 +431,22 @@ export interface TestCase {
  * One cell in the output matrix: a page/workflow row × a test type column.
  * null means this combination is not applicable for this project.
  */
+/** How each leg contributed to the final schedule cell certainty */
+export interface CertaintyBreakdown {
+  lookup: CertaintyLevel
+  calibration: CertaintyLevel
+  intake: CertaintyLevel
+}
+
 export interface ScheduleCell {
   rowId: string
   testType: TestType
   estimate: TimeEstimate
   certainty: CertaintyLevel
+  certaintyBreakdown: CertaintyBreakdown
   /** The test cases that make up this estimate (shown on drill-down) */
   testCases: TestCase[]
-  /** True if this cell needs review because it was interpolated or inferred */
+  /** True if this cell needs review (low certainty or missing calibration data) */
   needsReview: boolean
 }
 

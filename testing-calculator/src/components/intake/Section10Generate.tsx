@@ -1,15 +1,12 @@
 import type { ProjectSpec } from '@/types'
 import { validateProject, countEffectivePages } from '@/utils/projectHelpers'
-import { StepNav } from '@/components/calibration/StepWizard'
-
 interface Props {
   project: ProjectSpec
-  onBack: () => void
   onGenerate: () => void
   modelName: string
 }
 
-export function Section10Generate({ project, onBack, onGenerate, modelName }: Props) {
+export function Section10Generate({ project, onGenerate, modelName }: Props) {
   const validation = validateProject(project)
   const effectivePages = countEffectivePages(project.pages)
 
@@ -126,8 +123,6 @@ export function Section10Generate({ project, onBack, onGenerate, modelName }: Pr
           </p>
         )}
       </div>
-
-      <StepNav onBack={onBack} />
     </div>
   )
 }

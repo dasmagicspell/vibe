@@ -30,8 +30,10 @@ export function createDefaultProject(): ProjectSpec {
     pages:             [],
     workflows:         [],
     integrations:      [],
-    rigorLevel:        RigorLevel.Standard,
-    browserTier:       BrowserTier.Standard,
+    rigorLevel:           RigorLevel.Standard,
+    rigorCertainty:       'High',
+    browserTier:          BrowserTier.Standard,
+    browserTierCertainty: 'High',
     selectedTestTypes: [...ALWAYS_ACTIVE_TEST_TYPES],
     includeExploratory:   false,
     exploratoryBlockHours: undefined,
@@ -48,7 +50,8 @@ export function createPageSpec(overrides: Partial<PageSpec> = {}): PageSpec {
     id:         generateId(),
     name:       '',
     category:   PageCategory.Informational,
-    complexity: ComplexityLevel.Medium,
+    complexity:            ComplexityLevel.Medium,
+    complexityCertainty:   'High',
     isTemplate: false,
     ...overrides,
   }
@@ -61,7 +64,8 @@ export function createWorkflowSpec(overrides: Partial<WorkflowSpec> = {}): Workf
     stepCount:       3,
     hasBranching:    false,
     hasPaymentStep:  false,
-    complexity:      ComplexityLevel.Medium,
+    complexity:            ComplexityLevel.Medium,
+    complexityCertainty:   'High',
     ...overrides,
   }
 }
@@ -257,6 +261,34 @@ export function validateProject(project: ProjectSpec): ProjectValidationResult {
   }
 
   return { isValid: errors.length === 0, errors, warnings }
+}
+
+const INTAKE_STEP_COUNT = 10
+
+/** True when an intake wizard step is missing required data or has invalid values. */
+export function intakeStepHasError(stepIndex: number, project: ProjectSpec): boolean {
+  switch (stepIndex) {
+    case 0:
+      return !project.projectName.trim() || !project.clientName.trim()
+
+    case 2:
+      if (project.pages.length === 0) return true
+      return project.pages.some(p => !p.name.trim())
+
+    case 3:
+      return project.workflows.some(w => !w.name.trim())
+
+    case 9:
+      return !validateProject(project).isValid
+
+    default:
+      return false
+  }
+}
+
+/** Per-step error flags for the intake wizard bubbles (indices 0–9). */
+export function getIntakeStepErrors(project: ProjectSpec): boolean[] {
+  return Array.from({ length: INTAKE_STEP_COUNT }, (_, i) => intakeStepHasError(i, project))
 }
 
 // ---------------------------------------------------------------------------

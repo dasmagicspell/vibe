@@ -80,7 +80,8 @@ describe('computeCellEstimate — exact match', () => {
       RigorLevel.Standard,
       BrowserTier.Standard,
     )
-    expect(result.certainty).toBe('High')
+    expect(result.lookupCertainty).toBe('High')
+    expect(result.calibrationCertainty).toBe('High')
     expect(result.needsReview).toBe(false)
     expect(result.estimate.expectedHours).toBeGreaterThan(0)
   })
@@ -114,7 +115,7 @@ describe('computeCellEstimate — adjacent fallback', () => {
     const result = computeCellEstimate(
       entries, TestType.Functional, ComplexityLevel.Low, RigorLevel.Standard, BrowserTier.Standard
     )
-    expect(result.certainty).toBe('Medium')
+    expect(result.lookupCertainty).toBe('Medium')
   })
 })
 
@@ -127,7 +128,8 @@ describe('computeCellEstimate — no data fallback', () => {
       RigorLevel.Standard,
       BrowserTier.Standard,
     )
-    expect(result.certainty).toBe('Low')
+    expect(result.lookupCertainty).toBe('Low')
+    expect(result.calibrationCertainty).toBe('Low')
     expect(result.needsReview).toBe(true)
     expect(result.estimate.expectedHours).toBe(0)
   })
@@ -240,7 +242,43 @@ describe('runCalculationEngine', () => {
   })
 
   it('returns empty review flags when all entries are calibrated', () => {
-    // Default model has entries for all test types — no Low certainty expected
     expect(output.reviewFlags).toHaveLength(0)
+  })
+
+  it('each cell includes certainty breakdown', () => {
+    const cell = output.rows[0].cells[TestType.Functional]
+    expect(cell.certaintyBreakdown).toBeDefined()
+    expect(cell.certaintyBreakdown.lookup).toBeDefined()
+    expect(cell.certaintyBreakdown.calibration).toBeDefined()
+    expect(cell.certaintyBreakdown.intake).toBeDefined()
+  })
+
+  it('caps cell certainty when engineer sets Medium calibration', () => {
+    const entries = createDefaultEntries().map(e =>
+      e.testType === TestType.Functional && e.complexity === ComplexityLevel.Low
+        ? { ...e, certainty: 'Medium' as const }
+        : e
+    )
+    const modelWithMedium = { ...model, entries }
+    const out = runCalculationEngine(modelWithMedium, project)
+    const homeCell = out.rows.find(r => r.label === 'Home')?.cells[TestType.Functional]
+    expect(homeCell?.certainty).toBe('Medium')
+  })
+
+  it('caps cell certainty when intake complexity confidence is Low', () => {
+    const proj = {
+      ...project,
+      pages: [
+        createPageSpec({
+          name: 'Home',
+          category: PageCategory.Informational,
+          complexity: ComplexityLevel.Low,
+          complexityCertainty: 'Low' as const,
+        }),
+      ],
+    }
+    const out = runCalculationEngine(model, proj)
+    const cell = out.rows[0].cells[TestType.Functional]
+    expect(cell.certainty).toBe('Low')
   })
 })

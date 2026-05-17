@@ -1,14 +1,11 @@
-import type { PageSpec, ProjectSpec } from '@/types'
+import type { CertaintyLevel, PageSpec, ProjectSpec } from '@/types'
 import { PageCategory, ComplexityLevel, COMPLEXITY_DEFINITIONS } from '@/types'
 import { createPageSpec, PAGE_CATEGORY_DESCRIPTIONS } from '@/utils/projectHelpers'
 import { Tooltip } from '@/components/shared/Tooltip'
-import { StepNav } from '@/components/calibration/StepWizard'
-
+import { CertaintySelector } from '@/components/shared/CertaintySelector'
 interface Props {
   pages: PageSpec[]
   onChange: (updates: Partial<ProjectSpec>) => void
-  onBack: () => void
-  onNext: () => void
 }
 
 const CATEGORY_OPTIONS = Object.values(PageCategory).map(c => ({
@@ -22,7 +19,7 @@ const COMPLEXITY_OPTIONS = [
   { value: ComplexityLevel.High,   label: 'High' },
 ]
 
-export function Section3Pages({ pages, onChange, onBack, onNext }: Props) {
+export function Section3Pages({ pages, onChange }: Props) {
   function addPage() {
     onChange({ pages: [...pages, createPageSpec()] })
   }
@@ -77,7 +74,6 @@ export function Section3Pages({ pages, onChange, onBack, onNext }: Props) {
         Add page
       </button>
 
-      <StepNav onBack={onBack} onNext={onNext} />
     </div>
   )
 }
@@ -181,6 +177,15 @@ function PageCard({ page, index, onUpdate, onRemove }: PageCardProps) {
                 </button>
               )
             })}
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-xs text-gray-500">Confidence in complexity:</span>
+            <CertaintySelector
+              id={`page-certainty-${page.id}`}
+              compact
+              value={page.complexityCertainty ?? 'High'}
+              onChange={v => onUpdate({ complexityCertainty: v as CertaintyLevel })}
+            />
           </div>
         </div>
       </div>

@@ -2,26 +2,17 @@
 // CalculationEngine.ts
 // Pure function: (TestingModel, ProjectSpec) → ScheduleOutput
 //
-// Formula recap (from SPEC.md):
-//   CellEstimate = BaseEstimate(testType, complexity) at Standard rigor
-//                × RIGOR_MULTIPLIERS[rigorLevel]
-//                × BROWSER_SCALING[browserTier]   (CrossBrowser/Responsive only)
-//
-//   RetestingEstimate  = ExecutionSubtotal × DEFECT_DENSITY_MULTIPLIERS[density]
-//   RegressionEstimate = RetestingEstimate × 0.60
-//   CoordOverhead      = ExecutionSubtotal × coordinationFraction
-//   ReportOverhead     = ExecutionSubtotal × reportingFraction
-//   GrandTotal         = sum of all the above + deliverables
-//
-// Certainty:
-//   High   — exact (testType, complexity) base-rate entry found
-//   Medium — entry found at adjacent complexity (interpolated / approximate)
-//   Low    — no calibration data for this testType; flagged for review
+// Certainty (final per cell):
+//   min(lookupCertainty, calibrationCertainty, intakeCertainty)
+//   lookup: High = exact match, Medium = adjacent interpolation, Low = no data
+//   calibration: engineer-declared on CalibrationEntry
+//   intake: account manager confidence on complexity, rigor, browser, etc.
 // =============================================================================
 
 import type {
   TestingModel, ProjectSpec, ScheduleOutput, ScheduleRow, ScheduleCell,
-  SummaryLineItem, CalibrationEntry, TimeEstimate,
+  SummaryLineItem, CalibrationEntry, TimeEstimate, CertaintyLevel,
+  CertaintyBreakdown,
 } from '@/types'
 import {
   TestType, ComplexityLevel, BrowserTier,
@@ -29,12 +20,12 @@ import {
 } from '@/types'
 import { getTestCases } from './testCases'
 import { formatRange } from '@/utils/modelHelpers'
-
-// ---------------------------------------------------------------------------
-// Browser-tier scaling factors
-// Applied on top of the base scenario estimate for browser-dependent test types.
-// The engineer calibrates CrossBrowser/Responsive at their Standard tier baseline.
-// ---------------------------------------------------------------------------
+import {
+  minCertainty,
+  intakeCertaintyForCell,
+  intakeCertaintyForProject,
+  isEstimateEmpty,
+} from '@/utils/certaintyHelpers'
 
 const BROWSER_TIER_SCALING: Record<BrowserTier, number> = {
   [BrowserTier.Basic]:    0.50,
@@ -50,16 +41,11 @@ const RESPONSIVE_TIER_SCALING: Record<BrowserTier, number> = {
   [BrowserTier.Custom]:   1.80,
 }
 
-// Complexity order for adjacent-entry fallback
 const COMPLEXITY_ORDER = [
   ComplexityLevel.Low,
   ComplexityLevel.Medium,
   ComplexityLevel.High,
 ] as const
-
-// ---------------------------------------------------------------------------
-// Arithmetic helpers
-// ---------------------------------------------------------------------------
 
 export function addEstimates(a: TimeEstimate, b: TimeEstimate): TimeEstimate {
   return {
@@ -82,12 +68,8 @@ export function sumEstimates(estimates: TimeEstimate[]): TimeEstimate {
 }
 
 function roundQ(n: number): number {
-  return Math.round(n * 4) / 4   // nearest 0.25 hrs
+  return Math.round(n * 4) / 4
 }
-
-// ---------------------------------------------------------------------------
-// Calibration entry lookup
-// ---------------------------------------------------------------------------
 
 function findExactEntry(
   entries: CalibrationEntry[],
@@ -101,14 +83,12 @@ function findExactEntry(
   )
 }
 
-/** Try adjacent complexities in order: Medium → then the other end. */
 function findAdjacentEntry(
   entries: CalibrationEntry[],
   testType: TestType,
   targetComplexity: ComplexityLevel,
 ): CalibrationEntry | undefined {
   const tryOrder = COMPLEXITY_ORDER.filter(c => c !== targetComplexity)
-  // Prefer Medium as the most neutral fallback
   const sorted = [
     ComplexityLevel.Medium,
     ...tryOrder.filter(c => c !== ComplexityLevel.Medium),
@@ -122,15 +102,17 @@ function findAdjacentEntry(
   return undefined
 }
 
-// ---------------------------------------------------------------------------
-// Single-cell estimate computation
-// ---------------------------------------------------------------------------
+function calibrationCertaintyFromEntry(entry: CalibrationEntry | undefined): CertaintyLevel {
+  if (!entry || isEstimateEmpty(entry.baseEstimate)) return 'Low'
+  return entry.certainty ?? 'High'
+}
 
 interface CellComputation {
   estimate:    TimeEstimate
-  certainty:   'High' | 'Medium' | 'Low'
+  lookupCertainty: CertaintyLevel
+  calibrationCertainty: CertaintyLevel
   needsReview: boolean
-  source:      string   // human-readable explanation, shown in drill-down
+  source:      string
 }
 
 export function computeCellEstimate(
@@ -142,56 +124,50 @@ export function computeCellEstimate(
 ): CellComputation {
   const rigorMultiplier = RIGOR_MULTIPLIERS[rigorLevel]
 
-  // Determine browser scaling for browser-sensitive test types
   const browserScale =
     testType === TestType.CrossBrowser    ? BROWSER_TIER_SCALING[browserTier]    :
     testType === TestType.ResponsiveMobile ? RESPONSIVE_TIER_SCALING[browserTier] :
     1.0
 
-  // 1. Exact match
   const exact = findExactEntry(entries, testType, complexity)
   if (exact && exact.baseEstimate.expectedHours > 0) {
     const base = scaleEstimate(exact.baseEstimate, rigorMultiplier * browserScale)
     return {
-      estimate:    base,
-      certainty:   'High',
-      needsReview: false,
-      source:      `Calibrated at ${complexity} complexity × ${rigorLevel} rigor`,
+      estimate:             base,
+      lookupCertainty:      'High',
+      calibrationCertainty: calibrationCertaintyFromEntry(exact),
+      needsReview:          false,
+      source:               `Calibrated at ${complexity} complexity × ${rigorLevel} rigor`,
     }
   }
 
-  // 2. Adjacent complexity fallback
   const adjacent = findAdjacentEntry(entries, testType, complexity)
   if (adjacent && adjacent.baseEstimate.expectedHours > 0) {
-    // Apply a rough complexity ratio using COMPLEXITY_ORDER indices
     const fromIdx = COMPLEXITY_ORDER.indexOf(adjacent.complexity)
     const toIdx   = COMPLEXITY_ORDER.indexOf(complexity)
-    const complexityRatio = (toIdx + 1) / (fromIdx + 1)   // simple 1:2:3 ratio
+    const complexityRatio = (toIdx + 1) / (fromIdx + 1)
 
     const base = scaleEstimate(
       adjacent.baseEstimate,
       rigorMultiplier * browserScale * complexityRatio
     )
     return {
-      estimate:    base,
-      certainty:   'Medium',
-      needsReview: false,
-      source:      `Interpolated from ${adjacent.complexity} calibration (no exact ${complexity} entry)`,
+      estimate:             base,
+      lookupCertainty:      'Medium',
+      calibrationCertainty: calibrationCertaintyFromEntry(adjacent),
+      needsReview:          false,
+      source:               `Interpolated from ${adjacent.complexity} calibration (no exact ${complexity} entry)`,
     }
   }
 
-  // 3. No data — return zero estimate, flag for review
   return {
-    estimate:    { minHours: 0, expectedHours: 0, maxHours: 0 },
-    certainty:   'Low',
-    needsReview: true,
-    source:      `No calibration data found for ${testType} — add to model`,
+    estimate:             { minHours: 0, expectedHours: 0, maxHours: 0 },
+    lookupCertainty:      'Low',
+    calibrationCertainty: 'Low',
+    needsReview:          true,
+    source:               `No calibration data found for ${testType} — add to model`,
   }
 }
-
-// ---------------------------------------------------------------------------
-// Row builders
-// ---------------------------------------------------------------------------
 
 function buildMatrixRow(
   rowId:          string,
@@ -205,6 +181,7 @@ function buildMatrixRow(
   project:        ProjectSpec,
 ): ScheduleRow {
   const cells: Record<string, ScheduleCell> = {}
+  const intakeCertainty = intakeCertaintyForCell(project, rowType, rowId)
 
   for (const testType of matrixTestTypes) {
     const comp = computeCellEstimate(
@@ -215,29 +192,35 @@ function buildMatrixRow(
       project.browserTier,
     )
 
+    const certaintyBreakdown: CertaintyBreakdown = {
+      lookup:      comp.lookupCertainty,
+      calibration: comp.calibrationCertainty,
+      intake:      intakeCertainty,
+    }
+
+    const certainty = minCertainty(
+      certaintyBreakdown.lookup,
+      certaintyBreakdown.calibration,
+      certaintyBreakdown.intake,
+    )
+
     const scaledEstimate = scaleEstimate(comp.estimate, instanceMult)
 
-    const cell: ScheduleCell = {
+    cells[testType] = {
       rowId,
       testType,
-      estimate:    scaledEstimate,
-      certainty:   comp.certainty,
-      testCases:   getTestCases(testType, pageCategory),
-      needsReview: comp.needsReview,
+      estimate:           scaledEstimate,
+      certainty,
+      certaintyBreakdown,
+      testCases:            getTestCases(testType, pageCategory),
+      needsReview:          comp.needsReview || certainty === 'Low',
     }
-    cells[testType] = cell
   }
 
-  const subtotal = sumEstimates(
-    Object.values(cells).map(c => c.estimate)
-  )
+  const subtotal = sumEstimates(Object.values(cells).map(c => c.estimate))
 
   return { id: rowId, label: rowLabel, rowType, subtotal, cells }
 }
-
-// ---------------------------------------------------------------------------
-// Summary helpers
-// ---------------------------------------------------------------------------
 
 function buildDeliverableLineItems(
   model:   TestingModel,
@@ -246,10 +229,21 @@ function buildDeliverableLineItems(
   return project.selectedDeliverables.map(type => {
     const calibrated = model.deliverableEstimates.find(d => d.type === type)
     const estimate   = calibrated?.estimate ?? { minHours: 2, expectedHours: 4, maxHours: 6 }
+
+    const lookupCertainty: CertaintyLevel = calibrated && !isEstimateEmpty(calibrated.estimate)
+      ? 'High'
+      : 'Low'
+    const calibrationCertainty: CertaintyLevel = calibrated && !isEstimateEmpty(calibrated.estimate)
+      ? 'High'
+      : 'Low'
+    const intakeCertainty = project.deliverableCertainties?.[type] ?? 'High'
+
+    const certainty = minCertainty(lookupCertainty, calibrationCertainty, intakeCertainty)
+
     return {
       label:     type,
       estimate,
-      certainty: calibrated ? 'High' as const : 'Low' as const,
+      certainty,
       tooltip:   calibrated?.notes,
     }
   })
@@ -259,7 +253,6 @@ function buildE2ELineItem(
   model:   TestingModel,
   project: ProjectSpec,
 ): SummaryLineItem {
-  // Use the E2E automation calibration entry at the project's highest complexity
   const maxComplexity = project.pages.some(p => p.complexity === ComplexityLevel.High)
     ? ComplexityLevel.High : ComplexityLevel.Medium
 
@@ -271,17 +264,15 @@ function buildE2ELineItem(
     project.browserTier,
   )
 
+  const intakeCertainty = intakeCertaintyForProject(project)
+
   return {
     label:     TestType.E2EAutomation,
     estimate:  comp.estimate,
-    certainty: comp.certainty,
+    certainty: minCertainty(comp.lookupCertainty, comp.calibrationCertainty, intakeCertainty),
     tooltip:   'E2E automation is a project-level line item. Refine with the engineer after scope confirmation.',
   }
 }
-
-// ---------------------------------------------------------------------------
-// Review flag collector
-// ---------------------------------------------------------------------------
 
 function collectReviewFlags(
   rows: ScheduleRow[]
@@ -290,10 +281,13 @@ function collectReviewFlags(
   for (const row of rows) {
     for (const cell of Object.values(row.cells)) {
       if (cell.needsReview) {
+        const reason = cell.certaintyBreakdown.lookup === 'Low'
+          ? 'No calibration data — add this test type to the model'
+          : 'Low certainty — review calibration and intake confidence'
         flags.push({
           rowLabel: row.label,
           testType: cell.testType,
-          reason:   'No calibration data — add this test type to the model',
+          reason,
         })
       }
     }
@@ -301,24 +295,14 @@ function collectReviewFlags(
   return flags
 }
 
-// ---------------------------------------------------------------------------
-// Main entry point
-// ---------------------------------------------------------------------------
-
-/**
- * Runs the full estimation calculation.
- * Pure function — does not mutate inputs, does not access localStorage.
- */
 export function runCalculationEngine(
   model:   TestingModel,
   project: ProjectSpec,
 ): ScheduleOutput {
-  // E2E automation is a summary-level line item, not a matrix column
   const matrixTestTypes = project.selectedTestTypes.filter(
     t => t !== TestType.E2EAutomation
   )
 
-  // Build page rows
   const pageRows = project.pages.map(page =>
     buildMatrixRow(
       page.id,
@@ -335,7 +319,6 @@ export function runCalculationEngine(
     )
   )
 
-  // Build workflow rows (no page category → uses base rates)
   const workflowRows = project.workflows.map(wf =>
     buildMatrixRow(
       wf.id,
@@ -352,10 +335,8 @@ export function runCalculationEngine(
 
   const allRows = [...pageRows, ...workflowRows]
 
-  // Execution subtotal
   const executionSubtotal = sumEstimates(allRows.map(r => r.subtotal))
 
-  // Retesting and regression
   const effectiveDensity =
     project.defectDensityOverride ?? model.overheadFactors.defaultDefectDensity
   const retestingFraction    = DEFECT_DENSITY_MULTIPLIERS[effectiveDensity]
@@ -366,7 +347,6 @@ export function runCalculationEngine(
     ? scaleEstimate(retestingEstimate, 0.60)
     : { minHours: 0, expectedHours: 0, maxHours: 0 }
 
-  // Overhead
   const coordinationOverhead = scaleEstimate(
     executionSubtotal, model.overheadFactors.coordinationFraction
   )
@@ -374,13 +354,11 @@ export function runCalculationEngine(
     executionSubtotal, model.overheadFactors.reportingFraction
   )
 
-  // Deliverables
   const deliverableLineItems = buildDeliverableLineItems(model, project)
   if (project.includeAutomation) {
     deliverableLineItems.push(buildE2ELineItem(model, project))
   }
 
-  // Grand total
   const grandTotal = [
     executionSubtotal,
     retestingEstimate,
@@ -390,7 +368,6 @@ export function runCalculationEngine(
     ...deliverableLineItems.map(d => d.estimate),
   ].reduce(addEstimates, { minHours: 0, expectedHours: 0, maxHours: 0 })
 
-  // Review flags
   const reviewFlags = collectReviewFlags(allRows)
 
   return {
@@ -414,5 +391,4 @@ export function runCalculationEngine(
   }
 }
 
-// Re-export for convenience
 export { formatRange }

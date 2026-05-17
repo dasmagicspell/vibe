@@ -1,17 +1,20 @@
-import type { ProjectSpec } from '@/types'
+import type { CertaintyLevel, ProjectSpec } from '@/types'
 import { DeliverableType, ReportingLevel, DefectDensity, DEFECT_DENSITY_DEFINITIONS } from '@/types'
 import { Tooltip } from '@/components/shared/Tooltip'
 import { SelectField } from '@/components/shared/SelectField'
-import { StepNav } from '@/components/calibration/StepWizard'
+import { CertaintySelector } from '@/components/shared/CertaintySelector'
 
 interface Props {
   data: Pick<
     ProjectSpec,
-    'selectedDeliverables' | 'reportingLevel' | 'retestingIncluded' | 'defectDensityOverride'
+    | 'selectedDeliverables'
+    | 'deliverableCertainties'
+    | 'reportingLevel'
+    | 'retestingIncluded'
+    | 'defectDensityOverride'
+    | 'defectDensityCertainty'
   >
   onChange: (updates: Partial<ProjectSpec>) => void
-  onBack: () => void
-  onNext: () => void
 }
 
 const DELIVERABLE_DESCRIPTIONS: Record<DeliverableType, string> = {
@@ -35,13 +38,25 @@ const DEFECT_OPTIONS = [
   { value: DefectDensity.High,   label: 'High (~35%) — volatile codebase, rapid iteration' },
 ]
 
-export function Section9Deliverables({ data, onChange, onBack, onNext }: Props) {
+export function Section9Deliverables({ data, onChange }: Props) {
   function toggleDeliverable(type: DeliverableType) {
     const current = data.selectedDeliverables
     const next = current.includes(type)
       ? current.filter(d => d !== type)
       : [...current, type]
-    onChange({ selectedDeliverables: next })
+    const deliverableCertainties = { ...data.deliverableCertainties }
+    if (!current.includes(type)) {
+      deliverableCertainties[type] = deliverableCertainties[type] ?? 'High'
+    } else {
+      delete deliverableCertainties[type]
+    }
+    onChange({ selectedDeliverables: next, deliverableCertainties })
+  }
+
+  function setDeliverableCertainty(type: DeliverableType, certainty: CertaintyLevel) {
+    onChange({
+      deliverableCertainties: { ...data.deliverableCertainties, [type]: certainty },
+    })
   }
 
   return (
@@ -74,10 +89,24 @@ export function Section9Deliverables({ data, onChange, onBack, onNext }: Props) 
                 onChange={() => toggleDeliverable(type)}
                 className="mt-0.5 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
               />
-              <div>
+              <div className="flex-1">
                 <span className="text-sm font-medium text-gray-900">{type}</span>
                 <p className="text-xs text-gray-500 mt-0.5">{DELIVERABLE_DESCRIPTIONS[type]}</p>
               </div>
+              {isSelected && (
+                <div
+                  className="flex items-center gap-2 flex-none"
+                  onClick={e => e.preventDefault()}
+                >
+                  <span className="text-xs text-gray-500 whitespace-nowrap">Confidence:</span>
+                  <CertaintySelector
+                    id={`deliverable-certainty-${type}`}
+                    compact
+                    value={data.deliverableCertainties?.[type] ?? 'High'}
+                    onChange={v => setDeliverableCertainty(type, v)}
+                  />
+                </div>
+              )}
             </label>
           )
         })}
@@ -130,11 +159,13 @@ export function Section9Deliverables({ data, onChange, onBack, onNext }: Props) 
         </div>
         <select
           value={data.defectDensityOverride ?? ''}
-          onChange={e =>
+          onChange={e => {
+            const value = e.target.value ? e.target.value as DefectDensity : undefined
             onChange({
-              defectDensityOverride: e.target.value ? e.target.value as DefectDensity : undefined,
+              defectDensityOverride: value,
+              defectDensityCertainty: value ? (data.defectDensityCertainty ?? 'High') : undefined,
             })
-          }
+          }}
           className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white
                      focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
@@ -144,13 +175,23 @@ export function Section9Deliverables({ data, onChange, onBack, onNext }: Props) 
           ))}
         </select>
         {data.defectDensityOverride && (
-          <p className="text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-lg leading-relaxed">
-            {DEFECT_DENSITY_DEFINITIONS[data.defectDensityOverride]}
-          </p>
+          <>
+            <p className="text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-lg leading-relaxed">
+              {DEFECT_DENSITY_DEFINITIONS[data.defectDensityOverride]}
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Confidence in override:</span>
+              <CertaintySelector
+                id="defect-density-certainty"
+                compact
+                value={data.defectDensityCertainty ?? 'High'}
+                onChange={v => onChange({ defectDensityCertainty: v })}
+              />
+            </div>
+          </>
         )}
       </div>
 
-      <StepNav onBack={onBack} onNext={onNext} nextLabel="Review project" />
     </div>
   )
 }

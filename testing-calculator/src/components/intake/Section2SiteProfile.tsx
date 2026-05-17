@@ -1,13 +1,9 @@
 import type { ProjectSpec } from '@/types'
 import { SiteType, ProjectMoment, SensitiveDataLevel } from '@/types'
 import { RadioGroup } from '@/components/shared/RadioGroup'
-import { StepNav } from '@/components/calibration/StepWizard'
-
 interface Props {
   data: Pick<ProjectSpec, 'siteType' | 'projectMoment' | 'sensitiveData'>
   onChange: (updates: Partial<ProjectSpec>) => void
-  onBack: () => void
-  onNext: () => void
 }
 
 const SITE_TYPE_OPTIONS = [
@@ -33,7 +29,7 @@ const SENSITIVE_DATA_OPTIONS = [
   { value: SensitiveDataLevel.HealthLegal, label: 'Health / legal', description: 'Medical, financial, legal' },
 ]
 
-export function Section2SiteProfile({ data, onChange, onBack, onNext }: Props) {
+export function Section2SiteProfile({ data, onChange }: Props) {
   return (
     <div className="space-y-8">
       <div>
@@ -72,7 +68,6 @@ export function Section2SiteProfile({ data, onChange, onBack, onNext }: Props) {
         columns={4}
       />
 
-      <StepNav onBack={onBack} onNext={onNext} />
     </div>
   )
 }

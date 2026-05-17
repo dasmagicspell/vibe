@@ -219,10 +219,11 @@ Build `src/services/CalculationEngine.ts`:
 - Input: TestingModel + ProjectSpec
 - Output: ScheduleOutput
 - Logic: formula described above in this spec
-- Certainty assignment:
-  - High = exact calibration entry found (exact pageCategory + testType + complexity match)
-  - Medium = adjacent complexity found and interpolated
-  - Low = only category match or cross-type inference; flag for engineer review
+- Certainty assignment (per schedule cell):
+  - Engineers set certainty per calibration entry (Step 3); account managers set confidence on intake drivers (complexity, rigor, browser tier, deliverables)
+  - Lookup leg: High = exact base-rate match, Medium = adjacent-complexity interpolation, Low = no data
+  - Final cell certainty = min(lookup, calibration entry certainty, intake certainty)
+  - Review flags when final certainty is Low or calibration data is missing
 
 Build `ScheduleView`:
 - Pivot matrix table: rows = pages + workflows, columns = active test types

@@ -1,15 +1,11 @@
 import type { IntegrationSpec, ProjectSpec } from '@/types'
 import { createIntegrationSpec, INTEGRATION_CATEGORY_OPTIONS } from '@/utils/projectHelpers'
-import { StepNav } from '@/components/calibration/StepWizard'
-
 interface Props {
   integrations: IntegrationSpec[]
   onChange: (updates: Partial<ProjectSpec>) => void
-  onBack: () => void
-  onNext: () => void
 }
 
-export function Section5Integrations({ integrations, onChange, onBack, onNext }: Props) {
+export function Section5Integrations({ integrations, onChange }: Props) {
   function addIntegration() {
     onChange({ integrations: [...integrations, createIntegrationSpec()] })
   }
@@ -143,7 +139,6 @@ export function Section5Integrations({ integrations, onChange, onBack, onNext }:
         Add integration
       </button>
 
-      <StepNav onBack={onBack} onNext={onNext} />
     </div>
   )
 }

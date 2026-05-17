@@ -1,6 +1,7 @@
 import type { TestingModel } from '@/types'
 import { ComplexityLevel, ALWAYS_ACTIVE_TEST_TYPES } from '@/types'
 import { validateModel, findBaseRateEntry, formatRange } from '@/utils/modelHelpers'
+import { CertaintyBadge } from '@/components/shared/CertaintyBadge'
 import { StepNav } from './StepWizard'
 
 interface Step7Props {
@@ -85,6 +86,7 @@ export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props)
                 {COMPLEXITY_LEVELS.map(c => (
                   <th key={c} className="text-center px-3 py-2 text-gray-500 font-medium">{c}</th>
                 ))}
+                <th className="text-center px-3 py-2 text-gray-500 font-medium">Certainty</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -101,6 +103,19 @@ export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props)
                       </td>
                     )
                   })}
+                  <td className="px-3 py-2">
+                    <div className="flex justify-center gap-1">
+                      {COMPLEXITY_LEVELS.map(c => {
+                        const entry = findBaseRateEntry(model.entries, testType, c)
+                        const level = entry?.certainty ?? 'Low'
+                        return (
+                          <span key={c} title={`${c}: ${level}`}>
+                            <CertaintyBadge level={level} compact />
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -3,6 +3,7 @@ import {
   createDefaultProject, createPageSpec, createWorkflowSpec, createIntegrationSpec,
   deriveActiveTestTypes, getTestTypeActivationReason,
   isSectionComplete, validateProject, countEffectivePages,
+  intakeStepHasError, getIntakeStepErrors,
 } from './projectHelpers'
 import {
   PageCategory, AccountScope, ProjectMoment, TestType,
@@ -245,6 +246,39 @@ describe('validateProject', () => {
     }
     const result = validateProject(project)
     expect(result.isValid).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// intakeStepHasError / getIntakeStepErrors
+// ---------------------------------------------------------------------------
+
+describe('intakeStepHasError', () => {
+  it('flags identity step when names are empty', () => {
+    expect(intakeStepHasError(0, createDefaultProject())).toBe(true)
+  })
+
+  it('flags pages step when no pages exist', () => {
+    const project = { ...createDefaultProject(), projectName: 'Site', clientName: 'Acme' }
+    expect(intakeStepHasError(2, project)).toBe(true)
+  })
+
+  it('flags pages step when a page has no name', () => {
+    const project = {
+      ...createDefaultProject(),
+      projectName: 'Site',
+      clientName:  'Acme',
+      pages:       [createPageSpec()],
+    }
+    expect(intakeStepHasError(2, project)).toBe(true)
+  })
+
+  it('flags generate step when project validation fails', () => {
+    expect(intakeStepHasError(9, createDefaultProject())).toBe(true)
+  })
+
+  it('returns ten step flags from getIntakeStepErrors', () => {
+    expect(getIntakeStepErrors(createDefaultProject())).toHaveLength(10)
   })
 })
 

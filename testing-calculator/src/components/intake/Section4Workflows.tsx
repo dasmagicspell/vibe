@@ -1,17 +1,14 @@
-import type { WorkflowSpec, ProjectSpec } from '@/types'
+import type { CertaintyLevel, WorkflowSpec, ProjectSpec } from '@/types'
 import { ComplexityLevel, COMPLEXITY_DEFINITIONS } from '@/types'
 import { createWorkflowSpec } from '@/utils/projectHelpers'
 import { Tooltip } from '@/components/shared/Tooltip'
-import { StepNav } from '@/components/calibration/StepWizard'
-
+import { CertaintySelector } from '@/components/shared/CertaintySelector'
 interface Props {
   workflows: WorkflowSpec[]
   onChange: (updates: Partial<ProjectSpec>) => void
-  onBack: () => void
-  onNext: () => void
 }
 
-export function Section4Workflows({ workflows, onChange, onBack, onNext }: Props) {
+export function Section4Workflows({ workflows, onChange }: Props) {
   function addWorkflow() {
     onChange({ workflows: [...workflows, createWorkflowSpec()] })
   }
@@ -66,7 +63,6 @@ export function Section4Workflows({ workflows, onChange, onBack, onNext }: Props
         Add workflow
       </button>
 
-      <StepNav onBack={onBack} onNext={onNext} />
     </div>
   )
 }
@@ -155,6 +151,15 @@ function WorkflowCard({ workflow, index, onUpdate, onRemove }: WorkflowCardProps
                 {c}
               </button>
             ))}
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-xs text-gray-500">Confidence in complexity:</span>
+            <CertaintySelector
+              id={`wf-certainty-${workflow.id}`}
+              compact
+              value={workflow.complexityCertainty ?? 'High'}
+              onChange={v => onUpdate({ complexityCertainty: v as CertaintyLevel })}
+            />
           </div>
         </div>
       </div>

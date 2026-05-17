@@ -1,13 +1,19 @@
-import type { ProjectSpec } from '@/types'
+import type { CertaintyLevel, ProjectSpec } from '@/types'
 import { RiskLevel, RigorLevel, BrowserTier, RIGOR_DEFINITIONS, BROWSER_TIER_DEFINITIONS } from '@/types'
 import { RadioGroup } from '@/components/shared/RadioGroup'
-import { StepNav } from '@/components/calibration/StepWizard'
+import { CertaintySelector } from '@/components/shared/CertaintySelector'
 
 interface Props {
-  data: Pick<ProjectSpec, 'riskLevel' | 'rigorLevel' | 'browserTier' | 'customBrowserDescription'>
+  data: Pick<
+    ProjectSpec,
+    | 'riskLevel'
+    | 'rigorLevel'
+    | 'rigorCertainty'
+    | 'browserTier'
+    | 'browserTierCertainty'
+    | 'customBrowserDescription'
+  >
   onChange: (updates: Partial<ProjectSpec>) => void
-  onBack: () => void
-  onNext: () => void
 }
 
 const RISK_OPTIONS = [
@@ -74,7 +80,7 @@ const BROWSER_OPTIONS = [
   },
 ]
 
-export function Section7RiskRigor({ data, onChange, onBack, onNext }: Props) {
+export function Section7RiskRigor({ data, onChange }: Props) {
   return (
     <div className="space-y-8">
       <div>
@@ -88,32 +94,54 @@ export function Section7RiskRigor({ data, onChange, onBack, onNext }: Props) {
       <RadioGroup
         name="risk-level"
         label="How risky is failure?"
-        tooltip="Risk influences the certainty bands and flags in the schedule. It does not directly multiply estimates — rigour does that."
+        tooltip="Risk level is recorded for scope context. It does not directly multiply estimates or affect certainty — rigour does that."
         value={data.riskLevel}
         onChange={v => onChange({ riskLevel: v as RiskLevel })}
         options={RISK_OPTIONS}
         columns={3}
       />
 
-      <RadioGroup
-        name="rigor-level"
-        label="Required testing rigour"
-        tooltip="Rigour multiplies all estimates: Smoke=0.5×, Standard=1.0×, Enhanced=1.5×, Audit=2.2×. Choose based on what the client needs to see and sign off on."
-        value={data.rigorLevel}
-        onChange={v => onChange({ rigorLevel: v as RigorLevel })}
-        options={RIGOR_OPTIONS}
-        columns={4}
-      />
+      <div className="space-y-2">
+        <RadioGroup
+          name="rigor-level"
+          label="Required testing rigour"
+          tooltip="Rigour multiplies all estimates: Smoke=0.5×, Standard=1.0×, Enhanced=1.5×, Audit=2.2×. Choose based on what the client needs to see and sign off on."
+          value={data.rigorLevel}
+          onChange={v => onChange({ rigorLevel: v as RigorLevel })}
+          options={RIGOR_OPTIONS}
+          columns={4}
+        />
+        <div className="flex items-center gap-2 pl-1">
+          <span className="text-xs text-gray-500">Confidence in rigour:</span>
+          <CertaintySelector
+            id="rigor-certainty"
+            compact
+            value={data.rigorCertainty ?? 'High'}
+            onChange={v => onChange({ rigorCertainty: v as CertaintyLevel })}
+          />
+        </div>
+      </div>
 
-      <RadioGroup
-        name="browser-tier"
-        label="Browser and device coverage"
-        tooltip="Drives the cross-browser and responsive estimates. Standard covers most projects. Enhanced is recommended for e-commerce or high-traffic sites."
-        value={data.browserTier}
-        onChange={v => onChange({ browserTier: v as BrowserTier })}
-        options={BROWSER_OPTIONS}
-        columns={4}
-      />
+      <div className="space-y-2">
+        <RadioGroup
+          name="browser-tier"
+          label="Browser and device coverage"
+          tooltip="Drives the cross-browser and responsive estimates. Standard covers most projects. Enhanced is recommended for e-commerce or high-traffic sites."
+          value={data.browserTier}
+          onChange={v => onChange({ browserTier: v as BrowserTier })}
+          options={BROWSER_OPTIONS}
+          columns={4}
+        />
+        <div className="flex items-center gap-2 pl-1">
+          <span className="text-xs text-gray-500">Confidence in browser tier:</span>
+          <CertaintySelector
+            id="browser-certainty"
+            compact
+            value={data.browserTierCertainty ?? 'High'}
+            onChange={v => onChange({ browserTierCertainty: v as CertaintyLevel })}
+          />
+        </div>
+      </div>
 
       {data.browserTier === BrowserTier.Custom && (
         <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-2">
@@ -132,7 +160,6 @@ export function Section7RiskRigor({ data, onChange, onBack, onNext }: Props) {
         </div>
       )}
 
-      <StepNav onBack={onBack} onNext={onNext} />
     </div>
   )
 }

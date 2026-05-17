@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import type { CalibrationEntry, TimeEstimate } from '@/types'
+import type { CalibrationEntry, CertaintyLevel, TimeEstimate } from '@/types'
 import { TestType, ComplexityLevel, ALWAYS_ACTIVE_TEST_TYPES, CONDITIONAL_TEST_TYPES, TEST_TYPE_DESCRIPTIONS, COMPLEXITY_DEFINITIONS } from '@/types'
 import { findBaseRateEntry, upsertBaseRateEntry } from '@/utils/modelHelpers'
+import { isEstimateEmpty } from '@/utils/certaintyHelpers'
 import { TimeEstimateInput } from '@/components/shared/TimeEstimateInput'
+import { CertaintySelector } from '@/components/shared/CertaintySelector'
 import { Tooltip } from '@/components/shared/Tooltip'
 import { StepNav } from './StepWizard'
 
@@ -21,19 +23,14 @@ const COMPLEXITY_COLORS: Record<ComplexityLevel, string> = {
   [ComplexityLevel.High]:   'text-red-700 bg-red-50',
 }
 
-/**
- * The calibration scenario matrix.
- *
- * Organised as an accordion — one section per test type. Each section shows a
- * three-row grid (Low / Medium / High complexity) with min/expected/max hour
- * inputs pre-populated from DEFAULT_SCENARIO_ESTIMATES.
- *
- * The engineer reviews and adjusts. Entries are base rates (no pageCategory),
- * which the calculation engine uses as the fallback for any page category.
- */
+const CERTAINTY_DOT: Record<CertaintyLevel, string> = {
+  High:   'bg-green-500',
+  Medium: 'bg-yellow-500',
+  Low:    'bg-red-500',
+}
+
 export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props) {
   const [openSections, setOpenSections] = useState<Set<TestType>>(
-    // Open the first always-active type by default
     new Set([ALWAYS_ACTIVE_TEST_TYPES[0]])
   )
   const [notes, setNotes] = useState<Record<string, string>>({})
@@ -47,28 +44,55 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
     })
   }
 
+  function getEstimate(testType: TestType, complexity: ComplexityLevel): TimeEstimate {
+    const entry = findBaseRateEntry(entries, testType, complexity)
+    return entry?.baseEstimate ?? { minHours: 0, expectedHours: 0, maxHours: 0 }
+  }
+
+  function getCertainty(testType: TestType, complexity: ComplexityLevel): CertaintyLevel {
+    const entry = findBaseRateEntry(entries, testType, complexity)
+    if (!entry || isEstimateEmpty(entry.baseEstimate)) return 'Low'
+    return entry.certainty
+  }
+
   function handleEstimateChange(
     testType: TestType,
     complexity: ComplexityLevel,
     estimate: TimeEstimate,
   ) {
-    onChange(upsertBaseRateEntry(entries, testType, complexity, estimate, notes[testType]))
+    const existing = findBaseRateEntry(entries, testType, complexity)
+    const wasEmpty = !existing || isEstimateEmpty(existing.baseEstimate)
+    const nowEmpty = isEstimateEmpty(estimate)
+
+    let certainty: CertaintyLevel
+    if (nowEmpty) {
+      certainty = 'Low'
+    } else if (wasEmpty) {
+      certainty = 'High'
+    } else {
+      certainty = existing?.certainty ?? 'High'
+    }
+
+    onChange(upsertBaseRateEntry(entries, testType, complexity, estimate, notes[testType], certainty))
+  }
+
+  function handleCertaintyChange(
+    testType: TestType,
+    complexity: ComplexityLevel,
+    certainty: CertaintyLevel,
+  ) {
+    const estimate = getEstimate(testType, complexity)
+    onChange(upsertBaseRateEntry(entries, testType, complexity, estimate, notes[testType], certainty))
   }
 
   function handleNoteChange(testType: TestType, note: string) {
     setNotes(prev => ({ ...prev, [testType]: note }))
-    // Update notes on all entries for this test type
     const updated = entries.map(e =>
       e.testType === testType && e.pageCategory === undefined
         ? { ...e, notes: note }
         : e
     )
     onChange(updated)
-  }
-
-  function getEstimate(testType: TestType, complexity: ComplexityLevel): TimeEstimate {
-    const entry = findBaseRateEntry(entries, testType, complexity)
-    return entry?.baseEstimate ?? { minHours: 0, expectedHours: 0, maxHours: 0 }
   }
 
   function isCalibrated(testType: TestType): boolean {
@@ -81,28 +105,34 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
   const calibratedCount = [...ALWAYS_ACTIVE_TEST_TYPES, ...CONDITIONAL_TEST_TYPES]
     .filter(isCalibrated).length
 
+  const accordionProps = {
+    getEstimate,
+    getCertainty,
+    onEstimateChange: handleEstimateChange,
+    onCertaintyChange: handleCertaintyChange,
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Calibration scenarios</h2>
         <p className="mt-1 text-sm text-gray-500">
           For each test type, enter how long it takes to test a page at Low, Medium, and High
-          complexity at your standard level of rigour. Values are pre-filled with typical
-          starting points — adjust them to match your experience.
+          complexity at your standard level of rigour. Set certainty (green / yellow / red) to
+          reflect how confident you are in each estimate.
         </p>
         <p className="mt-2 text-xs text-gray-400">
           {calibratedCount} of {ALWAYS_ACTIVE_TEST_TYPES.length + CONDITIONAL_TEST_TYPES.length} test
-          types calibrated
+          types with estimates
         </p>
       </div>
 
-      {/* Column headers */}
-      <div className="hidden sm:grid grid-cols-[1fr_auto] gap-4 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide">
+      <div className="hidden sm:grid grid-cols-[1fr_auto_auto] gap-4 px-4 text-xs font-medium text-gray-400 uppercase tracking-wide">
         <span>Test type</span>
-        <span className="pr-1">Min / Expected / Max</span>
+        <span>Min / Expected / Max</span>
+        <span className="w-20 text-center">Certainty</span>
       </div>
 
-      {/* Always-active types */}
       <div className="space-y-1">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1">
           Standard test types — always included
@@ -112,17 +142,14 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
             key={testType}
             testType={testType}
             isOpen={openSections.has(testType)}
-            isCalibrated={isCalibrated(testType)}
             onToggle={() => toggleSection(testType)}
-            getEstimate={getEstimate}
-            onEstimateChange={handleEstimateChange}
             noteValue={notes[testType] ?? ''}
             onNoteChange={note => handleNoteChange(testType, note)}
+            {...accordionProps}
           />
         ))}
       </div>
 
-      {/* Conditional types */}
       <div className="space-y-1">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1">
           Conditional test types — activate based on project intake
@@ -132,13 +159,11 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
             key={testType}
             testType={testType}
             isOpen={openSections.has(testType)}
-            isCalibrated={isCalibrated(testType)}
             onToggle={() => toggleSection(testType)}
-            getEstimate={getEstimate}
-            onEstimateChange={handleEstimateChange}
             noteValue={notes[testType] ?? ''}
             onNoteChange={note => handleNoteChange(testType, note)}
             isConditional
+            {...accordionProps}
           />
         ))}
       </div>
@@ -148,18 +173,15 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
   )
 }
 
-// ---------------------------------------------------------------------------
-// ScenarioAccordion — one test type
-// ---------------------------------------------------------------------------
-
 interface AccordionProps {
   testType: TestType
   isOpen: boolean
-  isCalibrated: boolean
   isConditional?: boolean
   onToggle: () => void
   getEstimate: (t: TestType, c: ComplexityLevel) => TimeEstimate
+  getCertainty: (t: TestType, c: ComplexityLevel) => CertaintyLevel
   onEstimateChange: (t: TestType, c: ComplexityLevel, e: TimeEstimate) => void
+  onCertaintyChange: (t: TestType, c: ComplexityLevel, level: CertaintyLevel) => void
   noteValue: string
   onNoteChange: (note: string) => void
 }
@@ -167,30 +189,33 @@ interface AccordionProps {
 function ScenarioAccordion({
   testType,
   isOpen,
-  isCalibrated,
   isConditional = false,
   onToggle,
   getEstimate,
+  getCertainty,
   onEstimateChange,
+  onCertaintyChange,
   noteValue,
   onNoteChange,
 }: AccordionProps) {
   return (
     <div className={`rounded-lg border transition-colors ${isOpen ? 'border-brand-200 bg-brand-50/30' : 'border-gray-200 bg-white'}`}>
-      {/* Header */}
       <button
         type="button"
         onClick={onToggle}
         className="w-full flex items-center gap-3 px-4 py-3 text-left"
         aria-expanded={isOpen}
       >
-        {/* Status dot */}
-        <span
-          className={`flex-none w-2 h-2 rounded-full ${isCalibrated ? 'bg-green-400' : 'bg-gray-300'}`}
-          aria-label={isCalibrated ? 'Calibrated' : 'Not yet calibrated'}
-        />
+        <div className="flex gap-1 flex-none" aria-label="Certainty by complexity">
+          {COMPLEXITY_LEVELS.map(c => (
+            <span
+              key={c}
+              className={`w-2 h-2 rounded-full ${CERTAINTY_DOT[getCertainty(testType, c)]}`}
+              title={`${c}: ${getCertainty(testType, c)} certainty`}
+            />
+          ))}
+        </div>
 
-        {/* Label + description */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-900">{testType}</span>
@@ -203,7 +228,6 @@ function ScenarioAccordion({
           <p className="text-xs text-gray-400 truncate">{TEST_TYPE_DESCRIPTIONS[testType]}</p>
         </div>
 
-        {/* Chevron */}
         <svg
           className={`flex-none w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"
@@ -212,47 +236,49 @@ function ScenarioAccordion({
         </svg>
       </button>
 
-      {/* Expanded content */}
       {isOpen && (
         <div className="px-4 pb-4 space-y-3 border-t border-gray-100">
-          {/* Column headers (mobile visible) */}
-          <div className="flex items-center gap-2 pt-3">
-            <span className="w-24 text-xs text-gray-400 font-medium">Complexity</span>
-            <div className="flex gap-2 text-xs text-gray-400 font-medium">
-              <span className="w-20 text-center">Min hrs</span>
-              <span className="w-20 text-center">Expected</span>
-              <span className="w-20 text-center">Max hrs</span>
-            </div>
+          <div className="flex items-center gap-2 pt-3 text-xs text-gray-400 font-medium">
+            <span className="w-24">Complexity</span>
+            <span className="flex-1">Hours</span>
+            <span className="w-24 text-center">Certainty</span>
           </div>
 
-          {/* One row per complexity level */}
-          {COMPLEXITY_LEVELS.map(complexity => (
-            <div key={complexity} className="flex items-center gap-3">
-              {/* Complexity badge */}
-              <div className="flex items-center gap-1 w-24 flex-none">
-                <span
-                  className={`text-xs font-medium px-2 py-0.5 rounded-full ${COMPLEXITY_COLORS[complexity]}`}
-                >
-                  {complexity}
-                </span>
-                <Tooltip content={COMPLEXITY_DEFINITIONS[complexity]} />
+          {COMPLEXITY_LEVELS.map(complexity => {
+            const estimate = getEstimate(testType, complexity)
+            const empty = isEstimateEmpty(estimate)
+            return (
+              <div key={complexity} className="flex items-center gap-3">
+                <div className="flex items-center gap-1 w-24 flex-none">
+                  <span
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${COMPLEXITY_COLORS[complexity]}`}
+                  >
+                    {complexity}
+                  </span>
+                  <Tooltip content={COMPLEXITY_DEFINITIONS[complexity]} />
+                </div>
+
+                <TimeEstimateInput
+                  id={`${testType}-${complexity}`}
+                  value={estimate}
+                  onChange={e => onEstimateChange(testType, complexity, e)}
+                />
+
+                <div className="w-24 flex justify-center flex-none">
+                  <CertaintySelector
+                    id={`${testType}-${complexity}-certainty`}
+                    compact
+                    value={getCertainty(testType, complexity)}
+                    onChange={level => onCertaintyChange(testType, complexity, level)}
+                    disabled={empty}
+                  />
+                </div>
               </div>
+            )
+          })}
 
-              {/* Time estimate inputs */}
-              <TimeEstimateInput
-                id={`${testType}-${complexity}`}
-                value={getEstimate(testType, complexity)}
-                onChange={estimate => onEstimateChange(testType, complexity, estimate)}
-              />
-            </div>
-          ))}
-
-          {/* Notes */}
           <div className="pt-2">
-            <label
-              htmlFor={`notes-${testType}`}
-              className="text-xs text-gray-500 font-medium"
-            >
+            <label htmlFor={`notes-${testType}`} className="text-xs text-gray-500 font-medium">
               Notes (optional)
             </label>
             <input

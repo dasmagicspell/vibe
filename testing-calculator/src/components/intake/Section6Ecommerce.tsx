@@ -1,13 +1,9 @@
 import type { ProjectSpec } from '@/types'
 import { PaymentScope, AccountScope } from '@/types'
 import { RadioGroup } from '@/components/shared/RadioGroup'
-import { StepNav } from '@/components/calibration/StepWizard'
-
 interface Props {
   data: Pick<ProjectSpec, 'paymentScope' | 'accountScope'>
   onChange: (updates: Partial<ProjectSpec>) => void
-  onBack: () => void
-  onNext: () => void
 }
 
 const PAYMENT_OPTIONS = [
@@ -51,7 +47,7 @@ const ACCOUNT_OPTIONS = [
   },
 ]
 
-export function Section6Ecommerce({ data, onChange, onBack, onNext }: Props) {
+export function Section6Ecommerce({ data, onChange }: Props) {
   return (
     <div className="space-y-8">
       <div>
@@ -82,7 +78,6 @@ export function Section6Ecommerce({ data, onChange, onBack, onNext }: Props) {
         columns={3}
       />
 
-      <StepNav onBack={onBack} onNext={onNext} />
     </div>
   )
 }

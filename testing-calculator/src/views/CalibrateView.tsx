@@ -216,6 +216,7 @@ export function CalibrateView() {
           steps={steps}
           currentStep={activeStep}
           onNavigate={scrollToStep}
+          ariaLabel="Calibration progress"
         />
       </div>
 

@@ -199,6 +199,13 @@ describe('normalizeTestingModel', () => {
     const normalized = normalizeTestingModel(legacy)
     expect(normalized.entries[0].baseEstimate.expectedHours).toBe(2)
   })
+
+  it('fills missing certainty on entries from estimate', () => {
+    const legacy = createDefaultModel()
+    legacy.entries[0] = { ...legacy.entries[0], certainty: undefined as never }
+    const normalized = normalizeTestingModel(legacy)
+    expect(normalized.entries[0].certainty).toBe('High')
+  })
 })
 
 // ---------------------------------------------------------------------------

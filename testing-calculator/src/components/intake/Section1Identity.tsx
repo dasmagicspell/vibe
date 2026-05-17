@@ -1,15 +1,11 @@
 import type { ProjectSpec } from '@/types'
-import { StepNav } from '@/components/calibration/StepWizard'
 
 interface Props {
   data: Pick<ProjectSpec, 'projectName' | 'clientName' | 'createdAt'>
   onChange: (updates: Partial<ProjectSpec>) => void
-  onNext: () => void
 }
 
-export function Section1Identity({ data, onChange, onNext }: Props) {
-  const isValid = data.projectName.trim() !== '' && data.clientName.trim() !== ''
-
+export function Section1Identity({ data, onChange }: Props) {
   return (
     <div className="space-y-6">
       <div>
@@ -64,8 +60,6 @@ export function Section1Identity({ data, onChange, onNext }: Props) {
           />
         </div>
       </div>
-
-      <StepNav onNext={onNext} nextDisabled={!isValid} />
     </div>
   )
 }

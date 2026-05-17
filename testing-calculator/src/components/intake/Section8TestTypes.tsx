@@ -1,13 +1,9 @@
 import type { ProjectSpec } from '@/types'
 import { TestType, ALWAYS_ACTIVE_TEST_TYPES, CONDITIONAL_TEST_TYPES, TEST_TYPE_DESCRIPTIONS } from '@/types'
 import { getTestTypeActivationReason } from '@/utils/projectHelpers'
-import { StepNav } from '@/components/calibration/StepWizard'
-
 interface Props {
   project: ProjectSpec
   onChange: (updates: Partial<ProjectSpec>) => void
-  onBack: () => void
-  onNext: () => void
 }
 
 /**
@@ -16,7 +12,7 @@ interface Props {
  * Auto-activated conditional types show their activation reason.
  * Opt-in types (exploratory, automation, CMS admin) have toggles.
  */
-export function Section8TestTypes({ project, onChange, onBack, onNext }: Props) {
+export function Section8TestTypes({ project, onChange }: Props) {
   const activeTypes = new Set(project.selectedTestTypes)
 
   function setOptIn(
@@ -170,7 +166,6 @@ export function Section8TestTypes({ project, onChange, onBack, onNext }: Props) 
         these will form the columns of your schedule matrix.
       </div>
 
-      <StepNav onBack={onBack} onNext={onNext} />
     </div>
   )
 }

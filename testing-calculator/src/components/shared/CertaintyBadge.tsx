@@ -39,7 +39,13 @@ export function CertaintyBadge({ level, compact = false }: CertaintyBadgeProps) 
 
 /** Tooltip explanation shown in the drill-down panel */
 export const CERTAINTY_EXPLANATIONS: Record<CertaintyLevel, string> = {
-  High:   'Exact calibration data found for this test type and complexity level.',
-  Medium: 'Estimate interpolated from an adjacent complexity level — verify with the engineer.',
-  Low:    'No calibration data found. Add this test type to the model for a reliable estimate.',
+  High:   'High confidence — calibration, intake, and lookup all support this estimate.',
+  Medium: 'Medium confidence — at least one source (calibration, intake, or lookup) is approximate.',
+  Low:    'Low confidence — review calibration data, intake inputs, or add missing estimates.',
 }
+
+export const CERTAINTY_BREAKDOWN_LABELS = {
+  lookup:      'Lookup (exact match / interpolation)',
+  calibration: 'Engineer calibration',
+  intake:      'Intake confidence',
+} as const

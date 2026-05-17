@@ -4,7 +4,8 @@
 // No React imports — fully unit-testable.
 // =============================================================================
 
-import type { TestingModel, CalibrationEntry, TimeEstimate, BrowserCalibrationEntry, DeliverableEstimate, ExploratoryBlock } from '@/types'
+import type { TestingModel, CalibrationEntry, TimeEstimate, BrowserCalibrationEntry, DeliverableEstimate, ExploratoryBlock, CertaintyLevel } from '@/types'
+import { deriveCalibrationCertainty, normalizeEntryCertainty } from '@/utils/certaintyHelpers'
 import {
   TestType,
   ComplexityLevel,
@@ -183,10 +184,11 @@ export function createDefaultEntries(): CalibrationEntry[] {
   for (const testType of Object.values(TestType)) {
     for (const complexity of complexities) {
       entries.push({
-        id:          generateId(),
+        id:           generateId(),
         testType,
         complexity,
         baseEstimate: DEFAULT_SCENARIO_ESTIMATES[testType][complexity],
+        certainty:    'High',
       })
     }
   }
@@ -223,7 +225,7 @@ export function normalizeTestingModel(raw: TestingModel): TestingModel {
       entry.baseEstimate ??
       legacy.estimate ??
       { minHours: 0, expectedHours: 0, maxHours: 0 }
-    return { ...entry, baseEstimate }
+    return normalizeEntryCertainty({ ...entry, baseEstimate })
   })
 
   return {
@@ -267,18 +269,23 @@ export function upsertBaseRateEntry(
   complexity: ComplexityLevel,
   baseEstimate: TimeEstimate,
   notes?: string,
+  certainty?: CertaintyLevel,
 ): CalibrationEntry[] {
+  const resolvedCertainty = deriveCalibrationCertainty(baseEstimate, certainty)
   const existing = findBaseRateEntry(entries, testType, complexity)
   if (existing) {
     return entries.map(e =>
-      e.id === existing.id ? { ...e, baseEstimate, notes } : e
+      e.id === existing.id
+        ? { ...e, baseEstimate, notes, certainty: resolvedCertainty }
+        : e
     )
   }
   const newEntry: CalibrationEntry = {
-    id:          generateId(),
+    id:           generateId(),
     testType,
     complexity,
     baseEstimate,
+    certainty:    resolvedCertainty,
     notes,
   }
   return [...entries, newEntry]

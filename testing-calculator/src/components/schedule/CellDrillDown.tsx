@@ -1,6 +1,10 @@
 import { useEffect } from 'react'
 import type { ScheduleCell, ScheduleRow } from '@/types'
-import { CertaintyBadge, CERTAINTY_EXPLANATIONS } from '@/components/shared/CertaintyBadge'
+import {
+  CertaintyBadge,
+  CERTAINTY_EXPLANATIONS,
+  CERTAINTY_BREAKDOWN_LABELS,
+} from '@/components/shared/CertaintyBadge'
 import { formatRange, formatExpected } from '@/utils/modelHelpers'
 
 interface CellDrillDownProps {
@@ -90,8 +94,16 @@ export function CellDrillDown({ cell, row, onClose }: CellDrillDownProps) {
         </div>
 
         {/* Certainty explanation */}
-        <div className="px-6 py-2 text-xs text-gray-500 bg-gray-50 border-b border-gray-100">
-          {CERTAINTY_EXPLANATIONS[cell.certainty]}
+        <div className="px-6 py-3 text-xs text-gray-500 bg-gray-50 border-b border-gray-100 space-y-2">
+          <p>{CERTAINTY_EXPLANATIONS[cell.certainty]}</p>
+          <div className="grid grid-cols-3 gap-2 pt-1">
+            {(Object.keys(CERTAINTY_BREAKDOWN_LABELS) as Array<keyof typeof CERTAINTY_BREAKDOWN_LABELS>).map(key => (
+              <div key={key} className="text-center">
+                <p className="text-gray-400 mb-0.5">{CERTAINTY_BREAKDOWN_LABELS[key]}</p>
+                <CertaintyBadge level={cell.certaintyBreakdown[key]} compact />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Test cases list */}

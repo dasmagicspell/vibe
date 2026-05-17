@@ -5,8 +5,7 @@ interface ReviewFlagsProps {
 }
 
 /**
- * Shown below the summary when any cells have Low certainty (no calibration data).
- * Tells the account manager which cells need the engineer to review and add data.
+ * Shown below the summary when any cells need review (low certainty or missing calibration).
  */
 export function ReviewFlags({ flags }: ReviewFlagsProps) {
   if (flags.length === 0) return null
@@ -28,9 +27,8 @@ export function ReviewFlags({ flags }: ReviewFlagsProps) {
       </div>
 
       <div className="px-4 py-3 text-xs text-red-700 leading-relaxed bg-red-50">
-        The following test type + page combinations have no calibration data in the current model.
-        Estimates for these cells are zero. Ask the engineer to add these scenarios to the calibration model,
-        then regenerate the schedule.
+        These cells have low overall certainty — from missing calibration data, low engineer confidence,
+        or low intake confidence. Review with the test engineer and adjust the model or intake before sharing the schedule.
       </div>
 
       <ul className="divide-y divide-red-100">
