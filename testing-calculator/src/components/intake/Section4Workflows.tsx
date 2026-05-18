@@ -82,7 +82,7 @@ function WorkflowCard({ workflow, index, onUpdate, onRemove }: WorkflowCardProps
       <div className="flex gap-3">
         <div className="flex-1">
           <label htmlFor={`wf-name-${workflow.id}`} className="block text-xs font-medium text-gray-500 mb-1">
-            Workflow name
+            Workflow name <span className="text-red-500">*</span>
           </label>
           <input
             id={`wf-name-${workflow.id}`}

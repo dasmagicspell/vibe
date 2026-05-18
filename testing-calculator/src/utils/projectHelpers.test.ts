@@ -250,6 +250,32 @@ describe('validateProject', () => {
     const result = validateProject(project)
     expect(result.isValid).toBe(false)
   })
+
+  it('fails when workflows have no names', () => {
+    const project = {
+      ...createDefaultProject(),
+      projectName: 'Site',
+      clientName:  'Acme',
+      pages:       [createPageSpec({ name: 'Home' })],
+      workflows:   [createWorkflowSpec()],
+    }
+    const result = validateProject(project)
+    expect(result.isValid).toBe(false)
+    expect(result.errors.some(e => e.includes('workflow'))).toBe(true)
+  })
+
+  it('fails when integrations have no names', () => {
+    const project = {
+      ...createDefaultProject(),
+      projectName: 'Site',
+      clientName:  'Acme',
+      pages:       [createPageSpec({ name: 'Home' })],
+      integrations: [createIntegrationSpec()],
+    }
+    const result = validateProject(project)
+    expect(result.isValid).toBe(false)
+    expect(result.errors.some(e => e.includes('integration'))).toBe(true)
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -274,6 +300,28 @@ describe('intakeStepHasError', () => {
       pages:       [createPageSpec()],
     }
     expect(intakeStepHasError(2, project)).toBe(true)
+  })
+
+  it('flags workflows step when a workflow has no name', () => {
+    const project = {
+      ...createDefaultProject(),
+      projectName: 'Site',
+      clientName:  'Acme',
+      pages:       [createPageSpec({ name: 'Home' })],
+      workflows:   [createWorkflowSpec()],
+    }
+    expect(intakeStepHasError(3, project)).toBe(true)
+  })
+
+  it('flags integrations step when an integration has no name', () => {
+    const project = {
+      ...createDefaultProject(),
+      projectName: 'Site',
+      clientName:  'Acme',
+      pages:       [createPageSpec({ name: 'Home' })],
+      integrations: [createIntegrationSpec()],
+    }
+    expect(intakeStepHasError(4, project)).toBe(true)
   })
 
   it('flags generate step when project validation fails', () => {

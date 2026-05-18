@@ -45,7 +45,7 @@ export function Section5Integrations({ integrations, onChange }: Props) {
                   htmlFor={`int-name-${integration.id}`}
                   className="block text-xs font-medium text-gray-500 mb-1"
                 >
-                  Integration name
+                  Integration name <span className="text-red-500">*</span>
                 </label>
                 <input
                   id={`int-name-${integration.id}`}

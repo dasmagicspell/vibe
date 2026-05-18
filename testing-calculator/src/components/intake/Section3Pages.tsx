@@ -99,7 +99,7 @@ function PageCard({ page, index, onUpdate, onRemove }: PageCardProps) {
       <div className="flex items-start gap-3">
         <div className="flex-1">
           <label htmlFor={`page-name-${page.id}`} className="block text-xs font-medium text-gray-500 mb-1">
-            Page name
+            Page name <span className="text-red-500">*</span>
           </label>
           <input
             id={`page-name-${page.id}`}
