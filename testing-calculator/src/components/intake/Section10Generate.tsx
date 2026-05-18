@@ -3,12 +3,13 @@ import { validateProject, countEffectivePages, getScheduleBlockers } from '@/uti
 
 interface Props {
   project: ProjectSpec
+  onSaveProject: () => void
   onGenerate: () => void
   modelLoaded: boolean
   modelName?: string
 }
 
-export function Section10Generate({ project, onGenerate, modelLoaded, modelName }: Props) {
+export function Section10Generate({ project, onSaveProject, onGenerate, modelLoaded, modelName }: Props) {
   const validation = validateProject(project)
   const blockers = getScheduleBlockers(modelLoaded, project)
   const canGenerate = blockers.length === 0
@@ -114,6 +115,15 @@ export function Section10Generate({ project, onGenerate, modelLoaded, modelName 
       </div>
 
       <div className="flex flex-col gap-3 pt-2">
+        <button
+          type="button"
+          onClick={onSaveProject}
+          className="w-full px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors
+                     bg-green-600 text-white hover:bg-green-700"
+          title="Save project spec as JSON for reloading later"
+        >
+          ↓ Save project JSON
+        </button>
         <button
           type="button"
           onClick={onGenerate}

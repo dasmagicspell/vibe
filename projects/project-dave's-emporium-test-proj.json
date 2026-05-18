@@ -12,15 +12,43 @@
     {
       "id": "c6971602-70f0-40d6-9242-459abe734081",
       "name": "Home and About",
-      "category": "Informational",
+      "category": "Reports & dynamic data",
       "complexity": "Medium",
       "complexityCertainty": "High",
       "isTemplate": true,
       "templateInstanceCount": 2
+    },
+    {
+      "id": "02359f34-ddd1-4b00-861b-36287f1e91a7",
+      "name": "Intro page to Jewelry categories",
+      "category": "Informational",
+      "complexity": "Low",
+      "complexityCertainty": "Medium",
+      "isTemplate": false,
+      "notes": "Client still unsure about look and feel"
     }
   ],
-  "workflows": [],
-  "integrations": [],
+  "workflows": [
+    {
+      "id": "169910b3-eee0-4191-b0e2-4bfd95e218c9",
+      "name": "Ordering Jewelry item",
+      "stepCount": 3,
+      "hasBranching": false,
+      "hasPaymentStep": true,
+      "complexity": "Medium",
+      "complexityCertainty": "High"
+    }
+  ],
+  "integrations": [
+    {
+      "id": "1406a402-74f9-4673-81cd-41db00bc7b13",
+      "name": "Saves info to Odoo",
+      "category": "ERP (Odoo, Microsoft Dynamics)",
+      "hasAnalytics": false,
+      "certainty": "Low",
+      "notes": "Client unsure if needs *.sh or standard. Impacts implementation."
+    }
+  ],
   "rigorLevel": "Standard",
   "rigorCertainty": "High",
   "browserTier": "Standard",
@@ -35,12 +63,15 @@
     "Accessibility (WCAG)",
     "Performance (basic)",
     "SEO / Meta",
-    "Security / Privacy"
+    "Security / Privacy",
+    "Form validation",
+    "Email / Notification"
   ],
   "includeExploratory": false,
   "includeAutomation": false,
   "includeCMSAdmin": false,
   "selectedDeliverables": [],
   "reportingLevel": "Internal bug list",
-  "retestingIncluded": true
+  "retestingIncluded": true,
+  "notificationScope": "Basic"
 }

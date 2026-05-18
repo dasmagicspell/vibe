@@ -323,6 +323,13 @@ export function validateProject(project: ProjectSpec): ProjectValidationResult {
     errors.push(`${unnamedIntegrations.length} integration(s) have no name. Please name all integrations.`)
   }
 
+  const uncategorizedIntegrations = project.integrations.filter(i => !i.category.trim())
+  if (uncategorizedIntegrations.length > 0) {
+    errors.push(
+      `${uncategorizedIntegrations.length} integration(s) have no category. Please select a category for all integrations.`,
+    )
+  }
+
   return { isValid: errors.length === 0, errors, warnings }
 }
 
@@ -378,7 +385,7 @@ export function intakeStepHasError(stepIndex: number, project: ProjectSpec): boo
       return project.workflows.some(w => !w.name.trim())
 
     case 4:
-      return project.integrations.some(i => !i.name.trim())
+      return project.integrations.some(i => !i.name.trim() || !i.category.trim())
 
     case 9:
       return !validateProject(project).isValid

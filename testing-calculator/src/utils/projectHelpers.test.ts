@@ -276,6 +276,19 @@ describe('validateProject', () => {
     expect(result.isValid).toBe(false)
     expect(result.errors.some(e => e.includes('integration'))).toBe(true)
   })
+
+  it('fails when integrations have no category', () => {
+    const project = {
+      ...createDefaultProject(),
+      projectName: 'Site',
+      clientName:  'Acme',
+      pages:       [createPageSpec({ name: 'Home' })],
+      integrations: [createIntegrationSpec({ name: 'GA4' })],
+    }
+    const result = validateProject(project)
+    expect(result.isValid).toBe(false)
+    expect(result.errors.some(e => e.includes('category'))).toBe(true)
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -320,6 +333,17 @@ describe('intakeStepHasError', () => {
       clientName:  'Acme',
       pages:       [createPageSpec({ name: 'Home' })],
       integrations: [createIntegrationSpec()],
+    }
+    expect(intakeStepHasError(4, project)).toBe(true)
+  })
+
+  it('flags integrations step when an integration has no category', () => {
+    const project = {
+      ...createDefaultProject(),
+      projectName: 'Site',
+      clientName:  'Acme',
+      pages:       [createPageSpec({ name: 'Home' })],
+      integrations: [createIntegrationSpec({ name: 'GA4' })],
     }
     expect(intakeStepHasError(4, project)).toBe(true)
   })

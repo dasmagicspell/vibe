@@ -310,23 +310,12 @@ export function IntakeView() {
         >
           <Section10Generate
             project={draft}
+            onSaveProject={handleSaveProject}
             onGenerate={handleGenerate}
             modelLoaded={!!model}
             modelName={modelLabel}
           />
         </section>
-
-        <div className="mt-10 pt-2">
-          <button
-            type="button"
-            onClick={handleSaveProject}
-            className="w-full px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors
-                       bg-green-600 text-white hover:bg-green-700"
-            title="Save project spec as JSON for reloading later"
-          >
-            ↓ Save project JSON
-          </button>
-        </div>
       </div>
     </main>
   )

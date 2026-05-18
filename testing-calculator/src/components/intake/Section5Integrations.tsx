@@ -64,7 +64,7 @@ export function Section5Integrations({ integrations, onChange }: Props) {
                   htmlFor={`int-cat-${integration.id}`}
                   className="block text-xs font-medium text-gray-500 mb-1"
                 >
-                  Category
+                  Category <span className="text-red-500">*</span>
                 </label>
                 <select
                   id={`int-cat-${integration.id}`}
