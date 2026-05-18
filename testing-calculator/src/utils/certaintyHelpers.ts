@@ -12,7 +12,33 @@ import type {
   TimeEstimate,
   WorkflowSpec,
 } from '@/types'
+import {
+  TestType,
+  ComplexityLevel,
+  ALWAYS_ACTIVE_TEST_TYPES,
+  CONDITIONAL_TEST_TYPES,
+} from '@/types'
+import { findBaseRateEntry } from '@/utils/modelHelpers'
 import { inferNotificationScope, normalizePageCategory } from '@/utils/projectHelpers'
+
+const CALIBRATION_COMPLEXITIES = [
+  ComplexityLevel.Low,
+  ComplexityLevel.Medium,
+  ComplexityLevel.High,
+] as const
+
+/** One complexity row on the calibration matrix that is not fully High. */
+export interface CalibrationAttentionRow {
+  complexity: ComplexityLevel
+  empty: boolean
+  certainty: CertaintyLevel
+}
+
+/** Test type with at least one non–High-certainty or missing estimate row. */
+export interface CalibrationAttentionItem {
+  testType: TestType
+  rows: CalibrationAttentionRow[]
+}
 
 export const CERTAINTY_RANK: Record<CertaintyLevel, number> = {
   Low:    0,
@@ -31,6 +57,53 @@ export function minCertainty(...levels: CertaintyLevel[]): CertaintyLevel {
 /** True when there is no usable expected-hour estimate. */
 export function isEstimateEmpty(estimate: TimeEstimate): boolean {
   return estimate.expectedHours <= 0
+}
+
+/** Effective certainty for a base-rate calibration row (empty estimate → Low). */
+export function calibrationRowCertainty(
+  entries: CalibrationEntry[],
+  testType: TestType,
+  complexity: ComplexityLevel,
+): CertaintyLevel {
+  const entry = findBaseRateEntry(entries, testType, complexity)
+  if (!entry || isEstimateEmpty(entry.baseEstimate)) return 'Low'
+  return entry.certainty
+}
+
+/**
+ * Test types that have any missing estimate or explicit certainty below High.
+ * Used by the calibration scenarios summary panel and review step.
+ */
+export function getCalibrationAttentionItems(
+  entries: CalibrationEntry[],
+  testTypes: readonly TestType[] = [
+    ...ALWAYS_ACTIVE_TEST_TYPES,
+    ...CONDITIONAL_TEST_TYPES,
+  ],
+): CalibrationAttentionItem[] {
+  const items: CalibrationAttentionItem[] = []
+
+  for (const testType of testTypes) {
+    const rows: CalibrationAttentionRow[] = []
+    for (const complexity of CALIBRATION_COMPLEXITIES) {
+      const entry = findBaseRateEntry(entries, testType, complexity)
+      const empty = !entry || isEstimateEmpty(entry.baseEstimate)
+      const certainty = calibrationRowCertainty(entries, testType, complexity)
+      if (empty || certainty !== 'High') {
+        rows.push({ complexity, empty, certainty })
+      }
+    }
+    if (rows.length > 0) {
+      items.push({ testType, rows })
+    }
+  }
+
+  return items
+}
+
+export function formatCalibrationAttentionRow(row: CalibrationAttentionRow): string {
+  if (row.empty) return `${row.complexity}: missing estimate`
+  return `${row.complexity}: ${row.certainty} certainty`
 }
 
 /**

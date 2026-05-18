@@ -2,6 +2,7 @@ import type { TestingModel } from '@/types'
 import { ComplexityLevel, ALWAYS_ACTIVE_TEST_TYPES } from '@/types'
 import { validateModel, findBaseRateEntry, formatRange } from '@/utils/modelHelpers'
 import { CertaintyBadge } from '@/components/shared/CertaintyBadge'
+import { CalibrationAttentionSummary } from '@/components/calibration/CalibrationAttentionSummary'
 import { StepNav } from './StepWizard'
 
 interface Step7Props {
@@ -120,6 +121,10 @@ export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props)
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="px-4 py-4 border-t border-gray-200">
+          <CalibrationAttentionSummary entries={model.entries} />
         </div>
 
         {/* Overhead summary */}

@@ -2,7 +2,8 @@ import { useState } from 'react'
 import type { CalibrationEntry, CertaintyLevel, TimeEstimate } from '@/types'
 import { TestType, ComplexityLevel, ALWAYS_ACTIVE_TEST_TYPES, CONDITIONAL_TEST_TYPES, TEST_TYPE_DESCRIPTIONS, COMPLEXITY_DEFINITIONS } from '@/types'
 import { findBaseRateEntry, upsertBaseRateEntry } from '@/utils/modelHelpers'
-import { isEstimateEmpty } from '@/utils/certaintyHelpers'
+import { calibrationRowCertainty, isEstimateEmpty } from '@/utils/certaintyHelpers'
+import { CalibrationAttentionSummary } from '@/components/calibration/CalibrationAttentionSummary'
 import { TimeEstimateInput } from '@/components/shared/TimeEstimateInput'
 import { CertaintySelector } from '@/components/shared/CertaintySelector'
 import { Tooltip } from '@/components/shared/Tooltip'
@@ -50,9 +51,7 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
   }
 
   function getCertainty(testType: TestType, complexity: ComplexityLevel): CertaintyLevel {
-    const entry = findBaseRateEntry(entries, testType, complexity)
-    if (!entry || isEstimateEmpty(entry.baseEstimate)) return 'Low'
-    return entry.certainty
+    return calibrationRowCertainty(entries, testType, complexity)
   }
 
   function handleEstimateChange(
@@ -167,6 +166,8 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
           />
         ))}
       </div>
+
+      <CalibrationAttentionSummary entries={entries} />
 
       {(onBack || onNext) && <StepNav onBack={onBack} onNext={onNext} />}
     </div>
