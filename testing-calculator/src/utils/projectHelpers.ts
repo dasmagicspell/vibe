@@ -7,6 +7,7 @@
 import type { ProjectSpec, PageSpec, WorkflowSpec, IntegrationSpec } from '@/types'
 import {
   SiteType, ProjectMoment, SensitiveDataLevel, PaymentScope, AccountScope,
+  NotificationScope,
   RiskLevel, RigorLevel, BrowserTier, ReportingLevel, ComplexityLevel,
   PageCategory, TestType, ALWAYS_ACTIVE_TEST_TYPES,
 } from '@/types'
@@ -24,9 +25,10 @@ export function createDefaultProject(): ProjectSpec {
     siteType:          SiteType.Brochure,
     projectMoment:     ProjectMoment.NewLaunch,
     sensitiveData:     SensitiveDataLevel.None,
-    paymentScope:      PaymentScope.None,
-    accountScope:      AccountScope.None,
-    riskLevel:         RiskLevel.Medium,
+    paymentScope:        PaymentScope.None,
+    accountScope:        AccountScope.None,
+    notificationScope:   NotificationScope.None,
+    riskLevel:           RiskLevel.Medium,
     pages:             [],
     workflows:         [],
     integrations:      [],
@@ -112,6 +114,16 @@ const FORM_DRIVEN_CATEGORIES: PageCategory[] = [
   PageCategory.ReportsDynamicData,
 ]
 
+/** Infer notification scope for project JSON saved before notificationScope existed */
+export function inferNotificationScope(project: ProjectSpec): NotificationScope {
+  if (project.notificationScope != null) return project.notificationScope
+  const hasFormPages = project.pages.some(p =>
+    FORM_DRIVEN_CATEGORIES.includes(p.category),
+  )
+  const hasWorkflows = project.workflows.length > 0
+  return hasFormPages || hasWorkflows ? NotificationScope.Basic : NotificationScope.None
+}
+
 /**
  * Derives the full set of active TestTypes for a project.
  * Always-active types are always included.
@@ -143,8 +155,10 @@ export function deriveActiveTestTypes(project: ProjectSpec): TestType[] {
   // CMS/Admin — explicit toggle (typically WordPress admin, Shopify dashboard)
   if (project.includeCMSAdmin) active.add(TestType.CMSAdmin)
 
-  // Email/notification — forms and workflows typically trigger emails
-  if (hasFormPages || hasWorkflows) active.add(TestType.EmailNotification)
+  // Email/notification — explicit scope from intake (commerce section)
+  if (project.notificationScope !== NotificationScope.None) {
+    active.add(TestType.EmailNotification)
+  }
 
   // Content migration — only relevant for migration or redesign with import
   if (project.projectMoment === ProjectMoment.Migration) {
@@ -183,8 +197,12 @@ export function getTestTypeActivationReason(
     case TestType.CMSAdmin:
       return project.includeCMSAdmin ? 'CMS/Admin testing enabled' : null
     case TestType.EmailNotification:
-      if (hasFormPages) return 'Form pages detected (form submissions trigger emails)'
-      if (hasWorkflows) return 'Workflows detected (workflow completions trigger emails)'
+      if (project.notificationScope === NotificationScope.Extensive) {
+        return 'Extensive notifications selected'
+      }
+      if (project.notificationScope === NotificationScope.Basic) {
+        return 'Basic notifications selected'
+      }
       return null
     case TestType.ContentMigration:
       return project.projectMoment === ProjectMoment.Migration

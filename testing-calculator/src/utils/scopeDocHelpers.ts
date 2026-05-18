@@ -6,7 +6,7 @@
 
 import type { ClientScopeDoc, ProjectSpec, ScheduleOutput } from '@/types'
 import {
-  TestType, AccountScope, PaymentScope, ProjectMoment,
+  TestType, AccountScope, PaymentScope, NotificationScope, ProjectMoment,
   CONDITIONAL_TEST_TYPES, TEST_TYPE_DESCRIPTIONS,
   RigorLevel, BrowserTier,
   RIGOR_DEFINITIONS, BROWSER_TIER_DEFINITIONS,
@@ -67,6 +67,15 @@ function buildNeededFromYou(project: ProjectSpec): string[] {
 
   if (project.paymentScope !== PaymentScope.None) {
     items.push('Test credit card numbers approved by the payment provider for sandbox use')
+  }
+
+  if (project.notificationScope !== NotificationScope.None) {
+    items.push(
+      'Access to a test inbox, SMS sandbox, or notification log for verifying outbound messages',
+    )
+    if (project.notificationScope === NotificationScope.Extensive) {
+      items.push('Documentation of notification channels, triggers, and expected recipient lists')
+    }
   }
 
   if (project.integrations.some(i => i.hasAnalytics)) {

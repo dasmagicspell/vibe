@@ -8,7 +8,7 @@ import {
   ERP_INTEGRATION_CATEGORY, hasErpIntegration, isErpIntegrationCategory,
 } from './projectHelpers'
 import {
-  PageCategory, AccountScope, ProjectMoment, TestType,
+  PageCategory, AccountScope, NotificationScope, ProjectMoment, TestType,
   ALWAYS_ACTIVE_TEST_TYPES, ComplexityLevel,
 } from '@/types'
 
@@ -104,26 +104,27 @@ describe('deriveActiveTestTypes — AnalyticsTag', () => {
 })
 
 describe('deriveActiveTestTypes — EmailNotification', () => {
-  it('activates when there are form pages', () => {
+  it('activates when notification scope is Basic', () => {
     const project = {
       ...createDefaultProject(),
+      notificationScope: NotificationScope.Basic,
+    }
+    expect(deriveActiveTestTypes(project)).toContain(TestType.EmailNotification)
+  })
+
+  it('activates when notification scope is Extensive', () => {
+    const project = {
+      ...createDefaultProject(),
+      notificationScope: NotificationScope.Extensive,
+    }
+    expect(deriveActiveTestTypes(project)).toContain(TestType.EmailNotification)
+  })
+
+  it('does NOT activate when notification scope is None', () => {
+    const project = {
+      ...createDefaultProject(),
+      notificationScope: NotificationScope.None,
       pages: [createPageSpec({ category: PageCategory.SimpleForm })],
-    }
-    expect(deriveActiveTestTypes(project)).toContain(TestType.EmailNotification)
-  })
-
-  it('activates when there are workflows', () => {
-    const project = {
-      ...createDefaultProject(),
-      workflows: [createWorkflowSpec()],
-    }
-    expect(deriveActiveTestTypes(project)).toContain(TestType.EmailNotification)
-  })
-
-  it('does NOT activate for informational-only projects', () => {
-    const project = {
-      ...createDefaultProject(),
-      pages: [createPageSpec({ category: PageCategory.Informational })],
     }
     expect(deriveActiveTestTypes(project)).not.toContain(TestType.EmailNotification)
   })

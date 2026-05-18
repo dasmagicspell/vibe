@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { CalibrationEntry, ProjectSpec } from '@/types'
-import { TestType, ComplexityLevel } from '@/types'
+import { TestType, ComplexityLevel, NotificationScope, PageCategory } from '@/types'
 import {
   minCertainty,
   isEstimateEmpty,
@@ -106,5 +106,14 @@ describe('normalizeProjectSpec', () => {
     expect(normalized.browserTierCertainty).toBe('High')
     expect(normalized.pages[0].complexityCertainty).toBe('High')
     expect(normalized.integrations[0].certainty).toBe('High')
+  })
+
+  it('infers Basic notification scope when legacy project has form pages', () => {
+    const project = {
+      pages: [{ category: PageCategory.SimpleForm }],
+      workflows: [],
+    } as ProjectSpec
+    const normalized = normalizeProjectSpec(project)
+    expect(normalized.notificationScope).toBe(NotificationScope.Basic)
   })
 })

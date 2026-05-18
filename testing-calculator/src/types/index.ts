@@ -64,7 +64,7 @@ export enum TestType {
   SecurityPrivacy   = 'Security / Privacy',
   AnalyticsTag      = 'Analytics and tag',      // Conditional: has analytics integration
   CMSAdmin          = 'CMS / Admin',            // Conditional: CMS admin in scope
-  EmailNotification = 'Email / Notification',   // Conditional: forms or workflows > 0
+  EmailNotification = 'Email / Notification',   // Conditional: notificationScope ≠ None
   ContentMigration  = 'Content migration',      // Conditional: project moment = Migration
   Exploratory       = 'Exploratory',            // Conditional: explicitly selected
   E2EAutomation     = 'E2E automation',         // Conditional: explicitly selected
@@ -189,6 +189,12 @@ export enum AccountScope {
   None          = 'None',
   BasicLogin    = 'Basic login / register',
   MultipleRoles = 'Multiple user roles or permissions',
+}
+
+export enum NotificationScope {
+  None      = 'No notifications',
+  Basic     = 'Basic',
+  Extensive = 'Extensive',
 }
 
 export enum RiskLevel {
@@ -380,6 +386,7 @@ export interface ProjectSpec {
   sensitiveData: SensitiveDataLevel
   paymentScope: PaymentScope
   accountScope: AccountScope
+  notificationScope: NotificationScope
   riskLevel: RiskLevel
 
   // Dimensions

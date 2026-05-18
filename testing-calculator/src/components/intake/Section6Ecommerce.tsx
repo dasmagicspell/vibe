@@ -1,8 +1,8 @@
 import type { ProjectSpec } from '@/types'
-import { PaymentScope, AccountScope } from '@/types'
+import { PaymentScope, AccountScope, NotificationScope } from '@/types'
 import { RadioGroup } from '@/components/shared/RadioGroup'
 interface Props {
-  data: Pick<ProjectSpec, 'paymentScope' | 'accountScope'>
+  data: Pick<ProjectSpec, 'paymentScope' | 'accountScope' | 'notificationScope'>
   onChange: (updates: Partial<ProjectSpec>) => void
 }
 
@@ -47,14 +47,35 @@ const ACCOUNT_OPTIONS = [
   },
 ]
 
+const NOTIFICATION_OPTIONS = [
+  {
+    value: NotificationScope.None,
+    label: 'No notifications',
+    description: 'No email, SMS, or in-app alerts are sent',
+  },
+  {
+    value: NotificationScope.Basic,
+    label: 'Basic',
+    description: 'Transactional email — confirmations, receipts, password reset',
+  },
+  {
+    value: NotificationScope.Extensive,
+    label: 'Extensive',
+    description: 'Marketing email, SMS, push, in-app feeds, or multi-channel alerts',
+  },
+]
+
 export function Section6Ecommerce({ data, onChange }: Props) {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">E-commerce and user accounts</h2>
+        <h2 className="text-lg font-semibold text-gray-900">
+          E-commerce, accounts, and notifications
+        </h2>
         <p className="mt-1 text-sm text-gray-500">
-          These answers determine how much e-commerce and authentication testing is scoped.
-          Multiple user roles will automatically activate Role/Permission testing.
+          These answers scope payment, authentication, and notification testing.
+          Multiple user roles will automatically activate Role/Permission testing;
+          Basic or Extensive notifications activate Email / Notification testing.
         </p>
       </div>
 
@@ -75,6 +96,16 @@ export function Section6Ecommerce({ data, onChange }: Props) {
         value={data.accountScope}
         onChange={v => onChange({ accountScope: v as AccountScope })}
         options={ACCOUNT_OPTIONS}
+        columns={3}
+      />
+
+      <RadioGroup
+        name="notification-scope"
+        label="Are notifications generated?"
+        tooltip="Covers transactional email, admin alerts, SMS, push, and in-app notification centers. Extensive scope includes marketing and multi-channel messaging."
+        value={data.notificationScope}
+        onChange={v => onChange({ notificationScope: v as NotificationScope })}
+        options={NOTIFICATION_OPTIONS}
         columns={3}
       />
 

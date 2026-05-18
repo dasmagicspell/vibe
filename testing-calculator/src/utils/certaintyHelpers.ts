@@ -12,7 +12,7 @@ import type {
   TimeEstimate,
   WorkflowSpec,
 } from '@/types'
-import { normalizePageCategory } from '@/utils/projectHelpers'
+import { inferNotificationScope, normalizePageCategory } from '@/utils/projectHelpers'
 
 export const CERTAINTY_RANK: Record<CertaintyLevel, number> = {
   Low:    0,
@@ -123,12 +123,15 @@ export function normalizeIntegrationSpec(integration: IntegrationSpec): Integrat
 }
 
 export function normalizeProjectSpec(project: ProjectSpec): ProjectSpec {
+  const pages = project.pages.map(normalizePageSpec)
+  const workflows = project.workflows.map(normalizeWorkflowSpec)
   return {
     ...project,
     rigorCertainty: project.rigorCertainty ?? 'High',
     browserTierCertainty: project.browserTierCertainty ?? 'High',
-    pages: project.pages.map(normalizePageSpec),
-    workflows: project.workflows.map(normalizeWorkflowSpec),
+    pages,
+    workflows,
     integrations: (project.integrations ?? []).map(normalizeIntegrationSpec),
+    notificationScope: inferNotificationScope({ ...project, pages, workflows }),
   }
 }

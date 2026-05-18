@@ -69,6 +69,7 @@ export function Section10Generate({ project, onGenerate, modelLoaded, modelName 
           />
           <SummaryRow label="Payment scope" value={project.paymentScope} />
           <SummaryRow label="User accounts" value={project.accountScope} />
+          <SummaryRow label="Notifications" value={project.notificationScope} />
           <SummaryRow label="Risk level" value={project.riskLevel} />
           <SummaryRow label="Rigor" value={project.rigorLevel} />
           <SummaryRow label="Browser tier" value={project.browserTier} />

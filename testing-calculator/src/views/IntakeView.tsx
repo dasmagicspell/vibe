@@ -30,7 +30,7 @@ const SECTION_LABELS = [
   'Pages',
   'Workflows',
   'Integrations',
-  'E-commerce',
+  'Commerce & notifications',
   'Risk & rigor',
   'Test types',
   'Deliverables',
