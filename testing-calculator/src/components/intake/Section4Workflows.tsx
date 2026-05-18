@@ -3,6 +3,7 @@ import { ComplexityLevel, COMPLEXITY_DEFINITIONS } from '@/types'
 import { createWorkflowSpec } from '@/utils/projectHelpers'
 import { Tooltip } from '@/components/shared/Tooltip'
 import { CertaintySelector } from '@/components/shared/CertaintySelector'
+import { OptionalNotesField } from '@/components/shared/OptionalNotesField'
 interface Props {
   workflows: WorkflowSpec[]
   onChange: (updates: Partial<ProjectSpec>) => void
@@ -185,6 +186,13 @@ function WorkflowCard({ workflow, index, onUpdate, onRemove }: WorkflowCardProps
           <span className="text-xs text-gray-600">Includes a payment step</span>
         </label>
       </div>
+
+      <OptionalNotesField
+        id={`wf-notes-${workflow.id}`}
+        value={workflow.notes}
+        onChange={notes => onUpdate({ notes })}
+        placeholder="e.g. guest checkout allowed, OTP step, inventory held during booking…"
+      />
     </div>
   )
 }

@@ -11,6 +11,7 @@ import { ScheduleMatrix }  from '@/components/schedule/ScheduleMatrix'
 import { ScheduleSummary } from '@/components/schedule/ScheduleSummary'
 import { ReviewFlags }     from '@/components/schedule/ReviewFlags'
 import { ClientScopeTab }  from '@/components/schedule/ClientScopeTab'
+import { IntegrationIntakeNotes } from '@/components/schedule/IntegrationIntakeNotes'
 
 type ActiveTab = 'schedule' | 'scope'
 
@@ -203,6 +204,8 @@ export function ScheduleView() {
         <p className="no-print text-xs text-gray-400 bg-gray-50 rounded-lg px-3 py-2">
           💡 Click any cell in the matrix to see the individual test cases that make up the estimate.
         </p>
+
+        <IntegrationIntakeNotes project={project} />
 
         {/* Matrix */}
         <section aria-label="Estimation matrix">

@@ -3,6 +3,7 @@ import { PageCategory, ComplexityLevel, COMPLEXITY_DEFINITIONS } from '@/types'
 import { createPageSpec, PAGE_CATEGORY_DESCRIPTIONS } from '@/utils/projectHelpers'
 import { Tooltip } from '@/components/shared/Tooltip'
 import { CertaintySelector } from '@/components/shared/CertaintySelector'
+import { OptionalNotesField } from '@/components/shared/OptionalNotesField'
 interface Props {
   pages: PageSpec[]
   onChange: (updates: Partial<ProjectSpec>) => void
@@ -222,6 +223,13 @@ function PageCard({ page, index, onUpdate, onRemove }: PageCardProps) {
           </div>
         )}
       </div>
+
+      <OptionalNotesField
+        id={`page-notes-${page.id}`}
+        value={page.notes}
+        onChange={notes => onUpdate({ notes })}
+        placeholder="e.g. custom form validation, third-party embed, content varies by locale…"
+      />
     </div>
   )
 }

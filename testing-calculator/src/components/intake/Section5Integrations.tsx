@@ -1,6 +1,7 @@
 import type { CertaintyLevel, IntegrationSpec, ProjectSpec } from '@/types'
 import { createIntegrationSpec, INTEGRATION_CATEGORY_OPTIONS } from '@/utils/projectHelpers'
 import { CertaintySelector } from '@/components/shared/CertaintySelector'
+import { OptionalNotesField } from '@/components/shared/OptionalNotesField'
 interface Props {
   integrations: IntegrationSpec[]
   onChange: (updates: Partial<ProjectSpec>) => void
@@ -35,7 +36,7 @@ export function Section5Integrations({ integrations, onChange }: Props) {
         {integrations.map((integration, index) => (
           <div
             key={integration.id}
-            className="p-4 rounded-xl border border-gray-200 bg-white"
+            className="p-4 rounded-xl border border-gray-200 bg-white space-y-3"
           >
             <div className="flex gap-3">
               {/* Name */}
@@ -129,6 +130,13 @@ export function Section5Integrations({ integrations, onChange }: Props) {
                 onChange={v => updateIntegration(integration.id, { certainty: v as CertaintyLevel })}
               />
             </div>
+
+            <OptionalNotesField
+              id={`int-notes-${integration.id}`}
+              value={integration.notes}
+              onChange={notes => updateIntegration(integration.id, { notes })}
+              placeholder="e.g. sandbox only, syncs orders nightly, requires VPN to reach API…"
+            />
           </div>
         ))}
       </div>

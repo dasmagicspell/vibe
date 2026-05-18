@@ -368,6 +368,7 @@ export interface IntegrationSpec {
   hasAnalytics: boolean
   /** Account manager confidence in this integration listing */
   certainty: CertaintyLevel
+  notes?: string
 }
 
 /**
@@ -467,6 +468,8 @@ export interface ScheduleRow {
   id: string
   label: string
   rowType: 'page' | 'workflow'
+  /** Account manager context from intake (pages / workflows) */
+  notes?: string
   /** Row subtotal across all active test types */
   subtotal: TimeEstimate
   cells: Record<string, ScheduleCell>   // keyed by TestType

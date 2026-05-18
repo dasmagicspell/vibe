@@ -180,6 +180,7 @@ function buildMatrixRow(
   matrixTestTypes: TestType[],
   model:          TestingModel,
   project:        ProjectSpec,
+  notes?:         string,
 ): ScheduleRow {
   const cells: Record<string, ScheduleCell> = {}
   const intakeCertainty = intakeCertaintyForCell(project, rowType, rowId)
@@ -221,7 +222,15 @@ function buildMatrixRow(
 
   const subtotal = sumEstimates(Object.values(cells).map(c => c.estimate))
 
-  return { id: rowId, label: rowLabel, rowType, subtotal, cells }
+  const trimmedNotes = notes?.trim()
+  return {
+    id: rowId,
+    label: rowLabel,
+    rowType,
+    notes: trimmedNotes || undefined,
+    subtotal,
+    cells,
+  }
 }
 
 function buildDeliverableLineItems(
@@ -318,6 +327,7 @@ export function runCalculationEngine(
       matrixTestTypes,
       model,
       project,
+      page.notes,
     )
   )
 
@@ -332,6 +342,7 @@ export function runCalculationEngine(
       matrixTestTypes,
       model,
       project,
+      wf.notes,
     )
   )
 

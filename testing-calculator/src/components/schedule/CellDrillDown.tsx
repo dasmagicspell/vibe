@@ -66,6 +66,15 @@ export function CellDrillDown({ cell, row, onClose }: CellDrillDownProps) {
           </button>
         </div>
 
+        {row.notes && (
+          <div className="px-6 py-3 bg-amber-50 border-b border-amber-100">
+            <p className="text-xs font-semibold text-amber-900 uppercase tracking-wide mb-1">
+              Account manager notes
+            </p>
+            <p className="text-sm text-amber-950 leading-relaxed whitespace-pre-wrap">{row.notes}</p>
+          </div>
+        )}
+
         {/* Estimate summary strip */}
         <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 flex items-center gap-6">
           <div className="text-center">

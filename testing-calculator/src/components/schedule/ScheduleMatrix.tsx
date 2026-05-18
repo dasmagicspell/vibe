@@ -216,6 +216,11 @@ function MatrixRow({ row, activeTestTypes, onCellClick }: MatrixRowProps) {
         <span className="text-gray-400 font-normal text-xs">
           {row.rowType === 'workflow' ? 'workflow' : 'page'}
         </span>
+        {row.notes && (
+          <p className="mt-1 text-xs text-amber-800/90 line-clamp-2 leading-snug" title={row.notes}>
+            {row.notes}
+          </p>
+        )}
       </td>
 
       {/* Test type cells */}
