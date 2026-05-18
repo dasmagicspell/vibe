@@ -1,5 +1,5 @@
-import type { TestingModel } from '@/types'
-import { ComplexityLevel, ALWAYS_ACTIVE_TEST_TYPES } from '@/types'
+import type { CalibrationEntry, TestingModel } from '@/types'
+import { ComplexityLevel, TestType, ALWAYS_ACTIVE_TEST_TYPES, CONDITIONAL_TEST_TYPES } from '@/types'
 import { validateModel, findBaseRateEntry, formatRange } from '@/utils/modelHelpers'
 import { CertaintyBadge } from '@/components/shared/CertaintyBadge'
 import { CalibrationAttentionSummary } from '@/components/calibration/CalibrationAttentionSummary'
@@ -14,6 +14,73 @@ interface Step7Props {
 
 const COMPLEXITY_LEVELS = [ComplexityLevel.Low, ComplexityLevel.Medium, ComplexityLevel.High]
 
+const ALL_CALIBRATION_TEST_TYPES = [
+  ...ALWAYS_ACTIVE_TEST_TYPES,
+  ...CONDITIONAL_TEST_TYPES,
+] as const
+
+function isTypeCalibrated(entries: CalibrationEntry[], testType: TestType): boolean {
+  return COMPLEXITY_LEVELS.some(c => {
+    const e = findBaseRateEntry(entries, testType, c)
+    return e && e.baseEstimate.expectedHours > 0
+  })
+}
+
+interface ScenarioGroupRowsProps {
+  label: string
+  testTypes: readonly TestType[]
+  entries: CalibrationEntry[]
+  isConditional?: boolean
+}
+
+function ScenarioGroupRows({ label, testTypes, entries, isConditional = false }: ScenarioGroupRowsProps) {
+  return (
+    <>
+      <tr className="bg-gray-50/80">
+        <td
+          colSpan={COMPLEXITY_LEVELS.length + 2}
+          className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500"
+        >
+          {label}
+        </td>
+      </tr>
+      {testTypes.map(testType => (
+        <tr key={testType} className="hover:bg-gray-50">
+          <td className="px-4 py-2 text-gray-900 font-medium">
+            <span>{testType}</span>
+            {isConditional && (
+              <span className="ml-1.5 text-[10px] font-normal text-gray-400">conditional</span>
+            )}
+          </td>
+          {COMPLEXITY_LEVELS.map(c => {
+            const entry = findBaseRateEntry(entries, testType, c)
+            return (
+              <td key={c} className="px-3 py-2 text-center text-gray-600 font-mono">
+                {entry && entry.baseEstimate.expectedHours > 0
+                  ? formatRange(entry.baseEstimate)
+                  : <span className="text-gray-300">—</span>}
+              </td>
+            )
+          })}
+          <td className="px-3 py-2">
+            <div className="flex justify-center gap-1">
+              {COMPLEXITY_LEVELS.map(c => {
+                const entry = findBaseRateEntry(entries, testType, c)
+                const level = entry?.certainty ?? 'Low'
+                return (
+                  <span key={c} title={`${c}: ${level}`}>
+                    <CertaintyBadge level={level} compact />
+                  </span>
+                )
+              })}
+            </div>
+          </td>
+        </tr>
+      ))}
+    </>
+  )
+}
+
 export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props) {
   const validation = validateModel(model)
 
@@ -22,13 +89,10 @@ export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props)
     calibratedAt: new Date().toISOString(),
   }
 
-  const totalEntries   = model.entries.length
-  const calibratedTypes = ALWAYS_ACTIVE_TEST_TYPES.filter(tt =>
-    COMPLEXITY_LEVELS.some(c => {
-      const e = findBaseRateEntry(model.entries, tt, c)
-      return e && e.baseEstimate.expectedHours > 0
-    })
-  )
+  const totalEntries = model.entries.length
+  const calibratedCount = ALL_CALIBRATION_TEST_TYPES.filter(tt =>
+    isTypeCalibrated(model.entries, tt),
+  ).length
 
   return (
     <div className="space-y-6">
@@ -74,7 +138,7 @@ export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props)
           </div>
           <div className="text-right text-xs text-gray-500">
             <p>{totalEntries} calibration entries</p>
-            <p>{calibratedTypes.length} of {ALWAYS_ACTIVE_TEST_TYPES.length} standard types calibrated</p>
+            <p>{calibratedCount} of {ALL_CALIBRATION_TEST_TYPES.length} test types calibrated</p>
           </div>
         </div>
 
@@ -91,34 +155,17 @@ export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props)
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {ALWAYS_ACTIVE_TEST_TYPES.map(testType => (
-                <tr key={testType} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-gray-900 font-medium">{testType}</td>
-                  {COMPLEXITY_LEVELS.map(c => {
-                    const entry = findBaseRateEntry(model.entries, testType, c)
-                    return (
-                      <td key={c} className="px-3 py-2 text-center text-gray-600 font-mono">
-                        {entry && entry.baseEstimate.expectedHours > 0
-                          ? formatRange(entry.baseEstimate)
-                          : <span className="text-gray-300">—</span>}
-                      </td>
-                    )
-                  })}
-                  <td className="px-3 py-2">
-                    <div className="flex justify-center gap-1">
-                      {COMPLEXITY_LEVELS.map(c => {
-                        const entry = findBaseRateEntry(model.entries, testType, c)
-                        const level = entry?.certainty ?? 'Low'
-                        return (
-                          <span key={c} title={`${c}: ${level}`}>
-                            <CertaintyBadge level={level} compact />
-                          </span>
-                        )
-                      })}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              <ScenarioGroupRows
+                label="Standard test types"
+                testTypes={ALWAYS_ACTIVE_TEST_TYPES}
+                entries={model.entries}
+              />
+              <ScenarioGroupRows
+                label="Conditional test types"
+                testTypes={CONDITIONAL_TEST_TYPES}
+                entries={model.entries}
+                isConditional
+              />
             </tbody>
           </table>
         </div>
