@@ -11,6 +11,7 @@ import {
   PageCategory, AccountScope, NotificationScope, ProjectMoment, TestType,
   ALWAYS_ACTIVE_TEST_TYPES, ComplexityLevel,
 } from '@/types'
+import { createDefaultModel } from './modelHelpers'
 
 // ---------------------------------------------------------------------------
 // deriveActiveTestTypes
@@ -234,10 +235,11 @@ describe('validateProject', () => {
     expect(result.isValid).toBe(true)
   })
 
-  it('warns when no pages are defined', () => {
+  it('fails when no pages are defined', () => {
     const project = { ...createDefaultProject(), projectName: 'Site', clientName: 'Acme' }
     const result = validateProject(project)
-    expect(result.warnings.length).toBeGreaterThan(0)
+    expect(result.isValid).toBe(false)
+    expect(result.errors.some(e => e.includes('page'))).toBe(true)
   })
 
   it('fails when pages have no names', () => {
@@ -362,33 +364,52 @@ describe('intakeStepHasError', () => {
 // ---------------------------------------------------------------------------
 
 describe('getScheduleBlockers', () => {
+  function validModel() {
+    return { ...createDefaultModel(), engineerName: 'Jane Tester' }
+  }
+
   it('requires a loaded model', () => {
     const project = { ...createDefaultProject(), projectName: 'Site', clientName: 'Acme' }
-    const blockers = getScheduleBlockers(false, project)
+    const blockers = getScheduleBlockers(null, project)
     expect(blockers.some(b => b.includes('testing model'))).toBe(true)
-    expect(canAccessSchedule(false, project)).toBe(false)
+    expect(canAccessSchedule(null, project)).toBe(false)
   })
 
   it('requires a project', () => {
-    const blockers = getScheduleBlockers(true, null)
+    const blockers = getScheduleBlockers(validModel(), null)
     expect(blockers).toContain('Complete the project intake form first.')
   })
 
   it('includes validation errors for an incomplete project', () => {
-    const blockers = getScheduleBlockers(true, createDefaultProject())
+    const model = validModel()
+    const blockers = getScheduleBlockers(model, createDefaultProject())
     expect(blockers).toContain('Project name is required.')
-    expect(canAccessSchedule(true, createDefaultProject())).toBe(false)
+    expect(canAccessSchedule(model, createDefaultProject())).toBe(false)
   })
 
-  it('allows access when model is loaded and project is valid', () => {
+  it('blocks when the model has invalid time ranges', () => {
+    const model = validModel()
+    model.entries[0].baseEstimate = { minHours: 10, expectedHours: 1, maxHours: 2 }
     const project = {
       ...createDefaultProject(),
       projectName: 'Site',
       clientName:  'Acme',
       pages:       [createPageSpec({ name: 'Home' })],
     }
-    expect(getScheduleBlockers(true, project)).toEqual([])
-    expect(canAccessSchedule(true, project)).toBe(true)
+    expect(getScheduleBlockers(model, project).some(b => b.includes('min > expected'))).toBe(true)
+    expect(canAccessSchedule(model, project)).toBe(false)
+  })
+
+  it('allows access when model is loaded and project is valid', () => {
+    const model = validModel()
+    const project = {
+      ...createDefaultProject(),
+      projectName: 'Site',
+      clientName:  'Acme',
+      pages:       [createPageSpec({ name: 'Home' })],
+    }
+    expect(getScheduleBlockers(model, project)).toEqual([])
+    expect(canAccessSchedule(model, project)).toBe(true)
   })
 })
 

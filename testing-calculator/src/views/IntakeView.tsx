@@ -92,7 +92,7 @@ export function IntakeView() {
   }
 
   function handleGenerate() {
-    if (!model || !canAccessSchedule(true, draft)) return
+    if (!model || !canAccessSchedule(model, draft)) return
     const schedule = runCalculationEngine(model, draft)
     dispatch({ type: 'SET_PROJECT', project: draft })
     dispatch({ type: 'SET_SCHEDULE', schedule })
@@ -312,7 +312,7 @@ export function IntakeView() {
             project={draft}
             onSaveProject={handleSaveProject}
             onGenerate={handleGenerate}
-            modelLoaded={!!model}
+            model={model}
             modelName={modelLabel}
           />
         </section>

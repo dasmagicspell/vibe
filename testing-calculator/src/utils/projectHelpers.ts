@@ -4,7 +4,8 @@
 // No React imports — fully unit-testable.
 // =============================================================================
 
-import type { ProjectSpec, PageSpec, WorkflowSpec, IntegrationSpec } from '@/types'
+import type { ProjectSpec, PageSpec, WorkflowSpec, IntegrationSpec, TestingModel } from '@/types'
+import { validateModel } from '@/utils/modelHelpers'
 import {
   SiteType, ProjectMoment, SensitiveDataLevel, PaymentScope, AccountScope,
   NotificationScope,
@@ -305,7 +306,7 @@ export function validateProject(project: ProjectSpec): ProjectValidationResult {
   if (!project.clientName.trim())  errors.push('Client name is required.')
 
   if (project.pages.length === 0) {
-    warnings.push('No pages defined. Add at least one page for a meaningful estimate.')
+    errors.push('Add at least one page before generating a schedule.')
   }
 
   const unnamedPages = project.pages.filter(p => !p.name.trim())
@@ -338,15 +339,20 @@ export function validateProject(project: ProjectSpec): ProjectValidationResult {
  * Intake can be drafted without a model; both require a loaded model and valid project.
  */
 export function getScheduleBlockers(
-  modelLoaded: boolean,
+  model: TestingModel | null,
   project: ProjectSpec | null,
 ): string[] {
   const blockers: string[] = []
 
-  if (!modelLoaded) {
+  if (!model) {
     blockers.push(
       'Import a testing model (testing-model.json) before generating or viewing a schedule.',
     )
+  } else {
+    const modelValidation = validateModel(model)
+    if (!modelValidation.isValid) {
+      blockers.push(...modelValidation.errors)
+    }
   }
 
   if (!project) {
@@ -363,10 +369,10 @@ export function getScheduleBlockers(
 }
 
 export function canAccessSchedule(
-  modelLoaded: boolean,
+  model: TestingModel | null,
   project: ProjectSpec | null,
 ): boolean {
-  return getScheduleBlockers(modelLoaded, project).length === 0
+  return getScheduleBlockers(model, project).length === 0
 }
 
 const INTAKE_STEP_COUNT = 10

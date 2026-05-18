@@ -1,17 +1,18 @@
-import type { ProjectSpec } from '@/types'
+import type { ProjectSpec, TestingModel } from '@/types'
 import { validateProject, countEffectivePages, getScheduleBlockers } from '@/utils/projectHelpers'
 
 interface Props {
   project: ProjectSpec
   onSaveProject: () => void
   onGenerate: () => void
-  modelLoaded: boolean
+  model: TestingModel | null
   modelName?: string
 }
 
-export function Section10Generate({ project, onSaveProject, onGenerate, modelLoaded, modelName }: Props) {
+export function Section10Generate({ project, onSaveProject, onGenerate, model, modelName }: Props) {
   const validation = validateProject(project)
-  const blockers = getScheduleBlockers(modelLoaded, project)
+  const blockers = getScheduleBlockers(model, project)
+  const modelLoaded = model !== null
   const canGenerate = blockers.length === 0
   const effectivePages = countEffectivePages(project.pages)
 

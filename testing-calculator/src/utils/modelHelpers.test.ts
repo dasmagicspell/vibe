@@ -164,6 +164,15 @@ describe('validateModel', () => {
     expect(result.isValid).toBe(false)
     expect(result.errors.some(e => e.includes('min > expected'))).toBe(true)
   })
+
+  it('fails when min > expected in browser calibration', () => {
+    const model = createDefaultModel()
+    model.engineerName = 'Jane'
+    model.browserCalibration[0].estimatePerPage = { minHours: 5, expectedHours: 1, maxHours: 2 }
+    const result = validateModel(model)
+    expect(result.isValid).toBe(false)
+    expect(result.errors.some(e => e.includes('min > expected'))).toBe(true)
+  })
 })
 
 // ---------------------------------------------------------------------------

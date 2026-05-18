@@ -25,7 +25,7 @@ export function ScheduleView() {
   const [activeTab, setActiveTab]   = useState<ActiveTab>('schedule')
   const [scopeDoc, setScopeDoc]     = useState<ClientScopeDoc | null>(null)
 
-  const scheduleReady = canAccessSchedule(!!model, project)
+  const scheduleReady = canAccessSchedule(model, project)
 
   // ── Auto-compute schedule if missing and prerequisites are met ─────────────
   useEffect(() => {
@@ -61,7 +61,7 @@ export function ScheduleView() {
   }
 
   // ── Guards ────────────────────────────────────────────────────────────────
-  const blockers = getScheduleBlockers(!!model, project)
+  const blockers = getScheduleBlockers(model, project)
   if (blockers.length > 0) {
     return (
       <main className="max-w-xl mx-auto px-4 py-16">

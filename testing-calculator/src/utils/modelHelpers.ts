@@ -342,11 +342,12 @@ export function validateModel(model: TestingModel): ModelValidationResult {
     warnings.push('Some entries have an expected time of 0 hours — verify these are intentional.')
   }
 
-  const hasInvalidRanges = model.entries.some(
-    e => e.baseEstimate.minHours > e.baseEstimate.expectedHours ||
-         e.baseEstimate.expectedHours > e.baseEstimate.maxHours
-  )
-  if (hasInvalidRanges) {
+  const allEstimates: TimeEstimate[] = [
+    ...model.entries.map(e => e.baseEstimate),
+    ...model.browserCalibration.map(b => b.estimatePerPage),
+    ...model.deliverableEstimates.map(d => d.estimate),
+  ]
+  if (allEstimates.some(e => !isTimeEstimateRangeValid(e))) {
     errors.push('Some estimates have min > expected or expected > max. Please correct these.')
   }
 
