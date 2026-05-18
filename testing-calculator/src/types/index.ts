@@ -33,8 +33,11 @@ export enum PageCategory {
   ProductDetail    = 'Product detail (PDP)',  // Attribute selectors, add-to-cart, stock
   Cart             = 'Cart',                // Cart review, coupon entry, quantity edit
   CheckoutPayment  = 'Checkout / Payment',  // Address, shipping, payment, confirmation
-  Dashboard        = 'Dashboard / Portal',  // Authenticated views, data tables, account mgmt
-  CustomWorkflow   = 'Custom workflow / Wizard', // Multi-step configurators, booking, onboarding
+  Dashboard            = 'Dashboard / Portal',       // Authenticated views, data tables, account mgmt
+  ModelessInteraction  = 'Modeless interaction',     // Sidebar, chat bot, IM — does not block main UI
+  ModalPopup           = 'Modal popup',              // Overlay dialogs — newsletter signup, promos
+  ReportsDynamicData   = 'Reports & dynamic data',   // Reports, charts, filters — content loads dynamically
+  InteractiveGraphics  = 'Interactive graphics',     // Maps, locators, diagrams — visual UI driven by user input
 }
 
 // ---------------------------------------------------------------------------

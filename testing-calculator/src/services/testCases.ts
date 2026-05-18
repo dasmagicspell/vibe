@@ -210,6 +210,33 @@ const CATEGORY_EXTRA_CASES: Partial<Record<PageCategory, Partial<Record<TestType
       tc('Pagination or infinite scroll works at volume'),
     ],
   },
+  [PageCategory.ModalPopup]: {
+    [TestType.Functional]: [
+      tc('Modal opens and closes via trigger, close control, and Escape key'),
+      tc('Focus is trapped inside the modal while open and returns on close'),
+      tc('Background content is not interactable while modal is open'),
+    ],
+  },
+  [PageCategory.ModelessInteraction]: {
+    [TestType.Functional]: [
+      tc('Widget opens, minimizes, and closes without blocking main page interaction'),
+      tc('Messages or actions in the widget persist correctly across navigation'),
+    ],
+  },
+  [PageCategory.ReportsDynamicData]: {
+    [TestType.Functional]: [
+      tc('Filters and date ranges update displayed data correctly'),
+      tc('Empty, loading, and error states render appropriately'),
+      tc('Export or print (if present) matches on-screen data'),
+    ],
+  },
+  [PageCategory.InteractiveGraphics]: {
+    [TestType.Functional]: [
+      tc('Map or canvas loads and pans/zooms correctly'),
+      tc('Location search or geolocation returns relevant results'),
+      tc('Selected pin, region, or graphic element updates related detail correctly'),
+    ],
+  },
 }
 
 // ---------------------------------------------------------------------------

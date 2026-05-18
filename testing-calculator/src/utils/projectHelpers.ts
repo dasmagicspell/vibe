@@ -45,15 +45,30 @@ export function createDefaultProject(): ProjectSpec {
   }
 }
 
+/** Legacy PageCategory string values from saved project JSON */
+const LEGACY_PAGE_CATEGORY: Record<string, PageCategory> = {
+  'Custom workflow / Wizard': PageCategory.ComplexForm,
+}
+
+export function normalizePageCategory(category: PageCategory | string): PageCategory {
+  if (Object.values(PageCategory).includes(category as PageCategory)) {
+    return category as PageCategory
+  }
+  return LEGACY_PAGE_CATEGORY[category] ?? PageCategory.Informational
+}
+
 export function createPageSpec(overrides: Partial<PageSpec> = {}): PageSpec {
+  const { category, ...rest } = overrides
   return {
     id:         generateId(),
     name:       '',
-    category:   PageCategory.Informational,
+    category:   category !== undefined
+      ? normalizePageCategory(category)
+      : PageCategory.Informational,
     complexity:            ComplexityLevel.Medium,
     complexityCertainty:   'High',
     isTemplate: false,
-    ...overrides,
+    ...rest,
   }
 }
 
@@ -93,7 +108,8 @@ const FORM_DRIVEN_CATEGORIES: PageCategory[] = [
   PageCategory.ComplexForm,
   PageCategory.Authentication,
   PageCategory.CheckoutPayment,
-  PageCategory.CustomWorkflow,
+  PageCategory.ModalPopup,
+  PageCategory.ReportsDynamicData,
 ]
 
 /**
@@ -213,8 +229,11 @@ export const PAGE_CATEGORY_DESCRIPTIONS: Record<PageCategory, string> = {
   [PageCategory.ProductDetail]:  'Attribute selectors, add-to-cart, stock status',
   [PageCategory.Cart]:           'Cart review, coupon entry, quantity edit',
   [PageCategory.CheckoutPayment]:'Address, shipping, payment entry, order confirmation',
-  [PageCategory.Dashboard]:      'Authenticated views, data tables, account management',
-  [PageCategory.CustomWorkflow]: 'Multi-step configurators, booking, onboarding sequences',
+  [PageCategory.Dashboard]:           'Authenticated views, data tables, account management',
+  [PageCategory.ModelessInteraction]: 'Sidebar, chat bot, instant messaging — does not block the main page',
+  [PageCategory.ModalPopup]:          'Overlay dialogs — promos, newsletter signup, confirmations',
+  [PageCategory.ReportsDynamicData]:  'Reports, charts, tables — filters and content load dynamically',
+  [PageCategory.InteractiveGraphics]: 'Maps & location, diagrams, canvases — graphical screens that respond to user input',
 }
 
 export const INTEGRATION_CATEGORY_OPTIONS = [

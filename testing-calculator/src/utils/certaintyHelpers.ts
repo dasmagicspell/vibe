@@ -12,6 +12,7 @@ import type {
   TimeEstimate,
   WorkflowSpec,
 } from '@/types'
+import { normalizePageCategory } from '@/utils/projectHelpers'
 
 export const CERTAINTY_RANK: Record<CertaintyLevel, number> = {
   Low:    0,
@@ -102,6 +103,7 @@ export function intakeCertaintyForCell(
 export function normalizePageSpec(page: PageSpec): PageSpec {
   return {
     ...page,
+    category: normalizePageCategory(page.category),
     complexityCertainty: page.complexityCertainty ?? defaultComplexityCertainty(),
   }
 }
