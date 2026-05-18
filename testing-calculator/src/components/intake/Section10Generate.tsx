@@ -1,4 +1,6 @@
 import type { ProjectSpec, TestingModel } from '@/types'
+import { TEST_TYPE_DESCRIPTIONS } from '@/types'
+import { Tooltip } from '@/components/shared/Tooltip'
 import { validateProject, countEffectivePages, getScheduleBlockers } from '@/utils/projectHelpers'
 
 interface Props {
@@ -107,9 +109,10 @@ export function Section10Generate({ project, onSaveProject, onGenerate, model, m
           {project.selectedTestTypes.map(tt => (
             <span
               key={tt}
-              className="px-2.5 py-1 bg-brand-100 text-brand-800 rounded-full text-xs font-medium"
+              className="inline-flex items-center gap-0.5 px-2.5 py-1 bg-brand-100 text-brand-800 rounded-full text-xs font-medium"
             >
               {tt}
+              <Tooltip content={TEST_TYPE_DESCRIPTIONS[tt]} />
             </span>
           ))}
         </div>

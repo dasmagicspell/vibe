@@ -1,5 +1,6 @@
 import type { ProjectSpec } from '@/types'
 import { TestType, ALWAYS_ACTIVE_TEST_TYPES, CONDITIONAL_TEST_TYPES, TEST_TYPE_DESCRIPTIONS } from '@/types'
+import { Tooltip } from '@/components/shared/Tooltip'
 import { getTestTypeActivationReason } from '@/utils/projectHelpers'
 interface Props {
   project: ProjectSpec
@@ -55,7 +56,6 @@ export function Section8TestTypes({ project, onChange }: Props) {
               key={tt}
               testType={tt}
               status="always"
-              tooltip={TEST_TYPE_DESCRIPTIONS[tt]}
             />
           ))}
         </div>
@@ -83,7 +83,7 @@ export function Section8TestTypes({ project, onChange }: Props) {
                     />
                   </svg>
                   <div>
-                    <span className="text-sm font-medium text-green-800">{tt}</span>
+                    <TestTypeLabel testType={tt} className="text-sm font-medium text-green-800" />
                     {reason && (
                       <p className="text-xs text-green-600 mt-0.5">{reason}</p>
                     )}
@@ -107,7 +107,6 @@ export function Section8TestTypes({ project, onChange }: Props) {
                 key={tt}
                 testType={tt}
                 status="inactive"
-                tooltip={TEST_TYPE_DESCRIPTIONS[tt]}
               />
             ))}
           </div>
@@ -147,14 +146,14 @@ export function Section8TestTypes({ project, onChange }: Props) {
 
         <OptInRow
           label={TestType.E2EAutomation}
-          description="Automated test authoring and execution — quoted as a single line-item total."
+          description={TEST_TYPE_DESCRIPTIONS[TestType.E2EAutomation]}
           checked={project.includeAutomation}
           onToggle={v => setOptIn('includeAutomation', v)}
         />
 
         <OptInRow
           label={TestType.CMSAdmin}
-          description="Testing the CMS backend (WordPress admin, Shopify dashboard, etc.)."
+          description={TEST_TYPE_DESCRIPTIONS[TestType.CMSAdmin]}
           checked={project.includeCMSAdmin}
           onToggle={v => setOptIn('includeCMSAdmin', v)}
         />
@@ -177,10 +176,9 @@ export function Section8TestTypes({ project, onChange }: Props) {
 interface TestTypePillProps {
   testType: TestType
   status: 'always' | 'active' | 'inactive'
-  tooltip: string
 }
 
-function TestTypePill({ testType, status, tooltip }: TestTypePillProps) {
+function TestTypePill({ testType, status }: TestTypePillProps) {
   const styles = {
     always:  'bg-brand-100 text-brand-800 border border-brand-200',
     active:  'bg-green-100 text-green-800 border border-green-200',
@@ -188,10 +186,19 @@ function TestTypePill({ testType, status, tooltip }: TestTypePillProps) {
   }
   return (
     <span
-      className={`px-2.5 py-1 rounded-full text-xs font-medium ${styles[status]}`}
-      title={tooltip}
+      className={`inline-flex items-center gap-0.5 px-2.5 py-1 rounded-full text-xs font-medium ${styles[status]}`}
     >
       {testType}
+      <Tooltip content={TEST_TYPE_DESCRIPTIONS[testType]} />
+    </span>
+  )
+}
+
+function TestTypeLabel({ testType, className }: { testType: TestType; className?: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1 ${className ?? ''}`}>
+      {testType}
+      <Tooltip content={TEST_TYPE_DESCRIPTIONS[testType]} />
     </span>
   )
 }
@@ -205,21 +212,28 @@ interface OptInRowProps {
 }
 
 function OptInRow({ label, description, checked, onToggle, children }: OptInRowProps) {
+  const inputId = `opt-in-${label}`
   return (
     <div className={`p-3 rounded-xl border transition-all ${checked ? 'border-brand-300 bg-brand-50' : 'border-gray-200 bg-white'}`}>
-      <label className="flex items-start gap-3 cursor-pointer">
+      <div className="flex items-start gap-3">
         <input
+          id={inputId}
           type="checkbox"
           checked={checked}
           onChange={e => onToggle(e.target.checked)}
           className="mt-0.5 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
         />
-        <div>
-          <span className="text-sm font-medium text-gray-900">{label}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1">
+            <label htmlFor={inputId} className="text-sm font-medium text-gray-900 cursor-pointer">
+              {label}
+            </label>
+            <Tooltip content={TEST_TYPE_DESCRIPTIONS[label]} />
+          </div>
           <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+          {children}
         </div>
-      </label>
-      {children}
+      </div>
     </div>
   )
 }
