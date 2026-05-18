@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { generateClientScopeDoc } from './scopeDocHelpers'
-import { createDefaultProject, createPageSpec, createIntegrationSpec } from './projectHelpers'
+import {
+  createDefaultProject, createPageSpec, createIntegrationSpec,
+  ERP_INTEGRATION_CATEGORY,
+} from './projectHelpers'
 import { createDefaultModel } from './modelHelpers'
 import { runCalculationEngine } from '@/services/CalculationEngine'
 import {
@@ -73,6 +76,39 @@ describe('generateClientScopeDoc', () => {
     const doc = generateClientScopeDoc(project, output, true)
     const items = doc.sections.whatWeNeedFromYou.items.join(' ').toLowerCase()
     expect(items).toContain('analytics')
+  })
+
+  it('whatWeNeedFromYou includes ERP prerequisites when an ERP integration exists', () => {
+    const integration = createIntegrationSpec({
+      name: 'Odoo eCommerce',
+      category: ERP_INTEGRATION_CATEGORY,
+    })
+    const { project, output } = makeOutput({ integrations: [integration] })
+    const doc = generateClientScopeDoc(project, output, true)
+    const items = doc.sections.whatWeNeedFromYou.items.join(' ').toLowerCase()
+    expect(items).toContain('odoo')
+    expect(items).toContain('synced')
+    expect(items).toContain('webhook')
+  })
+
+  it('assumptions names ERP integrations in scope', () => {
+    const integration = createIntegrationSpec({
+      name: 'Odoo',
+      category: ERP_INTEGRATION_CATEGORY,
+    })
+    const { project, output } = makeOutput({ integrations: [integration] })
+    const doc = generateClientScopeDoc(project, output, true)
+    const items = doc.sections.assumptions.items.join(' ')
+    expect(items).toContain('ERP integrations in scope')
+    expect(items).toContain('Odoo')
+  })
+
+  it('whatWeWillNotTest excludes ERP platform work when ERP is in scope', () => {
+    const integration = createIntegrationSpec({ category: ERP_INTEGRATION_CATEGORY })
+    const { project, output } = makeOutput({ integrations: [integration] })
+    const doc = generateClientScopeDoc(project, output, true)
+    const items = doc.sections.whatWeWillNotTest.items.join(' ')
+    expect(items).toContain('Odoo/ERP platform administration')
   })
 
   it('deliverables includes bug report when retesting included', () => {

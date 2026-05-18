@@ -240,18 +240,49 @@ const CATEGORY_EXTRA_CASES: Partial<Record<PageCategory, Partial<Record<TestType
 }
 
 // ---------------------------------------------------------------------------
+// ERP integration extras (appended when project has an ERP category integration)
+// ---------------------------------------------------------------------------
+
+const ERP_INTEGRATION_EXTRA_CASES: Partial<Record<TestType, TestCase[]>> = {
+  [TestType.Functional]: [
+    tc('Product or catalog sync between website and ERP reflects current stock and pricing'),
+    tc('Order or quote created on the site appears correctly in ERP with expected line items'),
+    tc('Customer or contact record created/updated in ERP matches site submission data'),
+    tc('ERP sync failure surfaces a clear user-facing error (no silent data loss)'),
+  ],
+  [TestType.FormValidation]: [
+    tc('Fields mapped to ERP (SKU, tax ID, account reference) validate before sync is attempted'),
+  ],
+  [TestType.EmailNotification]: [
+    tc('ERP-triggered transactional emails (order confirmation, invoice) deliver with correct data'),
+  ],
+}
+
+export interface GetTestCasesOptions {
+  hasErpIntegration?: boolean
+}
+
+// ---------------------------------------------------------------------------
 // Public function
 // ---------------------------------------------------------------------------
 
 /**
  * Returns the list of test cases for a cell in the schedule matrix.
  * Starts with base test cases for the test type,
- * then appends any page-category-specific extras.
+ * then appends any page-category-specific extras,
+ * then ERP integration extras when applicable.
  */
-export function getTestCases(testType: TestType, pageCategory?: PageCategory): TestCase[] {
+export function getTestCases(
+  testType: TestType,
+  pageCategory?: PageCategory,
+  options?: GetTestCasesOptions,
+): TestCase[] {
   const base = BASE_TEST_CASES[testType] ?? []
-  if (!pageCategory) return base
-
-  const extras = CATEGORY_EXTRA_CASES[pageCategory]?.[testType] ?? []
-  return [...base, ...extras]
+  const categoryExtras = pageCategory
+    ? CATEGORY_EXTRA_CASES[pageCategory]?.[testType] ?? []
+    : []
+  const erpExtras = options?.hasErpIntegration
+    ? ERP_INTEGRATION_EXTRA_CASES[testType] ?? []
+    : []
+  return [...base, ...categoryExtras, ...erpExtras]
 }

@@ -24,9 +24,10 @@ export function Section5Integrations({ integrations, onChange }: Props) {
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Integrations</h2>
         <p className="mt-1 text-sm text-gray-500">
-          List third-party services the site connects to — analytics tools, CRMs, payment gateways,
-          email platforms. Each adds an API integration surface that needs testing. Marking an
-          integration as analytics will automatically activate Analytics and Tag testing.
+          List third-party services the site connects to — analytics tools, CRMs, ERP systems
+          (such as Odoo), payment gateways, email platforms. Each adds an API integration surface
+          that needs testing. Marking an integration as analytics will automatically activate
+          Analytics and Tag testing.
         </p>
       </div>
 
@@ -50,7 +51,7 @@ export function Section5Integrations({ integrations, onChange }: Props) {
                   type="text"
                   value={integration.name}
                   onChange={e => updateIntegration(integration.id, { name: e.target.value })}
-                  placeholder={`Integration ${index + 1} — e.g. Google Analytics 4`}
+                  placeholder={`Integration ${index + 1} — e.g. Google Analytics 4, Odoo`}
                   className="w-full px-3 py-1.5 rounded-lg border border-gray-300 text-sm
                              focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />

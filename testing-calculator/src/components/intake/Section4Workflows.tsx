@@ -27,7 +27,7 @@ export function Section4Workflows({ workflows, onChange }: Props) {
         <h2 className="text-lg font-semibold text-gray-900">Workflows</h2>
         <p className="mt-1 text-sm text-gray-500">
           A workflow is a multi-step user journey that may span several pages or states
-          — a checkout, a booking, an onboarding sequence. List each distinct user flow separately.
+          — a checkout, a booking, an onboarding sequence, or a wizard. List each distinct user flow separately.
         </p>
       </div>
 

@@ -236,9 +236,12 @@ export const PAGE_CATEGORY_DESCRIPTIONS: Record<PageCategory, string> = {
   [PageCategory.InteractiveGraphics]: 'Maps & location, diagrams, canvases — graphical screens that respond to user input',
 }
 
+export const ERP_INTEGRATION_CATEGORY = 'ERP (Odoo, Microsoft Dynamics)'
+
 export const INTEGRATION_CATEGORY_OPTIONS = [
   'Analytics (GA4, GTM)',
   'CRM (HubSpot, Salesforce)',
+  ERP_INTEGRATION_CATEGORY,
   'Email marketing (Mailchimp, Klaviyo)',
   'Payment gateway (Stripe, PayPal)',
   'Social media',
@@ -248,6 +251,23 @@ export const INTEGRATION_CATEGORY_OPTIONS = [
   'Custom API / webhook',
   'Other',
 ]
+
+/** True when category indicates an ERP back-office integration (Odoo, Dynamics, etc.). */
+export function isErpIntegrationCategory(category: string): boolean {
+  const c = category.trim().toLowerCase()
+  if (!c) return false
+  return c.includes('erp') || c.includes('odoo') || c.includes('dynamics')
+}
+
+export function hasErpIntegration(project: ProjectSpec): boolean {
+  return project.integrations.some(i => isErpIntegrationCategory(i.category))
+}
+
+export function erpIntegrationNames(project: ProjectSpec): string[] {
+  return project.integrations
+    .filter(i => isErpIntegrationCategory(i.category))
+    .map(i => i.name.trim() || 'Unnamed ERP integration')
+}
 
 // ---------------------------------------------------------------------------
 // Project validation

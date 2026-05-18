@@ -5,6 +5,7 @@ import {
   isSectionComplete, validateProject, countEffectivePages,
   intakeStepHasError, getIntakeStepErrors,
   getScheduleBlockers, canAccessSchedule,
+  ERP_INTEGRATION_CATEGORY, hasErpIntegration, isErpIntegrationCategory,
 } from './projectHelpers'
 import {
   PageCategory, AccountScope, ProjectMoment, TestType,
@@ -341,6 +342,23 @@ describe('countEffectivePages', () => {
 
   it('returns 0 for empty list', () => {
     expect(countEffectivePages([])).toBe(0)
+  })
+})
+
+describe('ERP integration helpers', () => {
+  it('isErpIntegrationCategory matches ERP category and common free-text values', () => {
+    expect(isErpIntegrationCategory(ERP_INTEGRATION_CATEGORY)).toBe(true)
+    expect(isErpIntegrationCategory('Odoo')).toBe(true)
+    expect(isErpIntegrationCategory('MS Dynamics')).toBe(true)
+    expect(isErpIntegrationCategory('Analytics (GA4, GTM)')).toBe(false)
+  })
+
+  it('hasErpIntegration is true when any integration uses an ERP category', () => {
+    const project = {
+      ...createDefaultProject(),
+      integrations: [createIntegrationSpec({ category: ERP_INTEGRATION_CATEGORY })],
+    }
+    expect(hasErpIntegration(project)).toBe(true)
   })
 })
 

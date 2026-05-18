@@ -11,7 +11,9 @@ import {
   RigorLevel, BrowserTier,
   RIGOR_DEFINITIONS, BROWSER_TIER_DEFINITIONS,
 } from '@/types'
-import { countEffectivePages } from '@/utils/projectHelpers'
+import {
+  countEffectivePages, erpIntegrationNames, hasErpIntegration,
+} from '@/utils/projectHelpers'
 import { formatRange } from '@/utils/modelHelpers'
 
 const PREPARED_BY = 'A Positive Future'
@@ -26,7 +28,7 @@ function buildWillTest(output: ScheduleOutput): string[] {
   )
 }
 
-function buildWillNotTest(_project: ProjectSpec, output: ScheduleOutput): string[] {
+function buildWillNotTest(project: ProjectSpec, output: ScheduleOutput): string[] {
   const active = new Set(output.activeTestTypes)
 
   // Conditional types that were not activated
@@ -42,6 +44,12 @@ function buildWillNotTest(_project: ProjectSpec, output: ScheduleOutput): string
     'Browser versions not listed in the agreed browser tier',
     'Third-party service uptime (payment gateways, CRM, analytics platforms)',
   ]
+
+  if (hasErpIntegration(project)) {
+    standard.push(
+      'Odoo/ERP platform administration, custom module development, or ERP hosting configuration',
+    )
+  }
 
   return [...notActivated, ...standard]
 }
@@ -63,6 +71,16 @@ function buildNeededFromYou(project: ProjectSpec): string[] {
 
   if (project.integrations.some(i => i.hasAnalytics)) {
     items.push('Analytics measurement plan or tag specification document')
+  }
+
+  if (hasErpIntegration(project)) {
+    items.push(
+      'Odoo or ERP sandbox/staging access with a test company and representative products, customers, and orders',
+    )
+    items.push(
+      'Documentation of data synced between the website and ERP (catalog, inventory, orders, contacts) and expected update timing',
+    )
+    items.push('API, webhook, or connector credentials for the ERP integration (staging environment only)')
   }
 
   if (project.includeCMSAdmin) {
@@ -102,11 +120,15 @@ function buildDeliverables(output: ScheduleOutput, retestingIncluded: boolean): 
 
 function buildAssumptions(project: ProjectSpec, output: ScheduleOutput): string[] {
   const effectivePages = countEffectivePages(project.pages)
+  const erpNames = erpIntegrationNames(project)
 
   return [
     `Testing environment: staging (not production)`,
     `Pages in scope: ${project.pages.length} defined (${effectivePages} effective including template instances)`,
     `Workflows in scope: ${project.workflows.length}`,
+    hasErpIntegration(project)
+      ? `ERP integrations in scope: ${erpNames.join(', ')} — website↔ERP sync paths confirmed before testing begins`
+      : '',
     `Browser and device coverage: ${project.browserTier} tier — ${BROWSER_TIER_DEFINITIONS[project.browserTier]}`,
     `Testing rigor: ${project.rigorLevel} — ${RIGOR_DEFINITIONS[project.rigorLevel]}`,
     `Estimate generated with model: ${output.engineerName} v${output.modelVersion}`,
