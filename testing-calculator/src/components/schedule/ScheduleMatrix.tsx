@@ -3,7 +3,7 @@ import type { ScheduleOutput, ScheduleRow, ScheduleCell } from '@/types'
 import { TestType } from '@/types'
 import { CertaintyBadge } from '@/components/shared/CertaintyBadge'
 import { CellDrillDown } from './CellDrillDown'
-import { formatRange } from '@/utils/modelHelpers'
+import { formatHours, formatRange } from '@/utils/modelHelpers'
 
 interface ScheduleMatrixProps {
   output: ScheduleOutput
@@ -155,7 +155,7 @@ export function ScheduleMatrix({ output }: ScheduleMatrixProps) {
                 const colTotal = sumColumnEstimates(rows, tt)
                 return (
                   <td key={tt} className="border-r border-gray-200 px-2 py-2 text-center font-mono text-gray-700">
-                    {colTotal > 0 ? `${colTotal.toFixed(1)}h` : '—'}
+                    {colTotal > 0 ? formatHours(colTotal) : '—'}
                   </td>
                 )
               })}

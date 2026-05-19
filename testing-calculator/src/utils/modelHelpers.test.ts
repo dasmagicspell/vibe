@@ -292,14 +292,14 @@ describe('formatHours', () => {
     expect(formatHours(0)).toBe('0')
   })
 
-  it('formats sub-hour values as minutes', () => {
-    expect(formatHours(0.5)).toBe('30 min')
-    expect(formatHours(0.25)).toBe('15 min')
+  it('formats sub-hour values as decimal hours', () => {
+    expect(formatHours(0.5)).toBe('0.5')
+    expect(formatHours(0.25)).toBe('0.25')
   })
 
   it('formats fractional hours', () => {
     expect(formatHours(1.5)).toBe('1.5')
-    expect(formatHours(2.75)).toBe('2.8')
+    expect(formatHours(2.75)).toBe('2.75')
   })
 })
 
@@ -310,7 +310,12 @@ describe('formatHours', () => {
 describe('formatRange', () => {
   it('formats a range correctly', () => {
     const estimate = { minHours: 1, expectedHours: 2, maxHours: 3 }
-    expect(formatRange(estimate)).toBe('1–3 hrs')
+    expect(formatRange(estimate)).toBe('1-3')
+  })
+
+  it('formats sub-hour to hour ranges without unit labels', () => {
+    const estimate = { minHours: 0.5, expectedHours: 1, maxHours: 1.5 }
+    expect(formatRange(estimate)).toBe('0.5-1.5')
   })
 })
 

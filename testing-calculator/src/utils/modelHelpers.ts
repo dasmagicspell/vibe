@@ -417,18 +417,19 @@ export function getCalibrationStepErrors(model: TestingModel): boolean[] {
 
 export function formatHours(hours: number): string {
   if (hours === 0) return '0'
-  if (hours < 1) return `${(hours * 60).toFixed(0)} min`
-  return hours % 1 === 0 ? `${hours}` : hours.toFixed(1)
+  if (Number.isInteger(hours)) return `${hours}`
+  return String(parseFloat(hours.toFixed(2)))
 }
 
 export function formatRange(estimate: TimeEstimate): string {
   const min = formatHours(estimate.minHours)
   const max = formatHours(estimate.maxHours)
-  return `${min}–${max} hrs`
+  if (min === max) return min
+  return `${min}-${max}`
 }
 
 export function formatExpected(estimate: TimeEstimate): string {
-  return `${formatHours(estimate.expectedHours)} hrs`
+  return formatHours(estimate.expectedHours)
 }
 
 /** Whether a loaded model's version should auto-bump on the first calibration edit. */
