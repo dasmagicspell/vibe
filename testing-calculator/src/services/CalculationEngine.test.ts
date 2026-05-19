@@ -253,6 +253,33 @@ describe('runCalculationEngine', () => {
     expect(cell.certaintyBreakdown.intake).toBeDefined()
   })
 
+  it('cell testCases come from model representativeTestCases', () => {
+    const custom = [{ id: 'custom-func', description: 'Verify bespoke widget' }]
+    const modelWithCases = {
+      ...model,
+      representativeTestCases: {
+        ...model.representativeTestCases,
+        [TestType.Functional]: custom,
+      },
+    }
+    const out = runCalculationEngine(modelWithCases, project)
+    const cell = out.rows[0].cells[TestType.Functional]
+    expect(cell.testCases).toEqual(custom)
+  })
+
+  it('cell testCases are empty when model has none for that type', () => {
+    const modelEmpty = {
+      ...model,
+      representativeTestCases: {
+        ...model.representativeTestCases,
+        [TestType.Functional]: [],
+      },
+    }
+    const out = runCalculationEngine(modelEmpty, project)
+    const cell = out.rows[0].cells[TestType.Functional]
+    expect(cell.testCases).toHaveLength(0)
+  })
+
   it('caps cell certainty when engineer sets Medium calibration', () => {
     const entries = createDefaultEntries().map(e =>
       e.testType === TestType.Functional && e.complexity === ComplexityLevel.Low

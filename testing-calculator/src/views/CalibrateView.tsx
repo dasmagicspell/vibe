@@ -252,6 +252,15 @@ export function CalibrateView() {
           <Step3Scenarios
             entries={draft.entries}
             onChange={entries => updateDraft({ entries })}
+            representativeTestCases={draft.representativeTestCases}
+            onTestCasesChange={(testType, cases) =>
+              updateDraft({
+                representativeTestCases: {
+                  ...draft.representativeTestCases,
+                  [testType]: cases,
+                },
+              })
+            }
           />
         </section>
 

@@ -18,8 +18,7 @@ import {
   TestType, ComplexityLevel, BrowserTier,
   RIGOR_MULTIPLIERS, DEFECT_DENSITY_MULTIPLIERS,
 } from '@/types'
-import { getTestCases } from './testCases'
-import { hasErpIntegration } from '@/utils/projectHelpers'
+import { getRepresentativeTestCases } from './testCases'
 import { formatRange } from '@/utils/modelHelpers'
 import {
   minCertainty,
@@ -184,7 +183,6 @@ function buildMatrixRow(
 ): ScheduleRow {
   const cells: Record<string, ScheduleCell> = {}
   const intakeCertainty = intakeCertaintyForCell(project, rowType, rowId)
-  const erpIntegration = hasErpIntegration(project)
 
   for (const testType of matrixTestTypes) {
     const comp = computeCellEstimate(
@@ -215,7 +213,7 @@ function buildMatrixRow(
       estimate:           scaledEstimate,
       certainty,
       certaintyBreakdown,
-      testCases:            getTestCases(testType, pageCategory, { hasErpIntegration: erpIntegration }),
+      testCases:            getRepresentativeTestCases(model, testType),
       needsReview:          comp.needsReview || certainty === 'Low',
     }
   }

@@ -1,20 +1,22 @@
 // =============================================================================
 // testCases.ts
-// Generates representative test case descriptions for each test type.
+// Default and model-backed representative test case descriptions per test type.
 // Used by the calculation engine to populate ScheduleCell.testCases[].
-// Each test case is shown in the drill-down modal when a matrix cell is clicked.
 // =============================================================================
 
-import type { TestCase } from '@/types'
-import { TestType, PageCategory } from '@/types'
-import { generateId } from '@/utils/modelHelpers'
+import type { TestCase, TestingModel } from '@/types'
+import { TestType } from '@/types'
+
+function newId(): string {
+  return crypto.randomUUID()
+}
 
 function tc(description: string): TestCase {
-  return { id: generateId(), description }
+  return { id: newId(), description }
 }
 
 // ---------------------------------------------------------------------------
-// Base test cases per test type (always included)
+// Base test cases per test type (seed defaults for new models)
 // ---------------------------------------------------------------------------
 
 const BASE_TEST_CASES: Record<TestType, TestCase[]> = {
@@ -158,131 +160,48 @@ const BASE_TEST_CASES: Record<TestType, TestCase[]> = {
   ],
 }
 
-// ---------------------------------------------------------------------------
-// Page-category–specific additional test cases (appended to base list)
-// ---------------------------------------------------------------------------
-
-const CATEGORY_EXTRA_CASES: Partial<Record<PageCategory, Partial<Record<TestType, TestCase[]>>>> = {
-  [PageCategory.CheckoutPayment]: {
-    [TestType.Functional]: [
-      tc('Valid payment card processes and order is confirmed'),
-      tc('Declined card shows appropriate error without losing cart'),
-      tc('Order confirmation email and order ID received'),
-      tc('Stock quantity decrements after successful purchase'),
-    ],
-    [TestType.SecurityPrivacy]: [
-      tc('Payment form uses secure payment provider iframe (no raw card data in DOM)'),
-      tc('CVV field cleared after submission attempt'),
-    ],
-  },
-  [PageCategory.Authentication]: {
-    [TestType.Functional]: [
-      tc('Valid credentials log the user in and redirect correctly'),
-      tc('Invalid credentials show error without revealing which field is wrong'),
-      tc('Password reset email received and link is valid for correct time window'),
-      tc('Session expires after inactivity and prompts re-authentication'),
-    ],
-  },
-  [PageCategory.SimpleForm]: {
-    [TestType.FormValidation]: [
-      tc('Honeypot or CAPTCHA prevents obvious spam submission'),
-      tc('Submitted data appears correctly in the admin notification email'),
-    ],
-  },
-  [PageCategory.ComplexForm]: {
-    [TestType.FormValidation]: [
-      tc('Conditional fields show/hide based on previous answers'),
-      tc('Partial progress is preserved if user navigates back'),
-      tc('Multi-step form summary is accurate before final submit'),
-    ],
-  },
-  [PageCategory.ProductDetail]: {
-    [TestType.Functional]: [
-      tc('Attribute combination (size + colour) updates price and stock correctly'),
-      tc('"Add to cart" button reflects correct selected variant'),
-      tc('Out-of-stock state disables purchase correctly'),
-    ],
-  },
-  [PageCategory.Dashboard]: {
-    [TestType.Functional]: [
-      tc("Data displayed is scoped to the authenticated user's account"),
-      tc('Filtering and sorting controls work correctly'),
-      tc('Pagination or infinite scroll works at volume'),
-    ],
-  },
-  [PageCategory.ModalPopup]: {
-    [TestType.Functional]: [
-      tc('Modal opens and closes via trigger, close control, and Escape key'),
-      tc('Focus is trapped inside the modal while open and returns on close'),
-      tc('Background content is not interactable while modal is open'),
-    ],
-  },
-  [PageCategory.ModelessInteraction]: {
-    [TestType.Functional]: [
-      tc('Widget opens, minimizes, and closes without blocking main page interaction'),
-      tc('Messages or actions in the widget persist correctly across navigation'),
-    ],
-  },
-  [PageCategory.ReportsDynamicData]: {
-    [TestType.Functional]: [
-      tc('Filters and date ranges update displayed data correctly'),
-      tc('Empty, loading, and error states render appropriately'),
-      tc('Export or print (if present) matches on-screen data'),
-    ],
-  },
-  [PageCategory.InteractiveGraphics]: {
-    [TestType.Functional]: [
-      tc('Map or canvas loads and pans/zooms correctly'),
-      tc('Location search or geolocation returns relevant results'),
-      tc('Selected pin, region, or graphic element updates related detail correctly'),
-    ],
-  },
+function cloneTestCases(cases: TestCase[]): TestCase[] {
+  return cases.map(c => ({
+    id: newId(),
+    description: c.description,
+    ...(c.estimatedMinutes !== undefined ? { estimatedMinutes: c.estimatedMinutes } : {}),
+  }))
 }
 
-// ---------------------------------------------------------------------------
-// ERP integration extras (appended when project has an ERP category integration)
-// ---------------------------------------------------------------------------
-
-const ERP_INTEGRATION_EXTRA_CASES: Partial<Record<TestType, TestCase[]>> = {
-  [TestType.Functional]: [
-    tc('Product or catalog sync between website and ERP reflects current stock and pricing'),
-    tc('Order or quote created on the site appears correctly in ERP with expected line items'),
-    tc('Customer or contact record created/updated in ERP matches site submission data'),
-    tc('ERP sync failure surfaces a clear user-facing error (no silent data loss)'),
-  ],
-  [TestType.FormValidation]: [
-    tc('Fields mapped to ERP (SKU, tax ID, account reference) validate before sync is attempted'),
-  ],
-  [TestType.EmailNotification]: [
-    tc('ERP-triggered transactional emails (order confirmation, invoice) deliver with correct data'),
-  ],
+/** Fresh copy of base representative cases for every test type (new IDs). */
+export function createDefaultRepresentativeTestCases(): Record<TestType, TestCase[]> {
+  const result = {} as Record<TestType, TestCase[]>
+  for (const testType of Object.values(TestType)) {
+    result[testType] = cloneTestCases(BASE_TEST_CASES[testType] ?? [])
+  }
+  return result
 }
 
-export interface GetTestCasesOptions {
-  hasErpIntegration?: boolean
+/** Merge loaded cases with defaults; missing test types get base seeds. */
+export function normalizeRepresentativeTestCases(
+  raw?: Partial<Record<TestType, TestCase[]>>,
+): Record<TestType, TestCase[]> {
+  const defaults = createDefaultRepresentativeTestCases()
+  if (!raw) return defaults
+
+  const result = { ...defaults }
+  for (const testType of Object.values(TestType)) {
+    const cases = raw[testType]
+    if (cases !== undefined) {
+      result[testType] = cases.map(c => ({
+        id: c.id || newId(),
+        description: c.description ?? '',
+        ...(c.estimatedMinutes !== undefined ? { estimatedMinutes: c.estimatedMinutes } : {}),
+      }))
+    }
+  }
+  return result
 }
 
-// ---------------------------------------------------------------------------
-// Public function
-// ---------------------------------------------------------------------------
-
-/**
- * Returns the list of test cases for a cell in the schedule matrix.
- * Starts with base test cases for the test type,
- * then appends any page-category-specific extras,
- * then ERP integration extras when applicable.
- */
-export function getTestCases(
+/** Representative cases for a test type from the engineer's model. */
+export function getRepresentativeTestCases(
+  model: TestingModel,
   testType: TestType,
-  pageCategory?: PageCategory,
-  options?: GetTestCasesOptions,
 ): TestCase[] {
-  const base = BASE_TEST_CASES[testType] ?? []
-  const categoryExtras = pageCategory
-    ? CATEGORY_EXTRA_CASES[pageCategory]?.[testType] ?? []
-    : []
-  const erpExtras = options?.hasErpIntegration
-    ? ERP_INTEGRATION_EXTRA_CASES[testType] ?? []
-    : []
-  return [...base, ...categoryExtras, ...erpExtras]
+  return model.representativeTestCases[testType] ?? []
 }

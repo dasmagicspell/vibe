@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { CalibrationEntry, CertaintyLevel, TimeEstimate } from '@/types'
+import type { CalibrationEntry, CertaintyLevel, TestCase, TimeEstimate } from '@/types'
 import { TestType, ComplexityLevel, ALWAYS_ACTIVE_TEST_TYPES, CONDITIONAL_TEST_TYPES, TEST_TYPE_DESCRIPTIONS, COMPLEXITY_DEFINITIONS } from '@/types'
 import { findBaseRateEntry, upsertBaseRateEntry } from '@/utils/modelHelpers'
 import { calibrationRowCertainty, isEstimateEmpty } from '@/utils/certaintyHelpers'
@@ -7,11 +7,14 @@ import { CalibrationAttentionSummary } from '@/components/calibration/Calibratio
 import { TimeEstimateInput } from '@/components/shared/TimeEstimateInput'
 import { CertaintySelector } from '@/components/shared/CertaintySelector'
 import { Tooltip } from '@/components/shared/Tooltip'
+import { EditableDescriptionList } from '@/components/shared/EditableDescriptionList'
 import { StepNav } from './StepWizard'
 
 interface Step3Props {
   entries: CalibrationEntry[]
   onChange: (entries: CalibrationEntry[]) => void
+  representativeTestCases: Record<TestType, TestCase[]>
+  onTestCasesChange: (testType: TestType, cases: TestCase[]) => void
   onBack?: () => void
   onNext?: () => void
 }
@@ -30,7 +33,14 @@ const CERTAINTY_DOT: Record<CertaintyLevel, string> = {
   Low:    'bg-red-500',
 }
 
-export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props) {
+export function Step3Scenarios({
+  entries,
+  onChange,
+  representativeTestCases,
+  onTestCasesChange,
+  onBack,
+  onNext,
+}: Step3Props) {
   const [openSections, setOpenSections] = useState<Set<TestType>>(
     new Set([ALWAYS_ACTIVE_TEST_TYPES[0]])
   )
@@ -144,6 +154,8 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
             onToggle={() => toggleSection(testType)}
             noteValue={notes[testType] ?? ''}
             onNoteChange={note => handleNoteChange(testType, note)}
+            testCases={representativeTestCases[testType] ?? []}
+            onTestCasesChange={cases => onTestCasesChange(testType, cases)}
             {...accordionProps}
           />
         ))}
@@ -161,6 +173,8 @@ export function Step3Scenarios({ entries, onChange, onBack, onNext }: Step3Props
             onToggle={() => toggleSection(testType)}
             noteValue={notes[testType] ?? ''}
             onNoteChange={note => handleNoteChange(testType, note)}
+            testCases={representativeTestCases[testType] ?? []}
+            onTestCasesChange={cases => onTestCasesChange(testType, cases)}
             isConditional
             {...accordionProps}
           />
@@ -185,6 +199,8 @@ interface AccordionProps {
   onCertaintyChange: (t: TestType, c: ComplexityLevel, level: CertaintyLevel) => void
   noteValue: string
   onNoteChange: (note: string) => void
+  testCases: TestCase[]
+  onTestCasesChange: (cases: TestCase[]) => void
 }
 
 function ScenarioAccordion({
@@ -198,6 +214,8 @@ function ScenarioAccordion({
   onCertaintyChange,
   noteValue,
   onNoteChange,
+  testCases,
+  onTestCasesChange,
 }: AccordionProps) {
   return (
     <div className={`rounded-lg border transition-colors ${isOpen ? 'border-brand-200 bg-brand-50/30' : 'border-gray-200 bg-white'}`}>
@@ -290,6 +308,15 @@ function ScenarioAccordion({
               placeholder="Any assumptions or caveats for this test type…"
               className="mt-1 w-full px-3 py-1.5 text-xs rounded border border-gray-200
                          focus:outline-none focus:ring-1 focus:ring-brand-500"
+            />
+          </div>
+
+          <div className="pt-3">
+            <p className="text-xs text-gray-500 font-medium mb-2">Representative test cases</p>
+            <EditableDescriptionList
+              idPrefix={`rep-tc-${testType}`}
+              items={testCases}
+              onChange={onTestCasesChange}
             />
           </div>
         </div>

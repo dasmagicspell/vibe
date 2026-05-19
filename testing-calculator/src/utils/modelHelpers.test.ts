@@ -14,6 +14,7 @@ import {
   shouldAutoBumpModelVersion,
   DEFAULT_SCENARIO_ESTIMATES,
 } from './modelHelpers'
+import type { TestingModel } from '@/types'
 import { TestType, ComplexityLevel, DefectDensity } from '@/types'
 
 // ---------------------------------------------------------------------------
@@ -83,6 +84,13 @@ describe('createDefaultModel', () => {
     expect(model.overheadFactors.coordinationFraction).toBe(0.12)
     expect(model.overheadFactors.reportingFraction).toBe(0.15)
     expect(model.overheadFactors.defaultDefectDensity).toBe(DefectDensity.Medium)
+  })
+
+  it('includes default representative test cases for every test type', () => {
+    const model = createDefaultModel()
+    for (const testType of Object.values(TestType)) {
+      expect(model.representativeTestCases[testType].length).toBeGreaterThan(0)
+    }
   })
 })
 
@@ -214,6 +222,18 @@ describe('normalizeTestingModel', () => {
     legacy.entries[0] = { ...legacy.entries[0], certainty: undefined as never }
     const normalized = normalizeTestingModel(legacy)
     expect(normalized.entries[0].certainty).toBe('High')
+  })
+
+  it('seeds representativeTestCases when missing on legacy model', () => {
+    const legacy = {
+      version: '1.0.0',
+      engineerName: 'Jane',
+      calibratedAt: '2025-01-01T00:00:00Z',
+      entries: createDefaultEntries(),
+    } as TestingModel
+
+    const normalized = normalizeTestingModel(legacy)
+    expect(normalized.representativeTestCases[TestType.Functional].length).toBeGreaterThan(0)
   })
 })
 

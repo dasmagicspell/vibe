@@ -323,6 +323,8 @@ export interface TestingModel {
   overheadFactors: OverheadFactors
   deliverableEstimates: DeliverableEstimate[]
   exploratoryBlocks: ExploratoryBlock[]
+  /** Engineer-editable representative cases per test type (shown in schedule drill-down) */
+  representativeTestCases: Record<TestType, TestCase[]>
   notes?: string
 }
 

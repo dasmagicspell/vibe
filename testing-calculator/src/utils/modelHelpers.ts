@@ -5,6 +5,7 @@
 // =============================================================================
 
 import type { TestingModel, CalibrationEntry, TimeEstimate, BrowserCalibrationEntry, DeliverableEstimate, ExploratoryBlock, CertaintyLevel } from '@/types'
+import { createDefaultRepresentativeTestCases, normalizeRepresentativeTestCases } from '@/services/testCases'
 import { deriveCalibrationCertainty, normalizeEntryCertainty } from '@/utils/certaintyHelpers'
 import {
   TestType,
@@ -209,6 +210,7 @@ export function createDefaultModel(): TestingModel {
     },
     deliverableEstimates: DEFAULT_DELIVERABLE_ESTIMATES.map(d => ({ ...d })),
     exploratoryBlocks:    DEFAULT_EXPLORATORY_BLOCKS.map(b => ({ ...b })),
+    representativeTestCases: createDefaultRepresentativeTestCases(),
   }
 }
 
@@ -239,6 +241,7 @@ export function normalizeTestingModel(raw: TestingModel): TestingModel {
     exploratoryBlocks:
       raw.exploratoryBlocks?.length ? raw.exploratoryBlocks : defaults.exploratoryBlocks,
     overheadFactors: raw.overheadFactors ?? defaults.overheadFactors,
+    representativeTestCases: normalizeRepresentativeTestCases(raw.representativeTestCases),
   }
 }
 

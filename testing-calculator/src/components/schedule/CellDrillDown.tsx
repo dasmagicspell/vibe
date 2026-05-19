@@ -120,16 +120,22 @@ export function CellDrillDown({ cell, row, onClose }: CellDrillDownProps) {
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
             Test cases ({cell.testCases.length})
           </p>
-          <ol className="space-y-2">
-            {cell.testCases.map((tc, i) => (
-              <li key={tc.id} className="flex gap-3">
-                <span className="flex-none w-5 h-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold flex items-center justify-center">
-                  {i + 1}
-                </span>
-                <span className="text-sm text-gray-700 leading-snug">{tc.description}</span>
-              </li>
-            ))}
-          </ol>
+          {cell.testCases.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              No representative test cases defined for this test type.
+            </p>
+          ) : (
+            <ol className="space-y-2">
+              {cell.testCases.map((tc, i) => (
+                <li key={tc.id} className="flex gap-3">
+                  <span className="flex-none w-5 h-5 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm text-gray-700 leading-snug">{tc.description}</span>
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
 
         {/* Footer */}

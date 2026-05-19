@@ -93,6 +93,9 @@ export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props)
   const calibratedCount = ALL_CALIBRATION_TEST_TYPES.filter(tt =>
     isTypeCalibrated(model.entries, tt),
   ).length
+  const testCaseTypeCount = Object.values(model.representativeTestCases).filter(
+    cases => cases.length > 0,
+  ).length
 
   return (
     <div className="space-y-6">
@@ -139,6 +142,7 @@ export function Step7Review({ model, onBack, onExport, onSaveOnly }: Step7Props)
           <div className="text-right text-xs text-gray-500">
             <p>{totalEntries} calibration entries</p>
             <p>{calibratedCount} of {ALL_CALIBRATION_TEST_TYPES.length} test types calibrated</p>
+            <p>{testCaseTypeCount} of {ALL_CALIBRATION_TEST_TYPES.length} with representative cases</p>
           </div>
         </div>
 
