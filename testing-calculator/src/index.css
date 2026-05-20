@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Expand estimation formula accordion when printing */
+@media print {
+  .estimation-formula-details > *:not(summary) {
+    display: block !important;
+  }
+}

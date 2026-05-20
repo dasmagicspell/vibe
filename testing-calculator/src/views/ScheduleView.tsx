@@ -7,7 +7,8 @@ import { StorageService }         from '@/services/StorageService'
 import { generateClientScopeDoc } from '@/utils/scopeDocHelpers'
 import { downloadCSV }            from '@/utils/exportHelpers'
 import { canAccessSchedule, getScheduleBlockers } from '@/utils/projectHelpers'
-import { ScheduleMatrix }  from '@/components/schedule/ScheduleMatrix'
+import { ScheduleMatrix }            from '@/components/schedule/ScheduleMatrix'
+import { ScheduleEstimationFormula } from '@/components/schedule/ScheduleEstimationFormula'
 import { ScheduleSummary } from '@/components/schedule/ScheduleSummary'
 import { ReviewFlags }     from '@/components/schedule/ReviewFlags'
 import { ClientScopeTab }  from '@/components/schedule/ClientScopeTab'
@@ -216,6 +217,7 @@ export function ScheduleView() {
               {schedule.activeTestTypes.length} test types
             </span>
           </h2>
+          <ScheduleEstimationFormula schedule={schedule} project={project} model={model} />
           <ScheduleMatrix output={schedule} />
         </section>
 
