@@ -99,7 +99,6 @@ export function createIntegrationSpec(overrides: Partial<IntegrationSpec> = {}):
     hasAnalytics:          false,
     complexity:            ComplexityLevel.Medium,
     complexityCertainty:   'High',
-    certainty:             'High',
     ...overrides,
   }
 }

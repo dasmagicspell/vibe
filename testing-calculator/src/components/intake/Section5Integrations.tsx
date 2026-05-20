@@ -159,16 +159,6 @@ export function Section5Integrations({ integrations, onChange }: Props) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mt-3">
-              <span className="text-xs text-gray-500">Confidence in integration:</span>
-              <CertaintySelector
-                id={`int-certainty-${integration.id}`}
-                compact
-                value={integration.certainty ?? 'High'}
-                onChange={v => updateIntegration(integration.id, { certainty: v as CertaintyLevel })}
-              />
-            </div>
-
             <OptionalNotesField
               id={`int-notes-${integration.id}`}
               value={integration.notes}

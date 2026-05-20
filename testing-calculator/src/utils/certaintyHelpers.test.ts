@@ -164,16 +164,15 @@ describe('intakeCertaintyForProject', () => {
     expect(intakeCertaintyForProject(project)).toBe('Low')
   })
 
-  it('includes lowest integration certainty when integrations exist', () => {
+  it('does not include per-integration confidence (only the row-level complexityCertainty influences integration row cells)', () => {
     const project = {
       rigorCertainty: 'High',
       browserTierCertainty: 'High',
       integrations: [
-        { id: '1', certainty: 'High' },
-        { id: '2', certainty: 'Low' },
+        { id: '1', complexityCertainty: 'Low' },
       ],
     } as ProjectSpec
-    expect(intakeCertaintyForProject(project)).toBe('Low')
+    expect(intakeCertaintyForProject(project)).toBe('High')
   })
 })
 
@@ -199,7 +198,7 @@ describe('normalizeProjectSpec', () => {
     expect(normalized.rigorCertainty).toBe('High')
     expect(normalized.browserTierCertainty).toBe('High')
     expect(normalized.pages[0].complexityCertainty).toBe('High')
-    expect(normalized.integrations[0].certainty).toBe('High')
+    expect(normalized.integrations[0].complexityCertainty).toBe('High')
     expect(normalized.amConfidenceMultipliers).toEqual({ High: 1, Medium: 1.1, Low: 1.2 })
   })
 

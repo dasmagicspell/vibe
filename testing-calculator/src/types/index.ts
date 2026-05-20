@@ -383,8 +383,6 @@ export interface IntegrationSpec {
   complexity: ComplexityLevel
   /** Account manager confidence in the assigned complexity level */
   complexityCertainty: CertaintyLevel
-  /** Account manager confidence in this integration listing */
-  certainty: CertaintyLevel
   notes?: string
 }
 

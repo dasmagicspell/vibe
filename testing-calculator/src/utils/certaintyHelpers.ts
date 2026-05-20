@@ -176,16 +176,11 @@ export function intakeCertaintyForRow(
   return integration?.complexityCertainty ?? defaultComplexityCertainty()
 }
 
-function integrationCertainties(project: ProjectSpec): CertaintyLevel[] {
-  return (project.integrations ?? []).map(i => i.certainty ?? defaultComplexityCertainty())
-}
-
 /** Project-wide intake certainty applied to every matrix cell. */
 export function intakeCertaintyForProject(project: ProjectSpec): CertaintyLevel {
   const levels: CertaintyLevel[] = [
     project.rigorCertainty ?? 'High',
     project.browserTierCertainty ?? 'High',
-    ...integrationCertainties(project),
   ]
   if (project.defectDensityOverride !== undefined) {
     levels.push(project.defectDensityCertainty ?? 'High')
@@ -225,7 +220,6 @@ export function normalizeIntegrationSpec(integration: IntegrationSpec): Integrat
     ...integration,
     complexity: integration.complexity ?? ComplexityLevel.Medium,
     complexityCertainty: integration.complexityCertainty ?? defaultComplexityCertainty(),
-    certainty: integration.certainty ?? defaultComplexityCertainty(),
   }
 }
 

@@ -8,6 +8,7 @@
 import type { TestingModel, ProjectSpec } from '@/types'
 import { STORAGE_KEYS } from '@/types'
 import { normalizeTestingModel } from '@/utils/modelHelpers'
+import { normalizeProjectSpec } from '@/utils/certaintyHelpers'
 
 // ---------------------------------------------------------------------------
 // Type guards — validate imported JSON before trusting it
@@ -82,7 +83,7 @@ export const StorageService = {
       const raw = localStorage.getItem(STORAGE_KEYS.PROJECT)
       if (!raw) return null
       const parsed: unknown = JSON.parse(raw)
-      return isProjectSpec(parsed) ? parsed : null
+      return isProjectSpec(parsed) ? normalizeProjectSpec(parsed) : null
     } catch {
       return null
     }
@@ -166,7 +167,7 @@ export const StorageService = {
           try {
             const parsed: unknown = JSON.parse(reader.result as string)
             if (isProjectSpec(parsed)) {
-              resolve(parsed)
+              resolve(normalizeProjectSpec(parsed))
             } else {
               reject(new Error(
                 'This file does not appear to be a valid Project Spec. ' +
