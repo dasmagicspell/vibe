@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { ProjectSpec, ScheduleOutput, ScheduleRow, ScheduleCell, TestingModel } from '@/types'
+import type { ProjectSpec, ScheduleOutput, ScheduleRow, TestingModel } from '@/types'
 import { TestType } from '@/types'
 import { CertaintyBadge } from '@/components/shared/CertaintyBadge'
 import { CellDrillDown } from './CellDrillDown'
@@ -9,6 +9,7 @@ interface ScheduleMatrixProps {
   output: ScheduleOutput
   model: TestingModel
   project: ProjectSpec
+  onToggleCellApplicability: (rowId: string, testType: TestType) => void
 }
 
 // Abbreviated labels for narrow column headers
@@ -38,31 +39,35 @@ const CERTAINTY_CELL_BG: Record<string, string> = {
   Low:    'hover:bg-red-50',
 }
 
-interface SelectedCell {
-  cell: ScheduleCell
-  row:  ScheduleRow
+interface SelectedKey {
+  rowId: string
+  testType: TestType
 }
 
 /**
  * The pivot matrix table.
- * Rows = pages + workflows.  Columns = active test types.
+ * Rows = pages + workflows + integrations. Columns = active test types.
  * Each cell shows the time range + certainty badge.
  * Clicking a cell opens the drill-down modal.
  * First column is sticky on horizontal scroll.
  */
-export function ScheduleMatrix({ output, model, project }: ScheduleMatrixProps) {
-  const [selected, setSelected] = useState<SelectedCell | null>(null)
+export function ScheduleMatrix({ output, model, project, onToggleCellApplicability }: ScheduleMatrixProps) {
+  // Store only IDs so the modal always reads the live cell/row from the latest output
+  // (otherwise toggling applicability would not update the modal until reopened).
+  const [selectedKey, setSelectedKey] = useState<SelectedKey | null>(null)
 
   const { rows, activeTestTypes } = output
 
-  // Separate pages and workflow rows for a group header
-  const pageRows     = rows.filter(r => r.rowType === 'page')
-  const workflowRows = rows.filter(r => r.rowType === 'workflow')
+  const pageRows         = rows.filter(r => r.rowType === 'page')
+  const workflowRows     = rows.filter(r => r.rowType === 'workflow')
+  const integrationRows  = rows.filter(r => r.rowType === 'integration')
 
   function handleCellClick(row: ScheduleRow, testType: TestType) {
-    const cell = row.cells[testType]
-    if (cell) setSelected({ cell, row })
+    if (row.cells[testType]) setSelectedKey({ rowId: row.id, testType })
   }
+
+  const selectedRow  = selectedKey ? rows.find(r => r.id === selectedKey.rowId) : undefined
+  const selectedCell = selectedRow && selectedKey ? selectedRow.cells[selectedKey.testType] : undefined
 
   return (
     <>
@@ -78,7 +83,7 @@ export function ScheduleMatrix({ output, model, project }: ScheduleMatrixProps) 
                 className="sticky left-0 z-20 bg-gray-50 border-b border-r border-gray-200
                            px-3 py-3 text-left text-xs font-semibold text-gray-500 w-48 min-w-48"
               >
-                Page / Workflow
+                Page / Workflow / Integration
               </th>
 
               {/* Test type column headers */}
@@ -110,7 +115,7 @@ export function ScheduleMatrix({ output, model, project }: ScheduleMatrixProps) 
             {/* Pages group */}
             {pageRows.length > 0 && (
               <>
-                {workflowRows.length > 0 && (
+                {(workflowRows.length > 0 || integrationRows.length > 0) && (
                   <GroupHeaderRow
                     label={`Pages (${pageRows.length})`}
                     colSpan={activeTestTypes.length + 2}
@@ -127,7 +132,6 @@ export function ScheduleMatrix({ output, model, project }: ScheduleMatrixProps) 
               </>
             )}
 
-            {/* Workflows group */}
             {workflowRows.length > 0 && (
               <>
                 <GroupHeaderRow
@@ -135,6 +139,23 @@ export function ScheduleMatrix({ output, model, project }: ScheduleMatrixProps) 
                   colSpan={activeTestTypes.length + 2}
                 />
                 {workflowRows.map(row => (
+                  <MatrixRow
+                    key={row.id}
+                    row={row}
+                    activeTestTypes={activeTestTypes}
+                    onCellClick={handleCellClick}
+                  />
+                ))}
+              </>
+            )}
+
+            {integrationRows.length > 0 && (
+              <>
+                <GroupHeaderRow
+                  label={`Integrations (${integrationRows.length})`}
+                  colSpan={activeTestTypes.length + 2}
+                />
+                {integrationRows.map(row => (
                   <MatrixRow
                     key={row.id}
                     row={row}
@@ -170,13 +191,16 @@ export function ScheduleMatrix({ output, model, project }: ScheduleMatrixProps) 
       </div>
 
       {/* Drill-down modal */}
-      {selected && (
+      {selectedKey && selectedRow && selectedCell && (
         <CellDrillDown
-          cell={selected.cell}
-          row={selected.row}
+          cell={selectedCell}
+          row={selectedRow}
           model={model}
           project={project}
-          onClose={() => setSelected(null)}
+          onClose={() => setSelectedKey(null)}
+          onToggleApplicability={() => {
+            onToggleCellApplicability(selectedKey.rowId, selectedKey.testType)
+          }}
         />
       )}
     </>
@@ -218,7 +242,7 @@ function MatrixRow({ row, activeTestTypes, onCellClick }: MatrixRowProps) {
       >
         <span className="block truncate" title={row.label}>{row.label}</span>
         <span className="text-gray-400 font-normal text-xs">
-          {row.rowType === 'workflow' ? 'workflow' : 'page'}
+          {row.rowType}
         </span>
         {row.notes && (
           <p className="mt-1 text-xs text-amber-800/90 line-clamp-2 leading-snug" title={row.notes}>
@@ -234,6 +258,21 @@ function MatrixRow({ row, activeTestTypes, onCellClick }: MatrixRowProps) {
           return (
             <td key={tt} className="border-r border-gray-100 px-2 py-2 text-center text-gray-300">
               —
+            </td>
+          )
+        }
+
+        if (cell.isExcluded) {
+          return (
+            <td
+              key={tt}
+              className="border-r border-gray-100 px-2 py-2 text-center cursor-pointer
+                         text-gray-300 hover:bg-gray-50 transition-colors"
+              onClick={() => onCellClick(row, tt)}
+              title="Tests do not apply — click to edit"
+            >
+              <span className="text-xs leading-tight">⊘</span>
+              <span className="block text-[10px] text-gray-400">N/A</span>
             </td>
           )
         }
@@ -278,6 +317,7 @@ function MatrixRow({ row, activeTestTypes, onCellClick }: MatrixRowProps) {
 function sumColumnEstimates(rows: ScheduleRow[], testType: TestType): number {
   return rows.reduce((sum, row) => {
     const cell = row.cells[testType]
-    return sum + (cell?.estimate.expectedHours ?? 0)
+    if (!cell || cell.isExcluded) return sum
+    return sum + cell.estimate.expectedHours
   }, 0)
 }

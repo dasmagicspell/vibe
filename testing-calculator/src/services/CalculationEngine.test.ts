@@ -7,7 +7,7 @@ import {
   TestType, ComplexityLevel, RigorLevel, BrowserTier, DefectDensity,
 } from '@/types'
 import { createDefaultModel, createDefaultEntries } from '@/utils/modelHelpers'
-import { createDefaultProject, createPageSpec } from '@/utils/projectHelpers'
+import { createDefaultProject, createPageSpec, createIntegrationSpec } from '@/utils/projectHelpers'
 import { PageCategory } from '@/types'
 
 // ---------------------------------------------------------------------------
@@ -430,5 +430,65 @@ describe('runCalculationEngine', () => {
       output.executionSubtotal.expectedHours,
     )
     expect(boosted.grandTotal.expectedHours).toBeGreaterThan(output.grandTotal.expectedHours)
+  })
+
+  it('produces integration rows when integrations are listed', () => {
+    const proj = {
+      ...project,
+      integrations: [
+        createIntegrationSpec({ name: 'Odoo', category: 'ERP (Odoo, Microsoft Dynamics)' }),
+      ],
+    }
+    const out = runCalculationEngine(model, proj)
+    const integrationRow = out.rows.find(r => r.rowType === 'integration')
+    expect(integrationRow).toBeDefined()
+    expect(integrationRow?.label).toBe('Odoo')
+  })
+
+  it('excluded cell has isExcluded=true and is not flagged for review', () => {
+    const pageId = project.pages[0].id
+    const proj = {
+      ...project,
+      excludedCells: [{ rowId: pageId, testType: TestType.Functional }],
+    }
+    const out = runCalculationEngine(model, proj)
+    const cell = out.rows.find(r => r.id === pageId)?.cells[TestType.Functional]
+    expect(cell?.isExcluded).toBe(true)
+    expect(cell?.needsReview).toBe(false)
+    // Cell keeps its computed estimate so the drill-down modal stays informative;
+    // subtotals filter excluded cells out at sum time.
+    expect(cell?.estimate.expectedHours).toBeGreaterThan(0)
+  })
+
+  it('excluded cell reduces row subtotal and execution subtotal', () => {
+    const pageId = project.pages[0].id
+    const baseline = output
+    const excluded = runCalculationEngine(model, {
+      ...project,
+      excludedCells: [{ rowId: pageId, testType: TestType.Functional }],
+    })
+    expect(excluded.executionSubtotal.expectedHours)
+      .toBeLessThan(baseline.executionSubtotal.expectedHours)
+    const baselineRow = baseline.rows.find(r => r.id === pageId)
+    const excludedRow = excluded.rows.find(r => r.id === pageId)
+    expect(excludedRow?.subtotal.expectedHours)
+      .toBeLessThan(baselineRow?.subtotal.expectedHours ?? 0)
+  })
+
+  it('excluded cell with missing calibration does not add review flag', () => {
+    const pageId = project.pages[0].id
+    const out = runCalculationEngine(model, {
+      ...project,
+      excludedCells: [{ rowId: pageId, testType: TestType.Exploratory }],
+    })
+    const flag = out.reviewFlags.find(
+      f => f.rowLabel === 'Home' && f.testType === TestType.Exploratory,
+    )
+    expect(flag).toBeUndefined()
+  })
+
+  it('active cells have isExcluded false', () => {
+    const cell = output.rows[0].cells[TestType.Functional]
+    expect(cell.isExcluded).toBe(false)
   })
 })

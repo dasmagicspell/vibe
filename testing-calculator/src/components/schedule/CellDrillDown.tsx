@@ -17,6 +17,7 @@ interface CellDrillDownProps {
   model: TestingModel
   project: ProjectSpec
   onClose: () => void
+  onToggleApplicability: () => void
 }
 
 /**
@@ -24,7 +25,7 @@ interface CellDrillDownProps {
  * Shows: test type + page, time estimate breakdown, certainty explanation,
  * and the list of test cases that make up the estimate.
  */
-export function CellDrillDown({ cell, row, model, project, onClose }: CellDrillDownProps) {
+export function CellDrillDown({ cell, row, model, project, onClose, onToggleApplicability }: CellDrillDownProps) {
   const teLeg = teCertaintyLegFromBreakdown(cell.certaintyBreakdown)
   const teMult = certaintyMultiplierForLevel(teLeg, model.teCertaintyMultipliers)
   const amMult = certaintyMultiplierForLevel(
@@ -61,10 +62,18 @@ export function CellDrillDown({ cell, row, model, project, onClose }: CellDrillD
         <div className="px-6 py-4 border-b border-gray-100 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-1">
-              {row.rowType === 'workflow' ? 'Workflow' : 'Page'}
+              {row.rowType === 'workflow' ? 'Workflow' : row.rowType === 'integration' ? 'Integration' : 'Page'}
             </p>
-            <h2 className="text-base font-semibold text-gray-900">{row.label}</h2>
-            <p className="text-sm text-brand-700 font-medium">{cell.testType}</p>
+            <h2
+              className={`text-base font-semibold text-gray-900 ${cell.isExcluded ? 'line-through' : ''}`}
+            >
+              {row.label}
+            </h2>
+            <p
+              className={`text-sm text-brand-700 font-medium ${cell.isExcluded ? 'line-through' : ''}`}
+            >
+              {cell.testType}
+            </p>
           </div>
           <button
             type="button"
@@ -161,7 +170,14 @@ export function CellDrillDown({ cell, row, model, project, onClose }: CellDrillD
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-gray-100 text-right">
+        <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={onToggleApplicability}
+            className="px-4 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+          >
+            {cell.isExcluded ? 'Tests do apply' : 'Tests do not apply'}
+          </button>
           <button
             type="button"
             onClick={onClose}

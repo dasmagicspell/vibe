@@ -47,6 +47,7 @@ export function createDefaultProject(): ProjectSpec {
     reportingLevel:       ReportingLevel.InternalBugList,
     retestingIncluded:    true,
     amConfidenceMultipliers: { ...DEFAULT_CERTAINTY_MULTIPLIERS },
+    excludedCells:        [],
   }
 }
 
@@ -92,13 +93,42 @@ export function createWorkflowSpec(overrides: Partial<WorkflowSpec> = {}): Workf
 
 export function createIntegrationSpec(overrides: Partial<IntegrationSpec> = {}): IntegrationSpec {
   return {
-    id:           generateId(),
-    name:         '',
-    category:     '',
-    hasAnalytics: false,
-    certainty:    'High',
+    id:                    generateId(),
+    name:                  '',
+    category:              '',
+    hasAnalytics:          false,
+    complexity:            ComplexityLevel.Medium,
+    complexityCertainty:   'High',
+    certainty:             'High',
     ...overrides,
   }
+}
+
+// ---------------------------------------------------------------------------
+// Schedule cell exclusion (matrix "Tests do not apply")
+// ---------------------------------------------------------------------------
+
+export function isCellExcluded(
+  project: ProjectSpec,
+  rowId: string,
+  testType: TestType,
+): boolean {
+  return (project.excludedCells ?? []).some(
+    e => e.rowId === rowId && e.testType === testType,
+  )
+}
+
+export function toggleCellExcluded(
+  project: ProjectSpec,
+  rowId: string,
+  testType: TestType,
+): ProjectSpec['excludedCells'] {
+  const current = project.excludedCells ?? []
+  const exists = current.some(e => e.rowId === rowId && e.testType === testType)
+  if (exists) {
+    return current.filter(e => !(e.rowId === rowId && e.testType === testType))
+  }
+  return [...current, { rowId, testType }]
 }
 
 // ---------------------------------------------------------------------------

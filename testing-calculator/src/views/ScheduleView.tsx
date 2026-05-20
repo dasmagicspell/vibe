@@ -1,19 +1,18 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { ClientScopeDoc, CertaintyMultipliers } from '@/types'
+import type { ClientScopeDoc, CertaintyMultipliers, TestType } from '@/types'
 import { useApp, useSchedule, useModel, useProject } from '@/context/AppContext'
 import { runCalculationEngine }   from '@/services/CalculationEngine'
 import { StorageService }         from '@/services/StorageService'
 import { generateClientScopeDoc } from '@/utils/scopeDocHelpers'
 import { downloadCSV }            from '@/utils/exportHelpers'
-import { canAccessSchedule, getScheduleBlockers } from '@/utils/projectHelpers'
+import { canAccessSchedule, getScheduleBlockers, toggleCellExcluded } from '@/utils/projectHelpers'
 import { ScheduleMatrix }            from '@/components/schedule/ScheduleMatrix'
 import { ScheduleCertaintyMultipliers } from '@/components/schedule/ScheduleCertaintyMultipliers'
 import { ScheduleEstimationFormula } from '@/components/schedule/ScheduleEstimationFormula'
 import { ScheduleSummary } from '@/components/schedule/ScheduleSummary'
 import { ReviewFlags }     from '@/components/schedule/ReviewFlags'
 import { ClientScopeTab }  from '@/components/schedule/ClientScopeTab'
-import { IntegrationIntakeNotes } from '@/components/schedule/IntegrationIntakeNotes'
 
 type ActiveTab = 'schedule' | 'scope'
 
@@ -65,6 +64,17 @@ export function ScheduleView() {
   function handleAmMultipliersChange(amConfidenceMultipliers: CertaintyMultipliers) {
     if (!model || !project) return
     const nextProject = { ...project, amConfidenceMultipliers }
+    dispatch({ type: 'SET_PROJECT', project: nextProject })
+    dispatch({ type: 'SET_SCHEDULE', schedule: runCalculationEngine(model, nextProject) })
+    setScopeDoc(null)
+  }
+
+  function handleToggleCellApplicability(rowId: string, testType: TestType) {
+    if (!model || !project) return
+    const nextProject = {
+      ...project,
+      excludedCells: toggleCellExcluded(project, rowId, testType),
+    }
     dispatch({ type: 'SET_PROJECT', project: nextProject })
     dispatch({ type: 'SET_SCHEDULE', schedule: runCalculationEngine(model, nextProject) })
     setScopeDoc(null)
@@ -225,8 +235,6 @@ export function ScheduleView() {
           💡 Click any cell in the matrix to see the individual test cases that make up the estimate.
         </p>
 
-        <IntegrationIntakeNotes project={project} />
-
         {/* Matrix */}
         <section aria-label="Estimation matrix">
           <h2 className="text-sm font-semibold text-gray-700 mb-3">
@@ -243,7 +251,12 @@ export function ScheduleView() {
             onModelMultipliersChange={handleTeMultipliersChange}
             onProjectMultipliersChange={handleAmMultipliersChange}
           />
-          <ScheduleMatrix output={schedule} model={model} project={project} />
+          <ScheduleMatrix
+            output={schedule}
+            model={model}
+            project={project}
+            onToggleCellApplicability={handleToggleCellApplicability}
+          />
         </section>
 
         {/* Summary */}

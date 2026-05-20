@@ -6,6 +6,7 @@ import {
   intakeStepHasError, getIntakeStepErrors,
   getScheduleBlockers, canAccessSchedule,
   ERP_INTEGRATION_CATEGORY, hasErpIntegration, isErpIntegrationCategory,
+  isCellExcluded, toggleCellExcluded,
 } from './projectHelpers'
 import {
   PageCategory, AccountScope, NotificationScope, ProjectMoment, TestType,
@@ -453,6 +454,27 @@ describe('ERP integration helpers', () => {
       integrations: [createIntegrationSpec({ category: ERP_INTEGRATION_CATEGORY })],
     }
     expect(hasErpIntegration(project)).toBe(true)
+  })
+})
+
+describe('cell exclusion helpers', () => {
+  it('createDefaultProject initializes excludedCells as empty array', () => {
+    expect(createDefaultProject().excludedCells).toEqual([])
+  })
+
+  it('createIntegrationSpec defaults complexity to Medium', () => {
+    const integration = createIntegrationSpec()
+    expect(integration.complexity).toBe(ComplexityLevel.Medium)
+    expect(integration.complexityCertainty).toBe('High')
+  })
+
+  it('toggleCellExcluded adds and removes entries', () => {
+    const project = createDefaultProject()
+    const rowId = 'row-1'
+    const afterAdd = { ...project, excludedCells: toggleCellExcluded(project, rowId, TestType.Functional) }
+    expect(isCellExcluded(afterAdd, rowId, TestType.Functional)).toBe(true)
+    const afterRemove = { ...afterAdd, excludedCells: toggleCellExcluded(afterAdd, rowId, TestType.Functional) }
+    expect(isCellExcluded(afterRemove, rowId, TestType.Functional)).toBe(false)
   })
 })
 

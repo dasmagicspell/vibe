@@ -69,7 +69,9 @@ export function generateScheduleCSV(output: ScheduleOutput): string {
 
     const cellValues = activeTestTypes.map(tt => {
       const c = matrixRow.cells[tt]
-      return c ? c.estimate.expectedHours.toFixed(2) : '0'
+      if (!c) return '0'
+      if (c.isExcluded) return 'N/A'
+      return c.estimate.expectedHours.toFixed(2)
     })
 
     lines.push(row(

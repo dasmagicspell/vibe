@@ -28,6 +28,7 @@ import {
   teCertaintyLegFromBreakdown,
   certaintyMultiplierForLevel,
 } from '@/utils/certaintyHelpers'
+import { isCellExcluded } from '@/utils/projectHelpers'
 
 const BROWSER_TIER_SCALING: Record<BrowserTier, number> = {
   [BrowserTier.Basic]:    0.50,
@@ -70,7 +71,12 @@ export function sumEstimates(estimates: TimeEstimate[]): TimeEstimate {
 }
 
 function roundQ(n: number): number {
-  return Math.round(n * 4) / 4
+  if (n <= 0) return 0
+  const rounded = Math.round(n * 4) / 4
+  // Preserve tiny non-zero values that would otherwise collapse to 0
+  // (e.g. an engineer-entered 0.1 hr min stays 0.1 instead of becoming 0).
+  if (rounded === 0) return Math.round(n * 100) / 100
+  return rounded
 }
 
 function findExactEntry(
@@ -174,7 +180,7 @@ export function computeCellEstimate(
 function buildMatrixRow(
   rowId:          string,
   rowLabel:       string,
-  rowType:        'page' | 'workflow',
+  rowType:        'page' | 'workflow' | 'integration',
   pageCategory:   import('@/types').PageCategory | undefined,
   complexity:     ComplexityLevel,
   instanceMult:   number,
@@ -187,6 +193,8 @@ function buildMatrixRow(
   const intakeCertainty = intakeCertaintyForCell(project, rowType, rowId)
 
   for (const testType of matrixTestTypes) {
+    const excluded = isCellExcluded(project, rowId, testType)
+
     const comp = computeCellEstimate(
       model.entries,
       testType,
@@ -218,15 +226,22 @@ function buildMatrixRow(
     cells[testType] = {
       rowId,
       testType,
+      // Keep the computed estimate populated even when excluded so the drill-down
+      // modal renders identically; subtotals filter excluded cells out at sum time.
       estimate:           scaledEstimate,
       certainty,
       certaintyBreakdown,
       testCases:            getRepresentativeTestCases(model, testType),
-      needsReview:          comp.needsReview || certainty === 'Low',
+      needsReview:          !excluded && (comp.needsReview || certainty === 'Low'),
+      isExcluded:           excluded,
     }
   }
 
-  const subtotal = sumEstimates(Object.values(cells).map(c => c.estimate))
+  const subtotal = sumEstimates(
+    Object.values(cells)
+      .filter(c => !c.isExcluded)
+      .map(c => c.estimate),
+  )
 
   const trimmedNotes = notes?.trim()
   return {
@@ -297,6 +312,7 @@ function collectReviewFlags(
   const flags: ScheduleOutput['reviewFlags'] = []
   for (const row of rows) {
     for (const cell of Object.values(row.cells)) {
+      if (cell.isExcluded) continue
       if (cell.needsReview) {
         const reason = cell.certaintyBreakdown.lookup === 'Low'
           ? 'No calibration data — add this test type to the model'
@@ -352,7 +368,22 @@ export function runCalculationEngine(
     )
   )
 
-  const allRows = [...pageRows, ...workflowRows]
+  const integrationRows = project.integrations.map(integ =>
+    buildMatrixRow(
+      integ.id,
+      integ.name || '(unnamed integration)',
+      'integration',
+      undefined,
+      integ.complexity,
+      1,
+      matrixTestTypes,
+      model,
+      project,
+      integ.notes,
+    )
+  )
+
+  const allRows = [...pageRows, ...workflowRows, ...integrationRows]
 
   const executionSubtotal = sumEstimates(allRows.map(r => r.subtotal))
 

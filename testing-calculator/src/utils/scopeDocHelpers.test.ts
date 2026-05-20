@@ -42,6 +42,19 @@ describe('generateClientScopeDoc', () => {
     })
   })
 
+  it('whatWeWillTest mentions integrations in matrix coverage when present', () => {
+    const { project, output } = makeOutput({
+      integrations: [createIntegrationSpec({ name: 'Odoo', category: ERP_INTEGRATION_CATEGORY })],
+    })
+    const doc = generateClientScopeDoc(project, output, true)
+    const matrixLine = doc.sections.whatWeWillTest.items.find(item =>
+      item.includes('Estimation matrix coverage'),
+    )
+    expect(matrixLine).toBeDefined()
+    expect(matrixLine).toContain('Odoo')
+    expect(matrixLine).toContain('integration')
+  })
+
   it('whatWeWillNotTest includes penetration testing exclusion', () => {
     const { project, output } = makeOutput()
     const doc = generateClientScopeDoc(project, output, true)

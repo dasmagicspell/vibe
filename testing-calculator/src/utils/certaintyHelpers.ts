@@ -158,18 +158,22 @@ export function defaultComplexityCertainty(): CertaintyLevel {
   return 'High'
 }
 
-/** Row-level intake certainty from page or workflow complexity confidence. */
+/** Row-level intake certainty from page, workflow, or integration complexity confidence. */
 export function intakeCertaintyForRow(
   project: ProjectSpec,
-  rowType: 'page' | 'workflow',
+  rowType: 'page' | 'workflow' | 'integration',
   rowId: string,
 ): CertaintyLevel {
   if (rowType === 'page') {
     const page = project.pages.find(p => p.id === rowId)
     return page?.complexityCertainty ?? defaultComplexityCertainty()
   }
-  const workflow = project.workflows.find(w => w.id === rowId)
-  return workflow?.complexityCertainty ?? defaultComplexityCertainty()
+  if (rowType === 'workflow') {
+    const workflow = project.workflows.find(w => w.id === rowId)
+    return workflow?.complexityCertainty ?? defaultComplexityCertainty()
+  }
+  const integration = project.integrations.find(i => i.id === rowId)
+  return integration?.complexityCertainty ?? defaultComplexityCertainty()
 }
 
 function integrationCertainties(project: ProjectSpec): CertaintyLevel[] {
@@ -192,7 +196,7 @@ export function intakeCertaintyForProject(project: ProjectSpec): CertaintyLevel 
 /** Combined intake certainty for a matrix cell. */
 export function intakeCertaintyForCell(
   project: ProjectSpec,
-  rowType: 'page' | 'workflow',
+  rowType: 'page' | 'workflow' | 'integration',
   rowId: string,
 ): CertaintyLevel {
   return minCertainty(
@@ -219,6 +223,8 @@ export function normalizeWorkflowSpec(workflow: WorkflowSpec): WorkflowSpec {
 export function normalizeIntegrationSpec(integration: IntegrationSpec): IntegrationSpec {
   return {
     ...integration,
+    complexity: integration.complexity ?? ComplexityLevel.Medium,
+    complexityCertainty: integration.complexityCertainty ?? defaultComplexityCertainty(),
     certainty: integration.certainty ?? defaultComplexityCertainty(),
   }
 }
@@ -234,6 +240,7 @@ export function normalizeProjectSpec(project: ProjectSpec): ProjectSpec {
     pages,
     workflows,
     integrations: (project.integrations ?? []).map(normalizeIntegrationSpec),
+    excludedCells: project.excludedCells ?? [],
     notificationScope: inferNotificationScope({ ...project, pages, workflows }),
   }
 }

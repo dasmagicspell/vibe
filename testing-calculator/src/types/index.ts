@@ -380,6 +380,9 @@ export interface IntegrationSpec {
   /** e.g. CRM, analytics, payment gateway, email, webhook, custom API */
   category: string
   hasAnalytics: boolean
+  complexity: ComplexityLevel
+  /** Account manager confidence in the assigned complexity level */
+  complexityCertainty: CertaintyLevel
   /** Account manager confidence in this integration listing */
   certainty: CertaintyLevel
   notes?: string
@@ -443,6 +446,9 @@ export interface ProjectSpec {
   /** Hour multipliers by AM confidence level (intake leg) */
   amConfidenceMultipliers: CertaintyMultipliers
 
+  /** Matrix cells marked "Tests do not apply" on the schedule screen */
+  excludedCells: Array<{ rowId: string; testType: TestType }>
+
   notes?: string
 }
 
@@ -478,14 +484,16 @@ export interface ScheduleCell {
   testCases: TestCase[]
   /** True if this cell needs review (low certainty or missing calibration data) */
   needsReview: boolean
+  /** True when the user marked "Tests do not apply" for this row × test type */
+  isExcluded: boolean
 }
 
-/** One row in the schedule matrix (a page or workflow) */
+/** One row in the schedule matrix (a page, workflow, or integration) */
 export interface ScheduleRow {
   id: string
   label: string
-  rowType: 'page' | 'workflow'
-  /** Account manager context from intake (pages / workflows) */
+  rowType: 'page' | 'workflow' | 'integration'
+  /** Account manager context from intake */
   notes?: string
   /** Row subtotal across all active test types */
   subtotal: TimeEstimate

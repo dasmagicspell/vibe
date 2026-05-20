@@ -22,10 +22,31 @@ const PREPARED_BY = 'A Positive Future'
 // Section builders
 // ---------------------------------------------------------------------------
 
-function buildWillTest(output: ScheduleOutput): string[] {
-  return output.activeTestTypes.map(tt =>
+function buildWillTest(project: ProjectSpec, output: ScheduleOutput): string[] {
+  const items = output.activeTestTypes.map(tt =>
     `${tt} — ${TEST_TYPE_DESCRIPTIONS[tt]}`
   )
+
+  const pageCount = project.pages.length
+  const workflowCount = project.workflows.length
+  const integrationCount = project.integrations.length
+
+  if (pageCount > 0 || workflowCount > 0 || integrationCount > 0) {
+    const parts: string[] = []
+    if (pageCount > 0) parts.push(`${pageCount} page${pageCount !== 1 ? 's' : ''}`)
+    if (workflowCount > 0) parts.push(`${workflowCount} workflow${workflowCount !== 1 ? 's' : ''}`)
+    if (integrationCount > 0) {
+      const names = project.integrations
+        .map(i => i.name.trim() || 'Unnamed integration')
+        .join(', ')
+      parts.push(`${integrationCount} integration${integrationCount !== 1 ? 's' : ''} (${names})`)
+    }
+    items.unshift(
+      `Estimation matrix coverage: ${parts.join(', ')} — each row × test type in the internal schedule`,
+    )
+  }
+
+  return items
 }
 
 function buildWillNotTest(project: ProjectSpec, output: ScheduleOutput): string[] {
@@ -201,7 +222,7 @@ export function generateClientScopeDoc(
     sections: {
       whatWeWillTest: {
         heading:  'What we will test',
-        items:    buildWillTest(output),
+        items:    buildWillTest(project, output),
         editable: true,
       },
       whatWeWillNotTest: {

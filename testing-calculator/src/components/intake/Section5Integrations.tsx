@@ -1,7 +1,9 @@
 import type { CertaintyLevel, IntegrationSpec, ProjectSpec } from '@/types'
+import { ComplexityLevel, COMPLEXITY_DEFINITIONS } from '@/types'
 import { createIntegrationSpec, INTEGRATION_CATEGORY_OPTIONS } from '@/utils/projectHelpers'
 import { CertaintySelector } from '@/components/shared/CertaintySelector'
 import { OptionalNotesField } from '@/components/shared/OptionalNotesField'
+import { Tooltip } from '@/components/shared/Tooltip'
 interface Props {
   integrations: IntegrationSpec[]
   onChange: (updates: Partial<ProjectSpec>) => void
@@ -119,6 +121,42 @@ export function Section5Integrations({ integrations, onChange }: Props) {
                   This integration includes analytics or tag tracking (activates Analytics &amp; Tag testing)
                 </span>
               </label>
+            </div>
+
+            {/* Complexity */}
+            <div className="mt-3">
+              <div className="flex items-center gap-0.5 mb-1">
+                <span className="text-xs font-medium text-gray-500">Complexity</span>
+                <Tooltip content={COMPLEXITY_DEFINITIONS[integration.complexity ?? ComplexityLevel.Medium]} />
+              </div>
+              <div className="flex gap-1 max-w-md">
+                {([ComplexityLevel.Low, ComplexityLevel.Medium, ComplexityLevel.High] as const).map(c => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => updateIntegration(integration.id, { complexity: c })}
+                    className={`
+                      flex-1 py-1.5 rounded-lg border-2 text-xs font-medium transition-all
+                      ${(integration.complexity ?? ComplexityLevel.Medium) === c
+                        ? c === ComplexityLevel.Low    ? 'bg-green-100  text-green-800  border-green-400'
+                        : c === ComplexityLevel.Medium ? 'bg-yellow-100 text-yellow-800 border-yellow-400'
+                        :                               'bg-red-100    text-red-800    border-red-400'
+                        : 'bg-white text-gray-600 border-gray-300'}
+                    `}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-xs text-gray-500">Confidence in complexity:</span>
+                <CertaintySelector
+                  id={`int-complexity-certainty-${integration.id}`}
+                  compact
+                  value={integration.complexityCertainty ?? 'High'}
+                  onChange={v => updateIntegration(integration.id, { complexityCertainty: v as CertaintyLevel })}
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-2 mt-3">

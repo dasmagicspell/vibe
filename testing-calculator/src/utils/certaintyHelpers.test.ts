@@ -12,6 +12,7 @@ import {
   intakeCertaintyForCell,
   intakeCertaintyForProject,
   normalizeProjectSpec,
+  normalizeIntegrationSpec,
 } from './certaintyHelpers'
 
 describe('minCertainty', () => {
@@ -209,5 +210,22 @@ describe('normalizeProjectSpec', () => {
     } as ProjectSpec
     const normalized = normalizeProjectSpec(project)
     expect(normalized.notificationScope).toBe(NotificationScope.Basic)
+  })
+
+  it('fills missing integration complexity fields and excludedCells', () => {
+    const project = { pages: [], workflows: [], integrations: [{}] } as ProjectSpec
+    const normalized = normalizeProjectSpec(project)
+    expect(normalized.integrations[0].complexity).toBe(ComplexityLevel.Medium)
+    expect(normalized.integrations[0].complexityCertainty).toBe('High')
+    expect(normalized.excludedCells).toEqual([])
+  })
+})
+
+describe('normalizeIntegrationSpec', () => {
+  it('fills complexity and complexityCertainty on legacy integration JSON', () => {
+    const legacy = { id: 'i1', name: 'Odoo', category: 'ERP', hasAnalytics: false } as import('@/types').IntegrationSpec
+    const normalized = normalizeIntegrationSpec(legacy)
+    expect(normalized.complexity).toBe(ComplexityLevel.Medium)
+    expect(normalized.complexityCertainty).toBe('High')
   })
 })
