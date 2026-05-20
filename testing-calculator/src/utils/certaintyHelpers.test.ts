@@ -199,6 +199,7 @@ describe('normalizeProjectSpec', () => {
     expect(normalized.browserTierCertainty).toBe('High')
     expect(normalized.pages[0].complexityCertainty).toBe('High')
     expect(normalized.integrations[0].certainty).toBe('High')
+    expect(normalized.amConfidenceMultipliers).toEqual({ High: 1, Medium: 1.1, Low: 1.2 })
   })
 
   it('infers Basic notification scope when legacy project has form pages', () => {

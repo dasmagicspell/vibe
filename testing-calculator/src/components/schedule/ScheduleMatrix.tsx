@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { ScheduleOutput, ScheduleRow, ScheduleCell } from '@/types'
+import type { ProjectSpec, ScheduleOutput, ScheduleRow, ScheduleCell, TestingModel } from '@/types'
 import { TestType } from '@/types'
 import { CertaintyBadge } from '@/components/shared/CertaintyBadge'
 import { CellDrillDown } from './CellDrillDown'
@@ -7,6 +7,8 @@ import { formatHours, formatRange } from '@/utils/modelHelpers'
 
 interface ScheduleMatrixProps {
   output: ScheduleOutput
+  model: TestingModel
+  project: ProjectSpec
 }
 
 // Abbreviated labels for narrow column headers
@@ -48,7 +50,7 @@ interface SelectedCell {
  * Clicking a cell opens the drill-down modal.
  * First column is sticky on horizontal scroll.
  */
-export function ScheduleMatrix({ output }: ScheduleMatrixProps) {
+export function ScheduleMatrix({ output, model, project }: ScheduleMatrixProps) {
   const [selected, setSelected] = useState<SelectedCell | null>(null)
 
   const { rows, activeTestTypes } = output
@@ -172,6 +174,8 @@ export function ScheduleMatrix({ output }: ScheduleMatrixProps) {
         <CellDrillDown
           cell={selected.cell}
           row={selected.row}
+          model={model}
+          project={project}
           onClose={() => setSelected(null)}
         />
       )}

@@ -308,4 +308,127 @@ describe('runCalculationEngine', () => {
     const cell = out.rows[0].cells[TestType.Functional]
     expect(cell.certainty).toBe('Low')
   })
+
+  it('default certainty multipliers do not change execution subtotal', () => {
+    const baseline = output.executionSubtotal.expectedHours
+    const withExplicitDefaults = runCalculationEngine(
+      {
+        ...model,
+        teCertaintyMultipliers: { High: 1, Medium: 1, Low: 1 },
+      },
+      {
+        ...project,
+        amConfidenceMultipliers: { High: 1, Medium: 1, Low: 1 },
+      },
+    )
+    expect(withExplicitDefaults.executionSubtotal.expectedHours).toBeCloseTo(baseline, 2)
+  })
+
+  it('TE Low multiplier increases hours when calibration certainty is Low', () => {
+    const entries = createDefaultEntries().map(e =>
+      e.testType === TestType.Functional && e.complexity === ComplexityLevel.Low
+        ? { ...e, certainty: 'Low' as const }
+        : e
+    )
+    const baselineModel = {
+      ...model,
+      entries,
+      teCertaintyMultipliers: { High: 1, Medium: 1, Low: 1 },
+    }
+    const baseline = runCalculationEngine(baselineModel, project)
+    const boosted = runCalculationEngine(
+      {
+        ...baselineModel,
+        teCertaintyMultipliers: { High: 1, Medium: 1, Low: 1.5 },
+      },
+      project,
+    )
+    const homeBaseline = baseline.rows.find(r => r.label === 'Home')?.cells[TestType.Functional]
+    const homeBoosted = boosted.rows.find(r => r.label === 'Home')?.cells[TestType.Functional]
+    expect(homeBoosted!.estimate.expectedHours).toBeCloseTo(
+      homeBaseline!.estimate.expectedHours * 1.5,
+      1,
+    )
+  })
+
+  it('AM Low multiplier increases hours when intake confidence is Low', () => {
+    const proj = {
+      ...project,
+      pages: [
+        createPageSpec({
+          name: 'Home',
+          category: PageCategory.Informational,
+          complexity: ComplexityLevel.Low,
+          complexityCertainty: 'Low' as const,
+        }),
+      ],
+      amConfidenceMultipliers: { High: 1, Medium: 1, Low: 1 },
+    }
+    const baseline = runCalculationEngine(model, proj)
+    const boosted = runCalculationEngine(model, {
+      ...proj,
+      amConfidenceMultipliers: { High: 1, Medium: 1, Low: 1.5 },
+    })
+    const cellBaseline = baseline.rows[0].cells[TestType.Functional]
+    const cellBoosted = boosted.rows[0].cells[TestType.Functional]
+    expect(cellBoosted.estimate.expectedHours).toBeCloseTo(
+      cellBaseline.estimate.expectedHours * 1.5,
+      1,
+    )
+  })
+
+  it('TE and AM Low multipliers stack multiplicatively', () => {
+    const entries = createDefaultEntries().map(e =>
+      e.testType === TestType.Functional && e.complexity === ComplexityLevel.Low
+        ? { ...e, certainty: 'Low' as const }
+        : e
+    )
+    const proj = {
+      ...project,
+      pages: [
+        createPageSpec({
+          name: 'Home',
+          category: PageCategory.Informational,
+          complexity: ComplexityLevel.Low,
+          complexityCertainty: 'Low' as const,
+        }),
+      ],
+      amConfidenceMultipliers: { High: 1, Medium: 1, Low: 1 },
+    }
+    const baseline = runCalculationEngine(
+      {
+        ...model,
+        entries,
+        teCertaintyMultipliers: { High: 1, Medium: 1, Low: 1 },
+      },
+      proj,
+    )
+    const boosted = runCalculationEngine(
+      {
+        ...model,
+        entries,
+        teCertaintyMultipliers: { High: 1, Medium: 1, Low: 1.5 },
+      },
+      {
+        ...proj,
+        amConfidenceMultipliers: { High: 1, Medium: 1, Low: 1.5 },
+      },
+    )
+    const cellBaseline = baseline.rows[0].cells[TestType.Functional]
+    const cellBoosted = boosted.rows[0].cells[TestType.Functional]
+    const expectedStacked = scaleEstimate(cellBaseline.estimate, 1.5 * 1.5)
+    expect(cellBoosted.estimate.expectedHours).toBe(expectedStacked.expectedHours)
+  })
+
+  it('certainty multipliers scale execution subtotal and grand total', () => {
+    const proj = {
+      ...project,
+      amConfidenceMultipliers: { High: 1.1, Medium: 1, Low: 1 },
+    }
+    const boosted = runCalculationEngine(model, proj)
+    expect(boosted.executionSubtotal.expectedHours).toBeGreaterThan(
+      output.executionSubtotal.expectedHours,
+    )
+    expect(boosted.grandTotal.expectedHours).toBeGreaterThan(output.grandTotal.expectedHours)
+  })
 })

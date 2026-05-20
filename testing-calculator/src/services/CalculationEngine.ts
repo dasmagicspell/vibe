@@ -25,6 +25,8 @@ import {
   intakeCertaintyForCell,
   intakeCertaintyForProject,
   isEstimateEmpty,
+  teCertaintyLegFromBreakdown,
+  certaintyMultiplierForLevel,
 } from '@/utils/certaintyHelpers'
 
 const BROWSER_TIER_SCALING: Record<BrowserTier, number> = {
@@ -205,7 +207,13 @@ function buildMatrixRow(
       certaintyBreakdown.intake,
     )
 
-    const scaledEstimate = scaleEstimate(comp.estimate, instanceMult)
+    const teLeg = teCertaintyLegFromBreakdown(certaintyBreakdown)
+    const teMult = certaintyMultiplierForLevel(teLeg, model.teCertaintyMultipliers)
+    const amMult = certaintyMultiplierForLevel(
+      certaintyBreakdown.intake,
+      project.amConfidenceMultipliers,
+    )
+    const scaledEstimate = scaleEstimate(comp.estimate, instanceMult * teMult * amMult)
 
     cells[testType] = {
       rowId,

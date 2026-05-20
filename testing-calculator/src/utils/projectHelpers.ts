@@ -5,6 +5,7 @@
 // =============================================================================
 
 import type { ProjectSpec, PageSpec, WorkflowSpec, IntegrationSpec, TestingModel } from '@/types'
+import { DEFAULT_CERTAINTY_MULTIPLIERS } from '@/types'
 import { validateModel } from '@/utils/modelHelpers'
 import {
   SiteType, ProjectMoment, SensitiveDataLevel, PaymentScope, AccountScope,
@@ -45,6 +46,7 @@ export function createDefaultProject(): ProjectSpec {
     selectedDeliverables: [],
     reportingLevel:       ReportingLevel.InternalBugList,
     retestingIncluded:    true,
+    amConfidenceMultipliers: { ...DEFAULT_CERTAINTY_MULTIPLIERS },
   }
 }
 

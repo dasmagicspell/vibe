@@ -1,0 +1,58 @@
+{
+  "projectName": "Alygra",
+  "clientName": "Natalie Loop",
+  "createdAt": "2026-05-18T17:09:32.717Z",
+  "siteType": "Nonprofit",
+  "projectMoment": "Bug fix",
+  "sensitiveData": "Contact information",
+  "paymentScope": "None",
+  "accountScope": "None",
+  "notificationScope": "Basic",
+  "riskLevel": "Medium",
+  "pages": [
+    {
+      "id": "5985eeee-18d2-4197-b3aa-a74063ca9944",
+      "name": "Contact page - English and French",
+      "category": "Informational",
+      "complexity": "Low",
+      "complexityCertainty": "High",
+      "isTemplate": true,
+      "templateInstanceCount": 2,
+      "notes": "Use Forminator Pro to test backend."
+    }
+  ],
+  "workflows": [],
+  "integrations": [
+    {
+      "id": "d5def4e1-333c-4348-91aa-acb6df934aed",
+      "name": "CRM Hubspot",
+      "category": "CRM (HubSpot, Salesforce)",
+      "hasAnalytics": false,
+      "certainty": "High",
+      "notes": "Just test that the connection works"
+    }
+  ],
+  "rigorLevel": "Standard",
+  "rigorCertainty": "High",
+  "browserTier": "Standard",
+  "browserTierCertainty": "High",
+  "selectedTestTypes": [
+    "Functional (manual)",
+    "UI / Layout",
+    "Content review",
+    "Link validation",
+    "Cross-browser",
+    "Responsive / Mobile",
+    "Accessibility (WCAG)",
+    "Performance (basic)",
+    "SEO / Meta",
+    "Security / Privacy",
+    "Email / Notification"
+  ],
+  "includeExploratory": false,
+  "includeAutomation": false,
+  "includeCMSAdmin": false,
+  "selectedDeliverables": [],
+  "reportingLevel": "Internal bug list",
+  "retestingIncluded": true
+}

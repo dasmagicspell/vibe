@@ -5,13 +5,16 @@
 
 import type {
   CalibrationEntry,
+  CertaintyBreakdown,
   CertaintyLevel,
+  CertaintyMultipliers,
   IntegrationSpec,
   PageSpec,
   ProjectSpec,
   TimeEstimate,
   WorkflowSpec,
 } from '@/types'
+import { DEFAULT_CERTAINTY_MULTIPLIERS } from '@/types'
 import {
   TestType,
   ComplexityLevel,
@@ -44,6 +47,31 @@ export const CERTAINTY_RANK: Record<CertaintyLevel, number> = {
   Low:    0,
   Medium: 1,
   High:   2,
+}
+
+const CERTAINTY_LEVELS: CertaintyLevel[] = ['High', 'Medium', 'Low']
+
+/** Backfill missing multiplier keys from defaults (legacy JSON / partial saves). */
+export function normalizeCertaintyMultipliers(
+  raw?: Partial<CertaintyMultipliers>,
+): CertaintyMultipliers {
+  return {
+    High:   raw?.High   ?? DEFAULT_CERTAINTY_MULTIPLIERS.High,
+    Medium: raw?.Medium ?? DEFAULT_CERTAINTY_MULTIPLIERS.Medium,
+    Low:    raw?.Low    ?? DEFAULT_CERTAINTY_MULTIPLIERS.Low,
+  }
+}
+
+/** TE-side leg for multiplier lookup: min(lookup, calibration). */
+export function teCertaintyLegFromBreakdown(breakdown: CertaintyBreakdown): CertaintyLevel {
+  return minCertainty(breakdown.lookup, breakdown.calibration)
+}
+
+export function certaintyMultiplierForLevel(
+  level: CertaintyLevel,
+  multipliers: CertaintyMultipliers,
+): number {
+  return multipliers[level] ?? 1.0
 }
 
 /** Returns the most conservative (lowest) certainty level. */
@@ -202,9 +230,12 @@ export function normalizeProjectSpec(project: ProjectSpec): ProjectSpec {
     ...project,
     rigorCertainty: project.rigorCertainty ?? 'High',
     browserTierCertainty: project.browserTierCertainty ?? 'High',
+    amConfidenceMultipliers: normalizeCertaintyMultipliers(project.amConfidenceMultipliers),
     pages,
     workflows,
     integrations: (project.integrations ?? []).map(normalizeIntegrationSpec),
     notificationScope: inferNotificationScope({ ...project, pages, workflows }),
   }
 }
+
+export { CERTAINTY_LEVELS }

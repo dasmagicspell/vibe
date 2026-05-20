@@ -1,15 +1,21 @@
 import { useEffect } from 'react'
-import type { ScheduleCell, ScheduleRow } from '@/types'
+import type { ProjectSpec, ScheduleCell, ScheduleRow, TestingModel } from '@/types'
 import {
   CertaintyBadge,
   CERTAINTY_EXPLANATIONS,
   CERTAINTY_BREAKDOWN_LABELS,
 } from '@/components/shared/CertaintyBadge'
+import {
+  certaintyMultiplierForLevel,
+  teCertaintyLegFromBreakdown,
+} from '@/utils/certaintyHelpers'
 import { formatRange, formatExpected } from '@/utils/modelHelpers'
 
 interface CellDrillDownProps {
   cell: ScheduleCell
   row:  ScheduleRow
+  model: TestingModel
+  project: ProjectSpec
   onClose: () => void
 }
 
@@ -18,7 +24,13 @@ interface CellDrillDownProps {
  * Shows: test type + page, time estimate breakdown, certainty explanation,
  * and the list of test cases that make up the estimate.
  */
-export function CellDrillDown({ cell, row, onClose }: CellDrillDownProps) {
+export function CellDrillDown({ cell, row, model, project, onClose }: CellDrillDownProps) {
+  const teLeg = teCertaintyLegFromBreakdown(cell.certaintyBreakdown)
+  const teMult = certaintyMultiplierForLevel(teLeg, model.teCertaintyMultipliers)
+  const amMult = certaintyMultiplierForLevel(
+    cell.certaintyBreakdown.intake,
+    project.amConfidenceMultipliers,
+  )
   // Close on Escape key
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -112,6 +124,16 @@ export function CellDrillDown({ cell, row, onClose }: CellDrillDownProps) {
                 <CertaintyBadge level={cell.certaintyBreakdown[key]} compact />
               </div>
             ))}
+          </div>
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200">
+            <div className="text-center">
+              <p className="text-gray-400 mb-0.5">TE multiplier ({teLeg})</p>
+              <p className="font-mono text-gray-800">×{teMult.toFixed(2)}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-gray-400 mb-0.5">AM multiplier ({cell.certaintyBreakdown.intake})</p>
+              <p className="font-mono text-gray-800">×{amMult.toFixed(2)}</p>
+            </div>
           </div>
         </div>
 

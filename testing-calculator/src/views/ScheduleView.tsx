@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { ClientScopeDoc } from '@/types'
+import type { ClientScopeDoc, CertaintyMultipliers } from '@/types'
 import { useApp, useSchedule, useModel, useProject } from '@/context/AppContext'
 import { runCalculationEngine }   from '@/services/CalculationEngine'
 import { StorageService }         from '@/services/StorageService'
@@ -8,6 +8,7 @@ import { generateClientScopeDoc } from '@/utils/scopeDocHelpers'
 import { downloadCSV }            from '@/utils/exportHelpers'
 import { canAccessSchedule, getScheduleBlockers } from '@/utils/projectHelpers'
 import { ScheduleMatrix }            from '@/components/schedule/ScheduleMatrix'
+import { ScheduleCertaintyMultipliers } from '@/components/schedule/ScheduleCertaintyMultipliers'
 import { ScheduleEstimationFormula } from '@/components/schedule/ScheduleEstimationFormula'
 import { ScheduleSummary } from '@/components/schedule/ScheduleSummary'
 import { ReviewFlags }     from '@/components/schedule/ReviewFlags'
@@ -50,6 +51,24 @@ export function ScheduleView() {
       setScopeDoc(null)  // force regeneration of scope doc
     }
   }, [model, project, dispatch])
+
+  function handleTeMultipliersChange(teCertaintyMultipliers: CertaintyMultipliers) {
+    if (!model) return
+    const nextModel = { ...model, teCertaintyMultipliers }
+    dispatch({ type: 'SET_MODEL', model: nextModel })
+    if (project) {
+      dispatch({ type: 'SET_SCHEDULE', schedule: runCalculationEngine(nextModel, project) })
+      setScopeDoc(null)
+    }
+  }
+
+  function handleAmMultipliersChange(amConfidenceMultipliers: CertaintyMultipliers) {
+    if (!model || !project) return
+    const nextProject = { ...project, amConfidenceMultipliers }
+    dispatch({ type: 'SET_PROJECT', project: nextProject })
+    dispatch({ type: 'SET_SCHEDULE', schedule: runCalculationEngine(model, nextProject) })
+    setScopeDoc(null)
+  }
 
   async function handleImportModel() {
     try {
@@ -218,7 +237,13 @@ export function ScheduleView() {
             </span>
           </h2>
           <ScheduleEstimationFormula schedule={schedule} project={project} model={model} />
-          <ScheduleMatrix output={schedule} />
+          <ScheduleCertaintyMultipliers
+            model={model}
+            project={project}
+            onModelMultipliersChange={handleTeMultipliersChange}
+            onProjectMultipliersChange={handleAmMultipliersChange}
+          />
+          <ScheduleMatrix output={schedule} model={model} project={project} />
         </section>
 
         {/* Summary */}

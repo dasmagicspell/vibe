@@ -1,11 +1,14 @@
-import type { OverheadFactors } from '@/types'
+import type { CertaintyMultipliers, OverheadFactors } from '@/types'
 import { DefectDensity, DEFECT_DENSITY_DEFINITIONS } from '@/types'
+import { CertaintyMultipliersEditor } from '@/components/shared/CertaintyMultipliersEditor'
 import { Tooltip } from '@/components/shared/Tooltip'
 import { StepNav } from './StepWizard'
 
 interface Step2Props {
   data: OverheadFactors
   onChange: (data: OverheadFactors) => void
+  teCertaintyMultipliers: CertaintyMultipliers
+  onTeMultipliersChange: (multipliers: CertaintyMultipliers) => void
   onBack?: () => void
   onNext?: () => void
 }
@@ -16,7 +19,14 @@ const DENSITY_OPTIONS = [
   { value: DefectDensity.High,   label: 'High',   pct: '~35%', color: 'red'    },
 ] as const
 
-export function Step2Overhead({ data, onChange, onBack, onNext }: Step2Props) {
+export function Step2Overhead({
+  data,
+  onChange,
+  teCertaintyMultipliers,
+  onTeMultipliersChange,
+  onBack,
+  onNext,
+}: Step2Props) {
   function setFraction(field: 'coordinationFraction' | 'reportingFraction', pct: number) {
     onChange({ ...data, [field]: pct / 100 })
   }
@@ -124,6 +134,15 @@ export function Step2Overhead({ data, onChange, onBack, onNext }: Step2Props) {
           {DEFECT_DENSITY_DEFINITIONS[data.defaultDefectDensity]}
         </p>
       </div>
+
+      {/* TE certainty multipliers */}
+      <CertaintyMultipliersEditor
+        idPrefix="calib-te-mult"
+        title="Engineer certainty multipliers"
+        description="Factor applied to matrix cells by test-engineer certainty (lookup + calibration). 1.00 leaves the calibrated estimate unchanged; 1.50 adds 50% for that certainty level."
+        multipliers={teCertaintyMultipliers}
+        onChange={onTeMultipliersChange}
+      />
 
       {/* Summary preview */}
       <div className="p-4 rounded-xl bg-gray-50 border border-gray-200">

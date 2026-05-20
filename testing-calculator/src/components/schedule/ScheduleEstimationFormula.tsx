@@ -51,7 +51,8 @@ export function ScheduleEstimationFormula({
         aria-label="Estimation algorithm"
       >
         <FormulaLine>
-          Cell estimation = Base(testType, complexity) × Rigor × BrowserScale? × Instances
+          Cell estimation = Base(testType, complexity) × Rigor × BrowserScale? × Instances × TE
+          mult × AM mult
         </FormulaLine>
         <p className="pl-2 text-gray-500 leading-relaxed">
           Base from engineer calibration (Standard-rigor rates). Rigor:{' '}
@@ -73,10 +74,23 @@ export function ScheduleEstimationFormula({
           confidence on page/workflow complexity, integrations, rigor, browser tier, defect
           density, and deliverables.
         </p>
-        <p className="pl-2 text-gray-500 italic leading-relaxed">
-          Confidence and Certainty don't change hours — they cap the cell's certainty badge so
-          ambiguous inputs surface early in Review flags and get addressed before the schedule
-          ships.
+        <p className="pl-2 text-gray-500 leading-relaxed">
+          <span className="font-medium text-gray-700">TE mult</span> applies from the worse of
+          lookup and calibration (
+          <span className="font-mono">
+            High {model.teCertaintyMultipliers.High}× · Medium{' '}
+            {model.teCertaintyMultipliers.Medium}× · Low {model.teCertaintyMultipliers.Low}×
+          </span>
+          ). <span className="font-medium text-gray-700">AM mult</span> applies from intake
+          confidence (
+          <span className="font-mono">
+            High {project.amConfidenceMultipliers.High}× · Medium{' '}
+            {project.amConfidenceMultipliers.Medium}× · Low{' '}
+            {project.amConfidenceMultipliers.Low}×
+          </span>
+          ). Both multiply together (e.g. TE Low 1.5× and AM Low 1.5× → 2.25×). Adjust factors
+          in the cards above the matrix. The combined certainty badge still uses min(all legs) for
+          review flags.
         </p>
 
         <FormulaLine>Execution = Σ matrix cells</FormulaLine>

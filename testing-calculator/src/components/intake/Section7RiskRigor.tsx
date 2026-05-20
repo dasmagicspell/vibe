@@ -1,4 +1,5 @@
-import type { CertaintyLevel, ProjectSpec } from '@/types'
+import type { CertaintyLevel, CertaintyMultipliers, ProjectSpec } from '@/types'
+import { CertaintyMultipliersEditor } from '@/components/shared/CertaintyMultipliersEditor'
 import { RiskLevel, RigorLevel, BrowserTier, RIGOR_DEFINITIONS, BROWSER_TIER_DEFINITIONS } from '@/types'
 import { RadioGroup } from '@/components/shared/RadioGroup'
 import { CertaintySelector } from '@/components/shared/CertaintySelector'
@@ -12,6 +13,7 @@ interface Props {
     | 'browserTier'
     | 'browserTierCertainty'
     | 'customBrowserDescription'
+    | 'amConfidenceMultipliers'
   >
   onChange: (updates: Partial<ProjectSpec>) => void
 }
@@ -159,6 +161,14 @@ export function Section7RiskRigor({ data, onChange }: Props) {
           />
         </div>
       )}
+
+      <CertaintyMultipliersEditor
+        idPrefix="intake-am-mult"
+        title="Account manager confidence multipliers"
+        description="Factor applied to matrix cells by intake confidence (pages, workflows, integrations, rigor, browser tier, etc.). 1.00 leaves the estimate unchanged; higher values increase hours when confidence is low."
+        multipliers={data.amConfidenceMultipliers}
+        onChange={amConfidenceMultipliers => onChange({ amConfidenceMultipliers })}
+      />
 
     </div>
   )

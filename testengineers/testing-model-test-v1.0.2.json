@@ -1,0 +1,1143 @@
+{
+  "version": "1.0.2",
+  "engineerName": "Test",
+  "calibratedAt": "2026-05-19T08:12:29.944Z",
+  "entries": [
+    {
+      "id": "2a8cdd9a-2e3f-4fa3-916f-0c5c0992f7e6",
+      "testType": "Functional (manual)",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "344d1f39-b112-4dcf-b547-6907765e53e6",
+      "testType": "Functional (manual)",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "809b0916-e763-4b97-a2ab-1b672dd8c289",
+      "testType": "Functional (manual)",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2.5,
+        "expectedHours": 4,
+        "maxHours": 7
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "63774bb3-31a7-49c0-8f72-3d6425d50430",
+      "testType": "UI / Layout",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.15,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      },
+      "certainty": "Low",
+      "notes": "No firm requirements"
+    },
+    {
+      "id": "94588e92-ccb2-4adf-84f2-a1fcfe07933f",
+      "testType": "UI / Layout",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 0.75,
+        "maxHours": 1.25
+      },
+      "certainty": "Medium",
+      "notes": "No firm requirements"
+    },
+    {
+      "id": "01d74b97-653d-440e-af9a-53b099f2cb39",
+      "testType": "UI / Layout",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.75,
+        "expectedHours": 1.5,
+        "maxHours": 2.5
+      },
+      "certainty": "Low",
+      "notes": "No firm requirements"
+    },
+    {
+      "id": "e66f276b-0fd1-45eb-85d2-ee6af56e8c5c",
+      "testType": "Content review",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.1,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "d95ef04a-2e9d-4093-89fc-940b30dd6657",
+      "testType": "Content review",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "aa89e53b-c8bc-4e8c-942a-e720625f474e",
+      "testType": "Content review",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "4431dc95-cc0a-4dac-a788-2104e9b37d31",
+      "testType": "Link validation",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.1,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "90ce5f0c-b3b0-4d09-9c0d-6723d588a358",
+      "testType": "Link validation",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "2cc02ab8-4e26-4115-ab15-e9585a8e85be",
+      "testType": "Link validation",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 0.75,
+        "maxHours": 1.25
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "4f410816-bf2f-4ca1-9a51-8683ba08e66a",
+      "testType": "Form validation",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      },
+      "certainty": "Low"
+    },
+    {
+      "id": "6466a8d2-864a-47dd-837a-2a7a0ff2de38",
+      "testType": "Form validation",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.75
+      },
+      "certainty": "Low"
+    },
+    {
+      "id": "d588f0e4-33db-4123-9ea6-edbf6bc502b4",
+      "testType": "Form validation",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      },
+      "certainty": "Low"
+    },
+    {
+      "id": "e64f6558-5d43-4b84-88eb-cff08fd3237a",
+      "testType": "Role / Permission",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "bc84aad5-7a1b-46e9-bb50-1f814bebb12e",
+      "testType": "Role / Permission",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.75,
+        "expectedHours": 1.5,
+        "maxHours": 2.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "190f47c7-c8f3-466e-8934-abfa265e4de3",
+      "testType": "Role / Permission",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1.5,
+        "expectedHours": 3,
+        "maxHours": 5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "4a81c47d-bd35-4003-99ab-075b5a3c0c38",
+      "testType": "Cross-browser",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "8671cbab-37b8-4a5a-859a-6b204b9d3620",
+      "testType": "Cross-browser",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "37294874-3631-4a03-82f4-7abbc93b11fd",
+      "testType": "Cross-browser",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "d509936a-3514-4934-acb3-ab19e16b09fc",
+      "testType": "Responsive / Mobile",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "a045acc7-b2b1-4a6f-b109-b7e07e9c8301",
+      "testType": "Responsive / Mobile",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "6f7f58fb-2529-4802-8207-06551820d6cb",
+      "testType": "Responsive / Mobile",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "a9fd96a8-ed5d-416a-84c6-d1e480ee1587",
+      "testType": "Accessibility (WCAG)",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      },
+      "certainty": "Low",
+      "notes": "Unsure how to test this!"
+    },
+    {
+      "id": "9c405bb1-b186-4165-a138-5e4a00e5783b",
+      "testType": "Accessibility (WCAG)",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      },
+      "certainty": "Low",
+      "notes": "Unsure how to test this!"
+    },
+    {
+      "id": "b2534996-f29d-4c6d-9e18-c2bd23edb817",
+      "testType": "Accessibility (WCAG)",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 6
+      },
+      "certainty": "Low",
+      "notes": "Unsure how to test this!"
+    },
+    {
+      "id": "b975cfca-4240-42e3-ac26-1fd041c15caa",
+      "testType": "Performance (basic)",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.1,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "27e6706e-ac5e-4908-a737-b854bfff0aee",
+      "testType": "Performance (basic)",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "57d81edb-9665-48ce-a479-492d4df622bd",
+      "testType": "Performance (basic)",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "c63b960a-6a09-4387-ad8f-98e1a18ddef3",
+      "testType": "SEO / Meta",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.1,
+        "expectedHours": 0.25,
+        "maxHours": 0.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "791c9aba-8e29-4e97-a10d-b9b7581f5602",
+      "testType": "SEO / Meta",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 0.75
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "35f6e2d1-7df7-43e1-bfce-9ee641a52a1d",
+      "testType": "SEO / Meta",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 0.75,
+        "maxHours": 1.25
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "c7a4c461-f49b-46ca-a5ec-43c0df873a5c",
+      "testType": "Security / Privacy",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "46c3fdd8-ed16-45f7-92f4-75d1b64ce292",
+      "testType": "Security / Privacy",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.75
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "7b3c3a8c-e55b-4949-b1bf-d59cdf8fa9a8",
+      "testType": "Security / Privacy",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "ac2354a3-68b8-47c8-9070-94e2b620db86",
+      "testType": "Analytics and tag",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "c77bfedf-6d97-46e1-831b-1598dde4a2f5",
+      "testType": "Analytics and tag",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 2
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "dc704742-9586-4045-a81a-05f98875781b",
+      "testType": "Analytics and tag",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "ed729dda-8461-4eb6-b062-3e7a62773031",
+      "testType": "CMS / Admin",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "3f57c03b-249f-482a-8c00-ff2105ea0c10",
+      "testType": "CMS / Admin",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "220b26ec-9e20-4445-953c-30ff6e3337a5",
+      "testType": "CMS / Admin",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 7
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "42496067-dc19-4117-af3b-60d93f3559a6",
+      "testType": "Email / Notification",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.25,
+        "expectedHours": 0.5,
+        "maxHours": 1
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "3ba79e45-611d-4003-b069-7791539ca827",
+      "testType": "Email / Notification",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 1.75
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "48b08dc5-0916-4e8d-b6f7-a084ce322e0d",
+      "testType": "Email / Notification",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 3.5
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "6887a5e5-ecc9-4f81-9e7a-1a252da796a9",
+      "testType": "Content migration",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 2
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "720e3109-deb6-445f-8450-2c93fdd8a058",
+      "testType": "Content migration",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 4
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "49de1f1e-31c8-409e-afcf-9ac06f868c8c",
+      "testType": "Content migration",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2.5,
+        "expectedHours": 5,
+        "maxHours": 9
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "68d503d3-aa92-4ad8-b185-ec6c4ee4986c",
+      "testType": "Exploratory",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 1,
+        "expectedHours": 2,
+        "maxHours": 2
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "22c70c1e-8478-4dd9-b2b4-4ab3f18d4140",
+      "testType": "Exploratory",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 2,
+        "expectedHours": 2,
+        "maxHours": 4
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "77d1ec64-246a-45fd-aae3-3680726e9365",
+      "testType": "Exploratory",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 4
+      },
+      "certainty": "High"
+    },
+    {
+      "id": "83d9fc5b-c0bb-49bd-8940-38ba8630ebf7",
+      "testType": "E2E automation",
+      "complexity": "Low",
+      "baseEstimate": {
+        "minHours": 0,
+        "expectedHours": 0,
+        "maxHours": 0
+      },
+      "certainty": "Low",
+      "notes": "Very diff to predict!"
+    },
+    {
+      "id": "054b7c16-c911-4c83-8d72-15a0d7502fe8",
+      "testType": "E2E automation",
+      "complexity": "Medium",
+      "baseEstimate": {
+        "minHours": 0,
+        "expectedHours": 0,
+        "maxHours": 0
+      },
+      "certainty": "Low",
+      "notes": "Very diff to predict!"
+    },
+    {
+      "id": "65529695-e1cf-4e52-8ba7-095d9b5117f7",
+      "testType": "E2E automation",
+      "complexity": "High",
+      "baseEstimate": {
+        "minHours": 0,
+        "expectedHours": 0,
+        "maxHours": 0
+      },
+      "certainty": "Low",
+      "notes": "Very diff to predict!"
+    }
+  ],
+  "browserCalibration": [
+    {
+      "tier": "Basic",
+      "estimatePerPage": {
+        "minHours": 0.1,
+        "expectedHours": 0.2,
+        "maxHours": 0.35
+      }
+    },
+    {
+      "tier": "Standard",
+      "estimatePerPage": {
+        "minHours": 0.25,
+        "expectedHours": 0.4,
+        "maxHours": 0.7
+      }
+    },
+    {
+      "tier": "Enhanced",
+      "estimatePerPage": {
+        "minHours": 0.4,
+        "expectedHours": 0.75,
+        "maxHours": 1.25
+      }
+    },
+    {
+      "tier": "Custom",
+      "estimatePerPage": {
+        "minHours": 0.5,
+        "expectedHours": 1,
+        "maxHours": 2
+      }
+    }
+  ],
+  "overheadFactors": {
+    "coordinationFraction": 0.1,
+    "reportingFraction": 0.2,
+    "defaultDefectDensity": "Low"
+  },
+  "deliverableEstimates": [
+    {
+      "type": "Test plan / matrix creation",
+      "estimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 6
+      },
+      "notes": "Includes test coverage matrix and risk assessment"
+    },
+    {
+      "type": "UAT support",
+      "estimate": {
+        "minHours": 2,
+        "expectedHours": 4,
+        "maxHours": 8
+      },
+      "notes": "Helping client team create and run acceptance tests"
+    },
+    {
+      "type": "Final QA report",
+      "estimate": {
+        "minHours": 1.5,
+        "expectedHours": 3,
+        "maxHours": 5
+      },
+      "notes": "Formal sign-off document with test results summary"
+    }
+  ],
+  "exploratoryBlocks": [
+    {
+      "label": "1-hour block",
+      "hours": 1
+    },
+    {
+      "label": "2-hour block",
+      "hours": 2
+    },
+    {
+      "label": "Half-day block",
+      "hours": 4
+    },
+    {
+      "label": "Full-day block",
+      "hours": 8
+    }
+  ],
+  "representativeTestCases": {
+    "Functional (manual)": [
+      {
+        "id": "4ff6b2d7-be82-445c-a8b6-b84e4b5e097a",
+        "description": "Happy path works end-to-end without errors"
+      },
+      {
+        "id": "c249c712-7590-419e-ad86-0f02785bef05",
+        "description": "Key error states display clear, specific messages"
+      },
+      {
+        "id": "b96f5e31-d52d-4131-a9dc-bf9dbf16c1eb",
+        "description": "Navigation and internal links work as expected"
+      },
+      {
+        "id": "b55d4013-4d71-4b99-a794-0c8bbd4e2c9f",
+        "description": "Page behaves correctly after browser refresh"
+      },
+      {
+        "id": "1f6c1554-5747-406c-be46-d0713012ea9e",
+        "description": "Loading and empty states handled gracefully"
+      },
+      {
+        "id": "2b91b2a8-58c1-486d-8990-fe0207d344b3",
+        "description": "Feature state is consistent across actions"
+      }
+    ],
+    "UI / Layout": [
+      {
+        "id": "a77ef117-7fb3-4686-9fbe-f65a0753c564",
+        "description": "Visual design matches approved mockup or design spec"
+      },
+      {
+        "id": "66994b13-bafe-4a91-be79-41fbc9250a12",
+        "description": "Typography (size, weight, line-height, spacing) consistent"
+      },
+      {
+        "id": "a5023f7c-9c05-4439-9094-479d558d5b60",
+        "description": "All interactive elements have visible hover and focus states"
+      },
+      {
+        "id": "53237400-759b-454e-b0b9-6990142f6b03",
+        "description": "No text overflow, clipping, or unintended line wrapping"
+      },
+      {
+        "id": "70c9ee9b-102d-4496-9b1f-b64c4cd14a2b",
+        "description": "Spacing and alignment consistent with design system"
+      },
+      {
+        "id": "c695311a-ce51-42b6-9ba8-c573bec30aca",
+        "description": "Images and media render at correct aspect ratio"
+      }
+    ],
+    "Content review": [
+      {
+        "id": "101305af-0a85-4094-b7f5-8006ab58bc09",
+        "description": "All body copy is accurate, proofread, and grammatically correct"
+      },
+      {
+        "id": "6e32b3f2-d628-4c06-b2f6-8d2db02f8dd0",
+        "description": "No placeholder text remains (Lorem ipsum, TODO, FIXME)"
+      },
+      {
+        "id": "d2e07324-fafb-44e2-9c3a-e9c5dab9fde7",
+        "description": "All images have appropriate alt text"
+      },
+      {
+        "id": "3c3f8f50-5bf1-44ba-9570-aee7c540f902",
+        "description": "Dates, names, phone numbers, and prices are correct"
+      },
+      {
+        "id": "66a83a61-d490-4840-8584-453b727a2287",
+        "description": "Legal/compliance copy (T&Cs, privacy, cookies) is current"
+      }
+    ],
+    "Link validation": [
+      {
+        "id": "52e24730-7e4e-4062-9d4f-76363c72fea8",
+        "description": "All internal navigation links route to the correct page"
+      },
+      {
+        "id": "2ffd5177-ab9a-4912-81f9-f20aec3610a2",
+        "description": "All external links open correctly (new tab where required)"
+      },
+      {
+        "id": "d434c813-5b51-4c0e-9b76-4e66510851f2",
+        "description": "No 404 errors on any linked page"
+      },
+      {
+        "id": "31a7b06c-a275-4b6a-a978-f8783054fded",
+        "description": "No redirect chains longer than two hops"
+      },
+      {
+        "id": "23e7e7ef-db5e-456b-a56e-7584ebae4c82",
+        "description": "Anchor links (#section) scroll to the correct target"
+      },
+      {
+        "id": "cb79121a-ecf1-4dc2-a128-7ed42b674a73",
+        "description": "Footer and header links are consistent across pages"
+      }
+    ],
+    "Form validation": [
+      {
+        "id": "a4783f4b-af57-402b-8288-d22829475d48",
+        "description": "Required field validation fires on submit with clear error messages"
+      },
+      {
+        "id": "055d8a27-3f15-4cd4-a9a7-a546e5e4af9a",
+        "description": "Email fields reject invalid formats and accept valid ones"
+      },
+      {
+        "id": "d6001db7-8c3f-4ed9-8bb4-a6b3e1ce8c26",
+        "description": "Character limits enforced and communicated to the user"
+      },
+      {
+        "id": "f40731a0-4e45-4893-9514-7d2fe231d109",
+        "description": "Success state displays correctly after valid submission"
+      },
+      {
+        "id": "ad842fa1-f6fc-4960-abe0-eb03dacef6b8",
+        "description": "Form cannot be submitted twice (double-submit protection)"
+      },
+      {
+        "id": "6db3d8ee-baa0-44ab-8a96-78a460c1c6ae",
+        "description": "Form data is cleared or preserved correctly after submission"
+      },
+      {
+        "id": "e0a151cc-c1b6-4b19-bcf3-1c9536f50657",
+        "description": "Tab order is logical for keyboard users"
+      }
+    ],
+    "Role / Permission": [
+      {
+        "id": "ed71cf81-c253-4ce4-8476-c3a0e6bbbb70",
+        "description": "Each role can access only its permitted pages and features"
+      },
+      {
+        "id": "cab19285-84f7-4c30-a4fd-41861728256b",
+        "description": "Unauthorised direct-URL access redirects appropriately"
+      },
+      {
+        "id": "64a5d4dc-f4a3-4cb6-b38d-ef166c17e675",
+        "description": "Admin-only actions are hidden from lower-privilege roles"
+      },
+      {
+        "id": "07b56271-83a5-4637-a321-037f6c5d3c3c",
+        "description": "Sensitive data (e.g. order details, PII) masked for unauthorised roles"
+      },
+      {
+        "id": "9ae81819-453b-4af5-889b-12e084da1c88",
+        "description": "Role-switching (if supported) updates permissions correctly"
+      }
+    ],
+    "Cross-browser": [
+      {
+        "id": "65bfac4e-d6e3-4247-8420-d4be6f346e5e",
+        "description": "All functionality works correctly in target browsers"
+      },
+      {
+        "id": "4e53a12e-495b-4361-a13b-365159078355",
+        "description": "Visual layout consistent across target browsers"
+      },
+      {
+        "id": "0b33c0b1-7205-4a68-9d78-80d7d1a044c4",
+        "description": "JavaScript features work in all target browsers"
+      },
+      {
+        "id": "1255515b-92e6-4e2e-813f-5fa383506212",
+        "description": "Fonts render acceptably across browsers"
+      },
+      {
+        "id": "e8ec88f3-43c0-469a-ab01-48239445317a",
+        "description": "Form submission and validation work across browsers"
+      }
+    ],
+    "Responsive / Mobile": [
+      {
+        "id": "038438b7-d849-40c5-8b8e-8a4c0e91456e",
+        "description": "Layout adapts correctly at each target breakpoint"
+      },
+      {
+        "id": "3abcc982-e423-4417-8ca3-b187b6a37daa",
+        "description": "No horizontal scrollbar on any mobile viewport"
+      },
+      {
+        "id": "b91ede1d-d36c-4fac-9995-37d30b72f2c7",
+        "description": "Touch targets large enough (minimum 44×44 px)"
+      },
+      {
+        "id": "ab9287fe-bab7-4700-9ee4-4b01beb60fb0",
+        "description": "Images and media scale to fit viewport"
+      },
+      {
+        "id": "a2d4f1a7-b59c-4916-ac96-b370c7c8289e",
+        "description": "Navigation is usable on small screens (hamburger, drawer, etc.)"
+      },
+      {
+        "id": "a3b9ecd5-8911-479a-b6b7-1a7cd42bbf5f",
+        "description": "Forms are usable on touch devices"
+      }
+    ],
+    "Accessibility (WCAG)": [
+      {
+        "id": "eef2212d-e3fe-4d43-9849-9f5eb3cfd04a",
+        "description": "Full keyboard navigation works without a mouse"
+      },
+      {
+        "id": "1f185982-d5a9-4494-b701-65d1fd42d4d3",
+        "description": "Focus indicators visible on all interactive elements"
+      },
+      {
+        "id": "1ba262cd-3ce1-45ca-bb03-3e4d33c4a7e1",
+        "description": "Screen reader announces content in a meaningful order"
+      },
+      {
+        "id": "9ef4e5cc-735f-4059-adb5-3a697a2f79cf",
+        "description": "Text contrast meets WCAG AA (4.5:1 for body text, 3:1 for UI)"
+      },
+      {
+        "id": "ab1c9a14-f5ab-4a17-acbb-9c2a7cb55aff",
+        "description": "Images have appropriate alt text or are marked decorative"
+      },
+      {
+        "id": "d33a4a14-1b81-4ef9-94a8-79c260ec1767",
+        "description": "Form inputs have correctly associated labels"
+      },
+      {
+        "id": "2c6cda6f-5ffe-48ee-9c9a-e8d5d243fa56",
+        "description": "No keyboard traps — focus can always exit interactive elements"
+      }
+    ],
+    "Performance (basic)": [
+      {
+        "id": "1aae5b8f-7886-40bd-9c47-dc8d6416b93f",
+        "description": "Lighthouse performance score meets agreed target"
+      },
+      {
+        "id": "596a782d-6958-43de-b6a9-a19eeeb123f3",
+        "description": "Largest Contentful Paint (LCP) under 2.5 seconds on 4G"
+      },
+      {
+        "id": "894b4767-eac0-4eba-ba80-2745e13d2342",
+        "description": "Cumulative Layout Shift (CLS) under 0.1"
+      },
+      {
+        "id": "f467f33a-f9c7-486f-8bde-85e038c929ce",
+        "description": "Images served in modern formats (WebP/AVIF) and appropriately sized"
+      },
+      {
+        "id": "dcee3874-262e-4383-a31f-259d0734d251",
+        "description": "No render-blocking scripts in the critical path"
+      }
+    ],
+    "SEO / Meta": [
+      {
+        "id": "d3c60ff3-5d71-4543-b514-f47cf6b5c2f6",
+        "description": "Page title is unique, descriptive, and under 60 characters"
+      },
+      {
+        "id": "f78ca80c-8bdd-4b5e-a58d-5319d381c9f5",
+        "description": "Meta description present and between 120–160 characters"
+      },
+      {
+        "id": "09a53a6b-499a-46c0-a0d1-ae519c5a9a2e",
+        "description": "Open Graph (og:title, og:image, og:description) tags present"
+      },
+      {
+        "id": "28c362b8-1b89-4ed9-afc7-cd826bf52ee7",
+        "description": "One H1 per page; heading hierarchy (H1→H2→H3) is logical"
+      },
+      {
+        "id": "a133ae3e-ee09-40cc-b13d-6a55cbcbb020",
+        "description": "Page is included in XML sitemap"
+      },
+      {
+        "id": "06aa712d-97e8-41c4-8441-48d9438585ea",
+        "description": "robots.txt does not inadvertently block indexing"
+      },
+      {
+        "id": "0e64e0b1-d976-40cb-97f7-1fe6e46e0f38",
+        "description": "Canonical URL tag set correctly"
+      }
+    ],
+    "Security / Privacy": [
+      {
+        "id": "ef61d821-505e-4b61-8b1e-6df920510f17",
+        "description": "Cookie consent banner appears before any non-essential cookies fire"
+      },
+      {
+        "id": "b009f7e2-3c0e-4efa-9a91-4114c3e54b12",
+        "description": "Accepting/declining cookies functions and persists across sessions"
+      },
+      {
+        "id": "badb98db-88ab-4d30-a51c-835b2ced189a",
+        "description": "All pages served over HTTPS; HTTP redirects to HTTPS"
+      },
+      {
+        "id": "317ce0d0-a721-4e29-b1a0-0999e295e5ad",
+        "description": "Sensitive data (emails, names) not visible in URL parameters"
+      },
+      {
+        "id": "522900dc-13b6-4742-89b9-e465ef44d22b",
+        "description": "Privacy policy linked in footer and is current"
+      },
+      {
+        "id": "4b9d309e-9a7c-4e59-a89f-97b5dc24b1eb",
+        "description": "Contact and lead-capture forms include GDPR/privacy notice where required"
+      }
+    ],
+    "Analytics and tag": [
+      {
+        "id": "de9a972b-78c7-43df-8552-0ea20d9c0d39",
+        "description": "Page view event fires correctly on page load"
+      },
+      {
+        "id": "e84e698d-4e22-4353-83fa-6534e1582f4e",
+        "description": "Key conversion events fire at the right moments"
+      },
+      {
+        "id": "b54f3831-0512-4bb1-9c0d-b534d5c1f4d7",
+        "description": "Tag Manager container loads and fires without console errors"
+      },
+      {
+        "id": "af5cfd5a-cadd-4161-b59f-3ce03b70b666",
+        "description": "No duplicate tags firing on a single page view"
+      },
+      {
+        "id": "bbeec156-7f5b-4b52-bd02-6a82ba46a88a",
+        "description": "Data layer populated with correct values before tags fire"
+      },
+      {
+        "id": "8417fd8e-c407-4ef8-a0ef-ffd6f98bd859",
+        "description": "Events verified in analytics platform debug view"
+      }
+    ],
+    "CMS / Admin": [
+      {
+        "id": "2babd122-32c7-48fc-a1b9-e88c61fcfede",
+        "description": "Content can be created, saved, and published from the CMS"
+      },
+      {
+        "id": "a4c97187-f717-4c45-86e1-dc64d3bd9e90",
+        "description": "Media (images, documents) can be uploaded and attached to content"
+      },
+      {
+        "id": "01770f22-a42d-479a-998b-30c6b6043800",
+        "description": "CMS user permissions match assigned roles"
+      },
+      {
+        "id": "2b9022b7-ff46-4e63-ab08-6b08c04aa222",
+        "description": "Scheduled publishing works at the correct time"
+      },
+      {
+        "id": "fcced6a2-9511-4654-8ec9-266e64990b50",
+        "description": "Draft/preview mode shows content correctly before publish"
+      }
+    ],
+    "Email / Notification": [
+      {
+        "id": "b249c4bf-5e9b-4922-9244-1a8dfd924fe9",
+        "description": "Confirmation emails delivered within expected time window"
+      },
+      {
+        "id": "11097d3a-7840-4750-a6fd-aff88dccaeb0",
+        "description": "Email subject lines and body copy are correct"
+      },
+      {
+        "id": "eb2d2e13-9293-4a31-b63b-1bcf1676cc71",
+        "description": "HTML email renders acceptably in major email clients"
+      },
+      {
+        "id": "dcf26d26-83eb-4d8c-aa77-034fdf46dd37",
+        "description": "Unsubscribe links function and update preferences"
+      },
+      {
+        "id": "91e38302-f244-4907-9c34-39515ce57df9",
+        "description": "Admin notification emails received by correct recipients"
+      },
+      {
+        "id": "9149e3f7-6eec-4c7c-a92e-3b83adf692fe",
+        "description": "Transactional emails fire for correct triggering actions only"
+      }
+    ],
+    "Content migration": [
+      {
+        "id": "74fb6569-254b-4295-bdc5-166a57eef15c",
+        "description": "All content items migrated with no data loss"
+      },
+      {
+        "id": "f97aa4dd-a368-4603-8879-57badc13d840",
+        "description": "Text formatting preserved correctly from source system"
+      },
+      {
+        "id": "2901170a-b172-4939-9548-bf84858db711",
+        "description": "Media files (images, PDFs) accessible at new URLs"
+      },
+      {
+        "id": "59bbe1c7-5b2f-4205-a970-367b3fdbf40a",
+        "description": "Internal links updated to new URL structure"
+      },
+      {
+        "id": "289db022-9d50-4ed1-aeb0-11b5aeaabd3b",
+        "description": "Metadata (dates, authors, categories) migrated accurately"
+      },
+      {
+        "id": "ab60b438-d6b2-4d13-ae68-2b0e4dc43c13",
+        "description": "Redirects in place from old URLs to new URLs"
+      }
+    ],
+    "Exploratory": [
+      {
+        "id": "5e54e70a-0953-48bf-b5cb-a3e12cd17e94",
+        "description": "Expert-driven unscripted testing of high-risk user journeys"
+      },
+      {
+        "id": "bb6c0e2c-0c69-4612-b004-4702cd6a7330",
+        "description": "Edge cases and unusual user behaviour explored"
+      },
+      {
+        "id": "a0bf90ba-1260-422f-aa66-e2348c0f7960",
+        "description": "Integration touchpoints tested for unexpected failures"
+      },
+      {
+        "id": "d2daa456-1a93-4168-87bf-b786e7c91906",
+        "description": "Session charter documented with findings and anomalies"
+      }
+    ],
+    "E2E automation": [
+      {
+        "id": "e6e7e85e-bda1-47c8-b654-af54d41b5308",
+        "description": "Automated test suite covers critical happy-path flows"
+      },
+      {
+        "id": "2dfe7e43-ae62-4495-8cc8-9571fc374f10",
+        "description": "Tests run reliably in CI/CD pipeline"
+      },
+      {
+        "id": "0eb1f1e8-a160-4e1d-82ce-43717069128d",
+        "description": "Test results reported clearly with failure screenshots"
+      },
+      {
+        "id": "794b9731-b4da-4c7b-9d99-8718e89cc94a",
+        "description": "Automation coverage documented in test plan"
+      }
+    ]
+  },
+  "notes": ""
+}

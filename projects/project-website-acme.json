@@ -1,0 +1,82 @@
+{
+  "projectName": "Acme",
+  "clientName": "Website",
+  "createdAt": "2026-05-20T18:40:29.682Z",
+  "siteType": "Nonprofit",
+  "projectMoment": "New launch",
+  "sensitiveData": "None",
+  "paymentScope": "None",
+  "accountScope": "None",
+  "notificationScope": "No notifications",
+  "riskLevel": "Medium",
+  "pages": [
+    {
+      "id": "1e2c06b9-72fd-44da-b2b5-714dd6494bdf",
+      "name": "Home",
+      "category": "Informational",
+      "complexity": "Low",
+      "complexityCertainty": "Low",
+      "isTemplate": false,
+      "notes": "Sample Page"
+    },
+    {
+      "id": "ec1210cf-52d5-41f7-8874-5cd9c9a4c239",
+      "name": "About",
+      "category": "Media gallery",
+      "complexity": "Medium",
+      "complexityCertainty": "Medium",
+      "isTemplate": false,
+      "notes": "Sample comment for About"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "9e0c15b7-d47c-4862-b22e-c9965aced714",
+      "name": "Sample Workflow",
+      "stepCount": 3,
+      "hasBranching": false,
+      "hasPaymentStep": false,
+      "complexity": "High",
+      "complexityCertainty": "High",
+      "notes": "This is a sample workflow comment."
+    }
+  ],
+  "integrations": [
+    {
+      "id": "3c1eac33-4dfc-42bd-8da0-98a1359c3df1",
+      "name": "Sample Integration",
+      "category": "Analytics (GA4, GTM)",
+      "hasAnalytics": true,
+      "certainty": "Medium",
+      "notes": "Comments for sample integration"
+    }
+  ],
+  "rigorLevel": "Standard",
+  "rigorCertainty": "High",
+  "browserTier": "Standard",
+  "browserTierCertainty": "High",
+  "selectedTestTypes": [
+    "Functional (manual)",
+    "UI / Layout",
+    "Content review",
+    "Link validation",
+    "Cross-browser",
+    "Responsive / Mobile",
+    "Accessibility (WCAG)",
+    "Performance (basic)",
+    "SEO / Meta",
+    "Security / Privacy",
+    "Analytics and tag"
+  ],
+  "includeExploratory": false,
+  "includeAutomation": false,
+  "includeCMSAdmin": false,
+  "selectedDeliverables": [],
+  "reportingLevel": "Internal bug list",
+  "retestingIncluded": true,
+  "amConfidenceMultipliers": {
+    "High": 1,
+    "Medium": 1.1,
+    "Low": 1.2
+  }
+}

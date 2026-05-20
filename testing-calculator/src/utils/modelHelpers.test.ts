@@ -86,6 +86,11 @@ describe('createDefaultModel', () => {
     expect(model.overheadFactors.defaultDefectDensity).toBe(DefectDensity.Medium)
   })
 
+  it('has default TE certainty multipliers with modest buffer as certainty drops', () => {
+    const model = createDefaultModel()
+    expect(model.teCertaintyMultipliers).toEqual({ High: 1, Medium: 1.1, Low: 1.2 })
+  })
+
   it('includes default representative test cases for every test type', () => {
     const model = createDefaultModel()
     for (const testType of Object.values(TestType)) {

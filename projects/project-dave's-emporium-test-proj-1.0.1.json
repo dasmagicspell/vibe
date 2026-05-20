@@ -47,7 +47,7 @@
       "name": "Saves info to Odoo",
       "category": "ERP (Odoo, Microsoft Dynamics)",
       "hasAnalytics": false,
-      "certainty": "High",
+      "certainty": "Low",
       "notes": "Client unsure if needs *.sh or standard. Impacts implementation."
     },
     {

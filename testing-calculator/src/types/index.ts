@@ -18,6 +18,16 @@ export interface TimeEstimate {
 /** Confidence that an estimate is accurate. Set explicitly in calibration/intake; capped at schedule generation. */
 export type CertaintyLevel = 'High' | 'Medium' | 'Low'
 
+/** Hour multipliers keyed by certainty/confidence level (1.0 = no adjustment). */
+export type CertaintyMultipliers = Record<CertaintyLevel, number>
+
+/** Default multipliers — modest buffer added as certainty drops. */
+export const DEFAULT_CERTAINTY_MULTIPLIERS: CertaintyMultipliers = {
+  High:   1.0,
+  Medium: 1.1,
+  Low:    1.2,
+}
+
 // ---------------------------------------------------------------------------
 // Enums — Page Categories
 // ---------------------------------------------------------------------------
@@ -325,6 +335,8 @@ export interface TestingModel {
   exploratoryBlocks: ExploratoryBlock[]
   /** Engineer-editable representative cases per test type (shown in schedule drill-down) */
   representativeTestCases: Record<TestType, TestCase[]>
+  /** Hour multipliers by TE certainty level (lookup + calibration legs) */
+  teCertaintyMultipliers: CertaintyMultipliers
   notes?: string
 }
 
@@ -427,6 +439,9 @@ export interface ProjectSpec {
 
   /** Per-deliverable confidence when selected in intake */
   deliverableCertainties?: Partial<Record<DeliverableType, CertaintyLevel>>
+
+  /** Hour multipliers by AM confidence level (intake leg) */
+  amConfidenceMultipliers: CertaintyMultipliers
 
   notes?: string
 }

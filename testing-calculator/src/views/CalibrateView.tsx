@@ -240,6 +240,10 @@ export function CalibrateView() {
           <Step2Overhead
             data={draft.overheadFactors}
             onChange={overheadFactors => updateDraft({ overheadFactors })}
+            teCertaintyMultipliers={draft.teCertaintyMultipliers}
+            onTeMultipliersChange={teCertaintyMultipliers =>
+              updateDraft({ teCertaintyMultipliers })
+            }
           />
         </section>
 
