@@ -23,6 +23,20 @@ const SELECTED_RING: Record<CertaintyLevel, string> = {
   High:   'ring-green-400',
 }
 
+// Size-encoded certainty: bigger = needs more attention (Low/red is largest).
+// Provides a redundant, color-blind-friendly cue alongside the color hue.
+const DOT_SIZE_COMPACT: Record<CertaintyLevel, string> = {
+  Low:    'w-3.5 h-3.5',
+  Medium: 'w-3 h-3',
+  High:   'w-2.5 h-2.5',
+}
+
+const DOT_SIZE_DEFAULT: Record<CertaintyLevel, string> = {
+  Low:    'w-4 h-4',
+  Medium: 'w-3.5 h-3.5',
+  High:   'w-3 h-3',
+}
+
 /**
  * Compact three-option certainty control (colored radio buttons).
  * Used in calibration and intake wherever the user declares confidence.
@@ -65,7 +79,7 @@ export function CertaintySelector({
             <span
               className={`
                 block rounded-full border-2 transition-all
-                ${compact ? 'w-3 h-3' : 'w-3.5 h-3.5'}
+                ${compact ? DOT_SIZE_COMPACT[level] : DOT_SIZE_DEFAULT[level]}
                 ${DOT_STYLES[level]}
                 ${isSelected ? `ring-2 ring-offset-1 ${SELECTED_RING[level]}` : 'opacity-60'}
               `}
